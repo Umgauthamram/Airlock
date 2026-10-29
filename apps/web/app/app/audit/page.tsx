@@ -6,50 +6,55 @@ export default async function AuditPage() {
   const events = await getAuditEvents(session.orgId, 100);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+    <div className="w-full flex flex-col gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-[#1c1917]">Immutable Audit Trail</h1>
-          <p className="text-sm text-[#78716c] mt-0.5">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Immutable Audit Trail</h1>
+          <p className="text-sm text-slate-500 mt-1">
             Append-only Redis Stream recording every request, policy evaluation, approval decision, and sandbox call.
           </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold px-3 py-1.5 rounded-md bg-white border border-slate-200 text-slate-600 shadow-xs">
+            Events: {events.length}
+          </span>
         </div>
       </div>
 
       {events.length === 0 ? (
-        <div className="p-12 bg-white border border-[#e7e5e4] rounded text-center text-sm text-[#78716c]">
+        <div className="p-16 bg-white border border-slate-200 rounded-lg text-center text-sm text-slate-500 shadow-xs">
           No audit stream events recorded yet.
         </div>
       ) : (
-        <div className="bg-white border border-[#e7e5e4] rounded overflow-hidden shadow-xs">
+        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-xs w-full">
           <table className="w-full text-left text-xs">
-            <thead className="bg-[#fafaf9] border-b border-[#e7e5e4] text-[#78716c] font-mono uppercase">
+            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider font-semibold text-[11px]">
               <tr>
-                <th className="py-3 px-4">Event ID / Time</th>
-                <th className="py-3 px-4">Type</th>
-                <th className="py-3 px-4">Actor</th>
-                <th className="py-3 px-4">Script / Approval</th>
-                <th className="py-3 px-4">Details</th>
+                <th className="py-3.5 px-5">Timestamp / Event ID</th>
+                <th className="py-3.5 px-5">Event Type</th>
+                <th className="py-3.5 px-5">Actor</th>
+                <th className="py-3.5 px-5">Target</th>
+                <th className="py-3.5 px-5">Telemetry Details</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#f5f5f4] font-mono">
+            <tbody className="divide-y divide-slate-100 font-mono text-xs">
               {events.map((evt) => (
-                <tr key={evt.id} className="hover:bg-[#fafaf9] transition-colors">
-                  <td className="py-3 px-4">
-                    <div className="text-[11px] text-[#78716c]">{new Date(evt.timestamp).toLocaleString()}</div>
-                    <div className="text-[10px] text-[#a8a29e]">{evt.id}</div>
+                <tr key={evt.id} className="hover:bg-slate-50/80 transition-colors">
+                  <td className="py-4 px-5">
+                    <div className="text-slate-800 font-medium">{new Date(evt.timestamp).toLocaleString()}</div>
+                    <div className="text-slate-400 text-[11px] mt-0.5">{evt.id}</div>
                   </td>
-                  <td className="py-3 px-4">
-                    <span className="px-2 py-0.5 rounded bg-[#f5f5f4] text-[#44403c] border border-[#e7e5e4] font-medium text-[11px]">
+                  <td className="py-4 px-5">
+                    <span className="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200 font-semibold text-[11px] inline-block font-sans">
                       {evt.eventType}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-[#44403c]">{evt.userId || evt.agentId || 'gateway'}</td>
-                  <td className="py-3 px-4 text-[11px]">
-                    {evt.approvalId && <div className="text-amber-800">{evt.approvalId}</div>}
-                    {evt.scriptHash && <div className="text-[#a8a29e]">{evt.scriptHash.slice(0, 12)}...</div>}
+                  <td className="py-4 px-5 text-slate-700 font-semibold">{evt.userId || evt.agentId || 'gateway'}</td>
+                  <td className="py-4 px-5">
+                    {evt.approvalId && <div className="text-amber-700 font-semibold">{evt.approvalId}</div>}
+                    {evt.scriptHash && <div className="text-slate-400 text-[11px]">{evt.scriptHash.slice(0, 16)}...</div>}
                   </td>
-                  <td className="py-3 px-4 text-[11px] text-[#57534e] max-w-md truncate">
+                  <td className="py-4 px-5 text-slate-600 max-w-xl truncate font-sans text-xs">
                     {JSON.stringify(evt.details)}
                   </td>
                 </tr>
@@ -61,4 +66,3 @@ export default async function AuditPage() {
     </div>
   );
 }
-

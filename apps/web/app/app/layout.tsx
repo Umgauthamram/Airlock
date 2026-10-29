@@ -9,59 +9,59 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const stats = await getDashboardStats(session.orgId);
 
   const roleColors = {
-    admin: 'bg-rose-100 text-rose-900 border-rose-300',
-    operator: 'bg-amber-100 text-amber-900 border-amber-300',
-    viewer: 'bg-stone-100 text-stone-700 border-stone-300',
+    admin: 'bg-rose-50 text-rose-700 border-rose-200',
+    operator: 'bg-amber-50 text-amber-800 border-amber-200',
+    viewer: 'bg-slate-100 text-slate-700 border-slate-200',
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fbfaf8]">
-      {/* Top Navigation */}
-      <header className="border-b border-[#e7e5e4] bg-white sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+    <div className="min-h-screen flex flex-col bg-[#f8fafc]">
+      {/* Full Width Top Navigation */}
+      <header className="border-b border-[#e2e8f0] bg-white sticky top-0 z-40 w-full">
+        <div className="w-full px-6 lg:px-10 h-16 flex items-center justify-between">
           <div className="flex items-center gap-8">
-            <Link href="/app" className="flex items-center gap-2 font-serif font-bold text-xl text-[#1c1917]">
+            <Link href="/app" className="flex items-center gap-2 font-bold text-xl text-[#0f172a] tracking-tight">
               <span>Airlock</span>
-              <span className="text-xs uppercase font-mono px-2 py-0.5 rounded bg-[#f5f5f4] text-[#78716c]">
+              <span className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
                 {session.orgId}
               </span>
             </Link>
 
             <nav className="flex items-center gap-1 text-sm font-medium">
-              <Link href="/app" className="px-3 py-1.5 rounded hover:bg-[#f5f5f4] text-[#44403c]">
+              <Link href="/app" className="px-3.5 py-2 rounded-md hover:bg-slate-100 text-slate-700 transition-colors">
                 Overview
               </Link>
-              <Link href="/app/approvals" className="px-3 py-1.5 rounded hover:bg-[#f5f5f4] text-[#44403c] flex items-center gap-2">
+              <Link href="/app/approvals" className="px-3.5 py-2 rounded-md hover:bg-slate-100 text-slate-700 transition-colors flex items-center gap-2">
                 <span>Approvals</span>
                 {stats.pendingApprovals > 0 && (
-                  <span className="px-1.5 py-0.2 rounded-full text-xs font-mono bg-amber-600 text-white font-bold">
+                  <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-600 text-white leading-none">
                     {stats.pendingApprovals}
                   </span>
                 )}
               </Link>
-              <Link href="/app/audit" className="px-3 py-1.5 rounded hover:bg-[#f5f5f4] text-[#44403c]">
+              <Link href="/app/audit" className="px-3.5 py-2 rounded-md hover:bg-slate-100 text-slate-700 transition-colors">
                 Audit Trail
               </Link>
-              <Link href="/app/agents" className="px-3 py-1.5 rounded hover:bg-[#f5f5f4] text-[#44403c]">
+              <Link href="/app/agents" className="px-3.5 py-2 rounded-md hover:bg-slate-100 text-slate-700 transition-colors">
                 Agents
               </Link>
-              <Link href="/app/tools" className="px-3 py-1.5 rounded hover:bg-[#f5f5f4] text-[#44403c]">
+              <Link href="/app/tools" className="px-3.5 py-2 rounded-md hover:bg-slate-100 text-slate-700 transition-colors">
                 Tools
               </Link>
-              <Link href="/app/policies" className="px-3 py-1.5 rounded hover:bg-[#f5f5f4] text-[#44403c]">
+              <Link href="/app/policies" className="px-3.5 py-2 rounded-md hover:bg-slate-100 text-slate-700 transition-colors">
                 Policies
               </Link>
-              <Link href="/app/results" className="px-3 py-1.5 rounded hover:bg-[#f5f5f4] text-[#44403c]">
-                Results
+              <Link href="/app/results" className="px-3.5 py-2 rounded-md hover:bg-slate-100 text-slate-700 transition-colors">
+                Benchmark
               </Link>
             </nav>
           </div>
 
           <div className="flex items-center gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-[#78716c]">{session.email}</span>
+            <div className="flex items-center gap-2.5">
+              <span className="text-xs text-slate-500 font-medium">{session.email}</span>
               <span
-                className={`text-xs font-mono uppercase px-2 py-0.5 rounded border font-medium ${
+                className={`text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md border ${
                   roleColors[session.role]
                 }`}
               >
@@ -70,7 +70,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </div>
             <Link
               href="/api/auth/logout"
-              className="text-xs text-[#78716c] hover:text-[#1c1917] border border-[#e7e5e4] px-2.5 py-1 rounded hover:bg-[#f5f5f4] transition-colors"
+              className="text-xs font-medium text-slate-600 hover:text-slate-900 border border-slate-200 px-3 py-1.5 rounded-md hover:bg-slate-50 transition-colors"
             >
               Sign out
             </Link>
@@ -78,8 +78,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">{children}</main>
+      {/* Full Width Main Content */}
+      <main className="flex-1 w-full px-6 lg:px-10 py-8">{children}</main>
     </div>
   );
 }

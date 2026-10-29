@@ -35,14 +35,14 @@ export default function DecisionButtons({ approvalId }: { approvalId: string }) 
   return (
     <div className="flex flex-col gap-4">
       {error && (
-        <div className="p-3 bg-rose-50 text-rose-800 border border-rose-200 rounded text-xs">
+        <div className="p-3 bg-rose-50 text-rose-800 border border-rose-200 rounded-md text-xs font-medium">
           {error}
         </div>
       )}
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="note" className="text-xs font-mono text-[#78716c]">
-          Audit Decision Note (Optional)
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="note" className="text-xs font-semibold text-slate-700">
+          Operator Audit Note (Optional)
         </label>
         <input
           id="note"
@@ -50,26 +50,33 @@ export default function DecisionButtons({ approvalId }: { approvalId: string }) 
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="e.g. Verified target endpoint is legitimate triage webhook"
-          className="px-3 py-2 border border-[#d6d3d1] rounded text-xs bg-[#fafaf9] focus:outline-none focus:border-[#1c1917]"
+          className="w-full px-3.5 py-2.5 border border-slate-200 rounded-md text-xs bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all text-slate-900 placeholder:text-slate-400"
           disabled={loading}
         />
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-2.5 pt-1">
         <button
           type="button"
           onClick={() => handleDecision('approved')}
           disabled={loading}
-          className="px-5 py-2.5 bg-emerald-700 text-white rounded text-xs font-semibold hover:bg-emerald-800 transition-colors cursor-pointer shadow-xs disabled:opacity-50"
+          className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-semibold transition-colors cursor-pointer shadow-xs disabled:opacity-50 flex items-center justify-center gap-2"
         >
-          {loading ? 'Processing...' : 'Approve & Execute Once'}
+          {loading ? (
+            'Processing...'
+          ) : (
+            <>
+              <span>✓</span>
+              <span>Approve & Execute Once</span>
+            </>
+          )}
         </button>
 
         <button
           type="button"
           onClick={() => handleDecision('denied')}
           disabled={loading}
-          className="px-5 py-2.5 border border-rose-300 bg-rose-50 text-rose-900 rounded text-xs font-semibold hover:bg-rose-100 transition-colors cursor-pointer disabled:opacity-50"
+          className="w-full py-2.5 px-4 border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-800 rounded-md text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50"
         >
           {loading ? 'Processing...' : 'Deny Execution'}
         </button>
@@ -77,4 +84,3 @@ export default function DecisionButtons({ approvalId }: { approvalId: string }) 
     </div>
   );
 }
-

@@ -1,21 +1,15 @@
 import type { Metadata } from 'next';
-import { Source_Serif_4, IBM_Plex_Sans, IBM_Plex_Mono } from 'next/font/google';
+import { Poppins, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 
-const serif = Source_Serif_4({
-  variable: '--font-serif',
+const poppins = Poppins({
+  variable: '--font-poppins',
+  weight: ['300', '400', '500', '600', '700'],
   subsets: ['latin'],
   display: 'swap',
 });
 
-const sans = IBM_Plex_Sans({
-  variable: '--font-sans',
-  weight: ['400', '500', '600', '700'],
-  subsets: ['latin'],
-  display: 'swap',
-});
-
-const mono = IBM_Plex_Mono({
+const mono = JetBrains_Mono({
   variable: '--font-mono',
   weight: ['400', '500', '600'],
   subsets: ['latin'],
@@ -23,7 +17,7 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Airlock — Pre-execution Gateway for AI Agents',
+  title: 'Airlock — Pre-execution Security Gateway for AI Agents',
   description: 'Deterministic policy inspection, script gating, and immutable audit logs for MCP tools.',
 };
 
@@ -33,8 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans bg-[#fbfaf8] text-[#1c1917] selection:bg-[#fde68a]">
+    <html lang="en" className={`${poppins.variable} ${mono.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col font-sans bg-[#f8fafc] text-[#0f172a] selection:bg-[#cbd5e1]">
         {children}
       </body>
     </html>

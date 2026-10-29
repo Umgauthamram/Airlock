@@ -29,13 +29,17 @@ export class NebiusTokenFactoryClient {
   public readonly modelMap: Record<NemotronTier, string>;
 
   constructor(config: NebiusClientConfig = {}) {
-    this.apiKey = config.apiKey || process.env.NEBIUS_API_KEY;
-    this.baseUrl = config.baseUrl || process.env.NEBIUS_BASE_URL || 'https://api.tokenfactory.nebius.com/v1';
+    this.apiKey = config.apiKey || process.env.NVIDIA_API_KEY || process.env.NEBIUS_API_KEY;
+    this.baseUrl =
+      config.baseUrl ||
+      process.env.NVIDIA_BASE_URL ||
+      process.env.NEBIUS_BASE_URL ||
+      (process.env.NVIDIA_API_KEY ? 'https://integrate.api.nvidia.com/v1' : 'https://api.tokenfactory.nebius.com/v1');
 
     this.modelMap = {
-      nano: config.models?.nano || process.env.NEBIUS_MODEL_NANO || 'nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B',
-      super: config.models?.super || process.env.NEBIUS_MODEL_SUPER || 'nvidia/nemotron-3-super-120b-a12b',
-      ultra: config.models?.ultra || process.env.NEBIUS_MODEL_ULTRA || 'nvidia/Nemotron-3-Ultra-550b-a55b',
+      nano: config.models?.nano || process.env.NVIDIA_MODEL_NANO || process.env.NEBIUS_MODEL_NANO || 'nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B',
+      super: config.models?.super || process.env.NVIDIA_MODEL_SUPER || process.env.NEBIUS_MODEL_SUPER || 'nvidia/nemotron-3-super-120b-a12b',
+      ultra: config.models?.ultra || process.env.NVIDIA_MODEL_ULTRA || process.env.NEBIUS_MODEL_ULTRA || 'nvidia/Nemotron-3-Ultra-550b-a55b',
     };
   }
 
@@ -115,4 +119,6 @@ export class NebiusTokenFactoryClient {
     };
   }
 }
+
+export { NebiusTokenFactoryClient as NvidiaModelClient };
 

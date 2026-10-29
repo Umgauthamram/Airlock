@@ -165,7 +165,8 @@ The brief follows the “AI Action Letter #81” guidance you shared, adapted to
 - No invented testimonials, logos, customer counts, or statistics. Simulated content is labelled.
 - Copy avoids em dashes and en dashes, and states benefits directly.
 - Motion is restrained, respects reduced-motion settings, and never blocks normal scrolling.
-- Every button, menu, and form works. Visible keyboard focus, labelled inputs, useful error and empty states, skeleton loaders only for real async content.
+- Every button, menu, and form works. Visible k
+eyboard focus, labelled inputs, useful error and empty states, skeleton loaders only for real async content.
 - Verify at desktop and mobile widths: wrapping, overflow, contrast, links, and the main action completing.
 
 ## 10. Non-functional requirements
