@@ -102,3 +102,4 @@ test('Gateway Core Exit Test: End-to-End Pipeline', async () => {
   assert.ok(eventTypes.includes('agent_suspended'));
   assert.ok(eventTypes.includes('agent_resumed'));
 });
+

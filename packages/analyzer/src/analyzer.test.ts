@@ -124,3 +124,4 @@ test('Analyzer: Rejects classes, this, var, and tagged templates', () => {
   const codeTagged = `const res = tag\`hello\`;`;
   assert.equal(analyzeScript(codeTagged).valid, false);
 });
+

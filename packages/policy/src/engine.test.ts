@@ -115,3 +115,4 @@ test('Policy: Invalid AST analysis fails closed with deny', () => {
   assert.equal(res.decision, 'deny');
   assert.ok(res.reasons[0].includes('eval'));
 });
+

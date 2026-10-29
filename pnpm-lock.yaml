@@ -49,6 +49,18 @@ importers:
 
   apps/web:
     dependencies:
+      '@airlock/mocks':
+        specifier: workspace:*
+        version: link:../../packages/mocks
+      '@airlock/policy':
+        specifier: workspace:*
+        version: link:../../packages/policy
+      '@airlock/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+      ioredis:
+        specifier: ^5.6.0
+        version: 5.11.1
       next:
         specifier: 16.4.3
         version: 16.4.3(@babel/core@7.29.7)(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)

@@ -263,3 +263,4 @@ export async function executeMockTool(server: string, tool: string, args: any): 
   // Generic mock response for benchmark tools
   return { success: true, server, tool, executedAt: new Date().toISOString() };
 }
+

@@ -25,3 +25,4 @@ AI agents are susceptible to prompt injection attacks where malicious instructio
 - Prompt injection attacks attempting external exfiltration are deterministically halted before execution.
 - Zero reliance on probabilistic LLM guardrails for security-critical access control.
 - An append-only audit trail records every submission, policy decision, approval, and proxy call.
+

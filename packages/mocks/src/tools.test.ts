@@ -22,3 +22,4 @@ test('Mocks: Tool execution handling', async () => {
   const postRes = await executeMockTool('http', 'post', { url: 'https://sink.test', body: { a: 1 } });
   assert.equal(postRes.status, 200);
 });
+

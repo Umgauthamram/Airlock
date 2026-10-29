@@ -16,14 +16,20 @@
   - [x] Implement atomic approvals, audit streams (`org:{orgId}:stream:audit`), budgets, and kill switch
   - [x] Pass end-to-end command-line exit test suite across all packages
   - [x] Record ADR `0002-deterministic-script-gating-and-sandbox-proxy.md`
-- [ ] Phase 2: Control Plane (Next.js Web App)
-  - [ ] Auth.js v5 Google OAuth & Demo credentials authentication
-  - [ ] Server-side role enforcement (Admin, Operator, Viewer) data-access layer
-  - [ ] App screens: Approvals queue (`/app/approvals`), Audit explorer (`/app/audit`), Dashboard (`/app`), Agents (`/app/agents`), Tools catalog (`/app/tools`), Policies viewer (`/app/policies`)
+- [x] Phase 2: Control Plane (Next.js Web App)
+  - [x] Design token & typography setup (`Source Serif 4`, `IBM Plex Sans`, `IBM Plex Mono`, warm paper theme)
+  - [x] Authentication & Session management (`lib/auth.ts`, Demo login `/api/auth/demo`, Google OAuth scaffold)
+  - [x] Server-side RBAC data-access layer (`requireSession`, `requireRole`)
+  - [x] App screens: Overview Dashboard (`/app`), Approvals Queue (`/app/approvals`), Script Inspection & Decision (`/app/approvals/[id]`), Audit Stream Explorer (`/app/audit`), Agents & Kill Switch (`/app/agents`), Tools Registry (`/app/tools`), Policies Viewer (`/app/policies`)
+  - [x] Public landing page (`/`), Login (`/login`), Documentation (`/docs`), Request Access (`/request-access`)
+  - [x] Verified full Next.js production build (`next build`)
+  - [x] Record ADR `0003-control-plane-rbac-and-demo-isolation.md`
 - [ ] Phase 3: Demo, Proof, Benchmark & Submission
-  - [ ] Nebius Token Factory reference agent (Nemotron Super / Ultra)
-  - [ ] Reproducible benchmark suite (`pnpm bench`)
-  - [ ] Landing page & demo mode with seeded data
+  - [ ] Implement `@airlock/nebius` Token Factory client (OpenAI-compatible client with usage tracking for Nano, Super, Ultra)
+  - [ ] Implement `@airlock/agent-ref` (reference agent in classic multi-turn mode vs Airlock script mode)
+  - [ ] Implement `@airlock/bench` (reproducible benchmark harness `pnpm bench` with 30 attack + 30 benign scenarios)
+  - [ ] Benchmark results display & documentation
+  - [ ] Final submission verification checklist
 
 ## Backlog
 - [ ] Phase 4: Production hardening (taint tracking, canary credentials, secret rotation)
