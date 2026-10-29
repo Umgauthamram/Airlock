@@ -1,0 +1,26 @@
+{
+  "name": "@airlock/gateway",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/server.js",
+    "test": "node --test dist/**/*.test.js"
+  },
+  "dependencies": {
+    "@airlock/analyzer": "workspace:*",
+    "@airlock/mocks": "workspace:*",
+    "@airlock/policy": "workspace:*",
+    "@airlock/shared": "workspace:*",
+    "dotenv": "^16.4.7",
+    "fastify": "^5.2.1",
+    "ioredis": "^5.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}
