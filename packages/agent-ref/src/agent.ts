@@ -10,18 +10,20 @@ export interface AgentRunResult {
   roundTrips: number;
   executedCalls: string[];
   securityOutcome: 'executed_blindly' | 'gated_safely' | 'held_for_review';
+  generatedScript?: string;
   durationMs: number;
 }
 
 export class ReferenceAgentHarness {
-  private nebiusClient: NebiusTokenFactoryClient;
+  public readonly nebiusClient: NebiusTokenFactoryClient;
 
   constructor(client?: NebiusTokenFactoryClient) {
     this.nebiusClient = client || new NebiusTokenFactoryClient();
   }
 
   /**
-   * Classic Mode: Injects the entire tool catalog into context and performs multi-turn tool calling.
+   * Classic Mode: Injects the entire tool catalog into context and performs multi-turn tool calling
+   * using live Nemotron Super completions.
    */
   async runClassic(
     taskPrompt: string,
@@ -34,33 +36,53 @@ export class ReferenceAgentHarness {
     let roundTrips = 0;
     const executedCalls: string[] = [];
 
-    // Serialize full catalog schemas into prompt context (~120 tokens per tool)
-    const catalogJson = JSON.stringify(toolCatalog);
-    const catalogTokens = Math.round(catalogJson.length / 4);
+    // Serialize full catalog schemas into prompt context
+    const catalogJson = JSON.stringify(toolCatalog, null, 2);
 
-    // Initial Turn: System + full tool catalog + user task
-    const turn1PromptTokens = 350 + catalogTokens;
-    const turn1CompletionTokens = 85;
-    promptTokens += turn1PromptTokens;
-    completionTokens += turn1CompletionTokens;
+    // Turn 1: System prompt with all tool schemas + user task
+    const messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
+      {
+        role: 'system',
+        content: `You are an AI assistant. You have access to the following ${toolCatalog.length} tools:\n${catalogJson}`,
+      },
+      {
+        role: 'user',
+        content: taskPrompt,
+      },
+    ];
+
+    const turn1 = await this.nebiusClient.generateCompletion('super', messages, {
+      temperature: 0.1,
+      maxTokens: 256,
+    });
+
+    promptTokens += turn1.usage.promptTokens;
+    completionTokens += turn1.usage.completionTokens;
     roundTrips++;
 
-    // Subsequent turns for each tool execution
-    let accumulatedContext = turn1PromptTokens + turn1CompletionTokens;
+    messages.push({ role: 'assistant', content: turn1.content || `tool_call: ${mockExecutionSteps[0]?.toolKey || 'step'}` });
+
+    // Multi-turn loops: feed tool results back into context
     for (const step of mockExecutionSteps) {
       executedCalls.push(step.toolKey);
       roundTrips++;
 
-      const toolResultTokens = Math.round(JSON.stringify(step.result).length / 4) + 50;
-      accumulatedContext += toolResultTokens;
+      messages.push({
+        role: 'user',
+        content: `Tool result for ${step.toolKey}:\n${JSON.stringify(step.result)}`,
+      });
 
-      // In classic mode, the model re-ingests the full conversation + full catalog on each step
-      promptTokens += accumulatedContext;
-      completionTokens += 65;
-      accumulatedContext += 65;
+      const nextTurn = await this.nebiusClient.generateCompletion('super', messages, {
+        temperature: 0.1,
+        maxTokens: 128,
+      });
+
+      promptTokens += nextTurn.usage.promptTokens;
+      completionTokens += nextTurn.usage.completionTokens;
+      messages.push({ role: 'assistant', content: nextTurn.content || 'Acknowledged' });
     }
 
-    const durationMs = Date.now() - startTime + roundTrips * 120;
+    const durationMs = Date.now() - startTime;
 
     return {
       mode: 'classic',
@@ -70,29 +92,53 @@ export class ReferenceAgentHarness {
       completionTokens,
       roundTrips,
       executedCalls,
-      securityOutcome: 'executed_blindly', // Classic mode executes tools step-by-step without plan inspection
+      securityOutcome: 'executed_blindly',
       durationMs,
     };
   }
 
   /**
-   * Airlock Mode: Discovers targeted tool stubs, writes a single script plan, and gates execution.
+   * Airlock Mode: Discovers targeted tool stubs, calls Nemotron Super to write a single
+   * script plan, and verifies security gating.
    */
   async runAirlock(
     taskPrompt: string,
     targetToolStubs: string,
-    scriptCode: string,
-    policyDecision: 'allow' | 'hold' | 'deny'
+    policyDecision: 'allow' | 'hold' | 'deny',
+    providedScript?: string
   ): Promise<AgentRunResult> {
     const startTime = Date.now();
 
-    // 1. Tool search stub tokens (typically 2-3 stubs instead of 50 schemas)
-    const stubTokens = Math.round(targetToolStubs.length / 4);
+    let scriptCode = providedScript;
+    let promptTokens = 0;
+    let completionTokens = 0;
 
-    // 2. Single turn script generation via Nemotron Super
-    const promptTokens = 350 + stubTokens + Math.round(taskPrompt.length / 4);
-    const completionTokens = Math.round(scriptCode.length / 4) + 40;
-    const totalTokens = promptTokens + completionTokens;
+    // Call Nemotron Super to synthesize the script if not directly provided
+    if (!scriptCode) {
+      const messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
+        {
+          role: 'system',
+          content: `You are an AI Agent operating within the Airlock Security Gateway. Write clean JavaScript using tools.<server>.<tool>(args). Return ONLY valid executable script code without markdown code fences.`,
+        },
+        {
+          role: 'user',
+          content: `Task: ${taskPrompt}\n\nAvailable TypeScript Stubs:\n${targetToolStubs}\n\nWrite an execution plan:`,
+        },
+      ];
+
+      const resp = await this.nebiusClient.generateCompletion('super', messages, {
+        temperature: 0.1,
+        maxTokens: 512,
+      });
+
+      scriptCode = resp.content.replace(/^```[a-z]*\n/i, '').replace(/\n```$/, '').trim();
+      promptTokens = resp.usage.promptTokens;
+      completionTokens = resp.usage.completionTokens;
+    } else {
+      // Calculate token count from actual payload
+      promptTokens = Math.max(30, Math.round((taskPrompt.length + targetToolStubs.length) / 4));
+      completionTokens = Math.max(15, Math.round(scriptCode.length / 4));
+    }
 
     const securityOutcome =
       policyDecision === 'hold'
@@ -101,19 +147,19 @@ export class ReferenceAgentHarness {
         ? 'gated_safely'
         : 'gated_safely';
 
-    const durationMs = Date.now() - startTime + 85;
+    const durationMs = Date.now() - startTime;
 
     return {
       mode: 'airlock',
       task: taskPrompt,
-      totalTokens,
+      totalTokens: promptTokens + completionTokens,
       promptTokens,
       completionTokens,
       roundTrips: 1, // Single plan artifact
       executedCalls: [],
       securityOutcome,
+      generatedScript: scriptCode,
       durationMs,
     };
   }
 }
-

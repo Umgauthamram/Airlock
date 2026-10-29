@@ -21,6 +21,39 @@ const BANNED_IDENTIFIERS = new Set([
 
 const ALLOWED_NEW_CLASSES = new Set(['Map', 'Set', 'Date']);
 
+const BANNED_PROPERTIES = new Set(['__proto__', 'constructor', 'prototype']);
+const GLOBAL_PRIMITIVES = new Set([
+  'Object',
+  'Array',
+  'Function',
+  'String',
+  'Number',
+  'Boolean',
+  'Symbol',
+  'Promise',
+  'Map',
+  'Set',
+  'Date',
+  'Math',
+  'JSON',
+  'RegExp',
+  'Error',
+]);
+
+function extractPropertyName(propNode: any): string | null {
+  if (!propNode) return null;
+  if (propNode.type === 'Identifier') {
+    return propNode.name;
+  }
+  if (propNode.type === 'Literal') {
+    return String(propNode.value);
+  }
+  if (propNode.type === 'TemplateLiteral' && propNode.quasis && propNode.quasis.length === 1) {
+    return propNode.quasis[0].value?.raw || propNode.quasis[0].value?.cooked || null;
+  }
+  return null;
+}
+
 export interface AnalyzerOptions {
   knownTagsByTool?: Record<string, string[]>; // e.g. "inbox.get_emails" -> ["reads_untrusted"]
 }
@@ -108,17 +141,44 @@ export function analyzeScript(code: string, options: AnalyzerOptions = {}): Anal
       });
     },
 
-    // Member expression property checks (e.g. prototype traversal)
+    // Member expression property checks (prototype traversal and constructor escapes)
     MemberExpression(node: any) {
-      if (!node.computed && node.property.type === 'Identifier') {
-        const propName = node.property.name;
-        if (propName === '__proto__' || propName === 'constructor' || propName === 'prototype') {
-          errors.push({
-            line: node.loc.start.line,
-            message: `Disallowed property access '${propName}'. Prototype traversal is prohibited.`,
-            code: 'BANNED_IDENTIFIER',
-          });
-        }
+      const propName = extractPropertyName(node.property);
+
+      // 1. Block any member access to constructor, __proto__, or prototype
+      if (propName && BANNED_PROPERTIES.has(propName)) {
+        errors.push({
+          line: node.loc.start.line,
+          message: `Disallowed property access '${propName}'. Prototype traversal and constructor execution are prohibited.`,
+          code: 'BANNED_IDENTIFIER',
+        });
+      }
+
+      // 2. Block computed member access on global primitives (e.g. Object['constructor'], Array[x])
+      if (
+        node.computed &&
+        node.object.type === 'Identifier' &&
+        GLOBAL_PRIMITIVES.has(node.object.name)
+      ) {
+        errors.push({
+          line: node.loc.start.line,
+          message: `Computed property access on global primitive '${node.object.name}' is prohibited.`,
+          code: 'BANNED_COMPUTED_PRIMITIVE',
+        });
+      }
+
+      // 3. Block dynamic template literals with expressions inside computed properties (e.g. obj[`${'const' + 'ructor'}`])
+      if (
+        node.computed &&
+        node.property.type === 'TemplateLiteral' &&
+        node.property.expressions &&
+        node.property.expressions.length > 0
+      ) {
+        errors.push({
+          line: node.loc.start.line,
+          message: "Dynamic computed template literals with expressions are not permitted.",
+          code: 'DISALLOWED_DYNAMIC_MEMBER',
+        });
       }
     },
 

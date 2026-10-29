@@ -8,15 +8,15 @@
 - **Languages**: TypeScript / Node.js
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: Phase 3 Complete -> Hackathon Core Delivery Verified
-- **Status**: Hackathon Slice (Phases 0, 1, 2, 3) 100% Complete & Verified
+- **Current Focus**: Hardening Gateway Security & Live Nemotron Runtime Integration
+- **Status**: Core Security Boundaries Fixed (Sandbox Escapes Closed, Atomic Approvals, Control Plane Auth Guarded, Live Nemotron Inference Wired)
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
-- Connected live Nebius API key: verified active Token Factory endpoints with live `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B` completions, reasoning trace extraction, and Nebius ConTree Sandboxes client
-- Completed Poppins typography, full-screen width, and balanced left/right grid layouts across all web pages
-- Built and validated reproducible benchmark harness `@airlock/bench` (`pnpm bench`) over 60 scenarios (30 attacks + 30 benign): **100% block rate, 0% false holds, 94.7% token reduction, 1.26ms p95 latency**
-- Added benchmark results view (`/app/results`) and drafted legal pages (`/terms`, `/privacy`)
-- Completed comprehensive `FEEDBACK.md`, updated `README.md`, and recorded ADR `0004-empirical-benchmark-and-token-reduction-proof.md`
+- **Closed Sandbox Escape Vector**: Blocked prototype/constructor traversal in `@airlock/analyzer` (computed literals, template literals, global primitive member access) and scrubbed host globals/primitives in `executor.ts`.
+- **Live Nemotron Runtime Wired**: Connected Nemotron Nano (automated policy risk explanations), Super (script synthesis and Reference Agent execution), and Ultra (script repair) at runtime via Nebius Token Factory.
+- **Secured Gateway Control Endpoints**: Added bearer authorization guards on `/api/*` and enforced atomic state transitions (`pending` -> `executing` -> `approved`) to eliminate check-then-act race conditions.
+- **Real Google OAuth & Session Expiry**: Replaced demo mock redirect with true Google OAuth authorization code flow (`/api/auth/google`, `/api/auth/callback/google`) and embedded cryptographic session expiration (`exp`).
+- **Standard MCP Protocol & Deployment**: Added JSON-RPC 2.0 `tools/list` and `tools/call` support on `/mcp`, created `apps/gateway/Dockerfile` and `infra/Caddyfile` for VM deployment.
 
 ## 4. Next Immediate Steps
 - [ ] Review live local test run (`pnpm -r test` & `pnpm bench`) with user

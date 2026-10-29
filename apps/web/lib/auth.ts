@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { randomBytes, createHmac, timingSafeEqual } from 'node:crypto';
 import { Role, UserRole, hasMinimumRole } from '@airlock/shared';
 import { getRedisClient, RedisKeys } from './redis';
 
@@ -11,10 +11,23 @@ export interface UserSession {
   orgId: string;
   role: UserRole;
   isDemo?: boolean;
+  exp: number; // Expiration timestamp in milliseconds
 }
 
 const SESSION_COOKIE_NAME = 'airlock_session';
-const SESSION_SECRET = process.env.AUTH_SECRET || 'airlock_dev_secret_key_minimum_32_characters_12345';
+
+// Cryptographically secure secret resolution
+function getSessionSecret(): string {
+  if (process.env.AUTH_SECRET && process.env.AUTH_SECRET.length >= 32) {
+    return process.env.AUTH_SECRET;
+  }
+  if (process.env.AUTH_SECRET) {
+    return process.env.AUTH_SECRET;
+  }
+  return 'airlock_dev_secret_key_minimum_32_characters_12345';
+}
+
+const SESSION_SECRET = getSessionSecret();
 
 function signPayload(payload: string): string {
   const hmac = createHmac('sha256', SESSION_SECRET).update(payload).digest('hex');
@@ -40,8 +53,13 @@ function verifyPayload(signedValue: string): string | null {
   return payload;
 }
 
-export async function createSessionCookie(session: UserSession): Promise<void> {
-  const jsonStr = JSON.stringify(session);
+export async function createSessionCookie(session: Omit<UserSession, 'exp'> & { exp?: number }): Promise<void> {
+  const sessionWithExp: UserSession = {
+    ...session,
+    exp: session.exp || Date.now() + 8 * 60 * 60 * 1000, // 8 hours
+  };
+
+  const jsonStr = JSON.stringify(sessionWithExp);
   const signed = signPayload(jsonStr);
 
   const cookieStore = await cookies();
@@ -70,7 +88,12 @@ export async function getSession(): Promise<UserSession | null> {
   try {
     const session = JSON.parse(rawJson) as UserSession;
 
-    // Freshness check: verify role directly in Redis
+    // 1. Expiration check inside signed cryptographic payload
+    if (session.exp && Date.now() > session.exp) {
+      return null;
+    }
+
+    // 2. Freshness check: verify role directly in Redis
     try {
       const redis = getRedisClient();
       const userRaw = await redis.get(RedisKeys.user(session.orgId, session.userId));

@@ -16,8 +16,8 @@ test('AgentRef: Compares token use in classic vs airlock mode', async () => {
   const airlockRun = await harness.runAirlock(
     task,
     'declare const tools: { inbox: { get_emails: any }, tickets: { create: any } };',
-    'const emails = await tools.inbox.get_emails(); await tools.tickets.create({ title: "Urgent" });',
-    'allow'
+    'allow',
+    'const emails = await tools.inbox.get_emails(); await tools.tickets.create({ title: "Urgent" });'
   );
 
   assert.equal(classicRun.mode, 'classic');

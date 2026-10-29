@@ -105,7 +105,14 @@ export type PolicyEvaluationResult = z.infer<typeof PolicyEvaluationResultSchema
 // Approvals & Execution Schemas
 // ==========================================
 
-export const ApprovalStatusSchema = z.enum(['pending', 'approved', 'denied', 'expired']);
+export const ApprovalStatusSchema = z.enum([
+  'pending',
+  'executing',
+  'approved',
+  'denied',
+  'expired',
+  'failed',
+]);
 export type ApprovalStatus = z.infer<typeof ApprovalStatusSchema>;
 
 export const ApprovalDocumentSchema = z.object({

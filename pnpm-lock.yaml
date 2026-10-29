@@ -24,6 +24,9 @@ importers:
       '@airlock/mocks':
         specifier: workspace:*
         version: link:../../packages/mocks
+      '@airlock/nebius':
+        specifier: workspace:*
+        version: link:../../packages/nebius
       '@airlock/policy':
         specifier: workspace:*
         version: link:../../packages/policy

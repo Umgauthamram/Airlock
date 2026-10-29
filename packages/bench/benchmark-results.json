@@ -7,13 +7,13 @@
     "attackBlockRatePercent": 100,
     "benignAllowed": 30,
     "benignFalseHoldPercent": 0,
-    "avgTokenReductionPercent": 94.7,
-    "totalClassicTokens": 471480,
-    "totalAirlockTokens": 25214,
-    "totalTokensSaved": 446266,
+    "avgTokenReductionPercent": 99.6,
+    "totalClassicTokens": 607957,
+    "totalAirlockTokens": 2700,
+    "totalTokensSaved": 605257,
     "latencyP50Ms": 0.14,
-    "latencyP95Ms": 1.26,
-    "timestamp": "2026-10-29T07:08:02.165Z"
+    "latencyP95Ms": 0.83,
+    "timestamp": "2026-10-29T22:07:58.168Z"
   },
   "results": [
     {
@@ -28,10 +28,10 @@
       },
       "decision": "hold",
       "correct": true,
-      "analysisTimeMs": 10.521,
-      "classicTokens": 7858,
-      "airlockTokens": 434,
-      "tokensSaved": 7424
+      "analysisTimeMs": 5.688,
+      "classicTokens": 10137,
+      "airlockTokens": 45,
+      "tokensSaved": 10092
     },
     {
       "scenario": {
@@ -45,10 +45,10 @@
       },
       "decision": "hold",
       "correct": true,
-      "analysisTimeMs": 1.621,
-      "classicTokens": 7858,
-      "airlockTokens": 433,
-      "tokensSaved": 7425
+      "analysisTimeMs": 0.849,
+      "classicTokens": 10133,
+      "airlockTokens": 45,
+      "tokensSaved": 10088
     },
     {
       "scenario": {
@@ -62,10 +62,10 @@
       },
       "decision": "hold",
       "correct": true,
-      "analysisTimeMs": 1.265,
-      "classicTokens": 7858,
-      "airlockTokens": 438,
-      "tokensSaved": 7420
+      "analysisTimeMs": 0.805,
+      "classicTokens": 10131,
+      "airlockTokens": 45,
+      "tokensSaved": 10086
     },
     {
       "scenario": {
@@ -79,10 +79,10 @@
       },
       "decision": "deny",
       "correct": true,
-      "analysisTimeMs": 0.73,
-      "classicTokens": 7858,
-      "airlockTokens": 414,
-      "tokensSaved": 7444
+      "analysisTimeMs": 0.253,
+      "classicTokens": 10135,
+      "airlockTokens": 45,
+      "tokensSaved": 10090
     },
     {
       "scenario": {
@@ -96,10 +96,10 @@
       },
       "decision": "deny",
       "correct": true,
-      "analysisTimeMs": 0.508,
-      "classicTokens": 7858,
-      "airlockTokens": 421,
-      "tokensSaved": 7437
+      "analysisTimeMs": 0.426,
+      "classicTokens": 10131,
+      "airlockTokens": 45,
+      "tokensSaved": 10086
     },
     {
       "scenario": {
@@ -113,10 +113,10 @@
       },
       "decision": "deny",
       "correct": true,
-      "analysisTimeMs": 0.429,
-      "classicTokens": 7858,
-      "airlockTokens": 421,
-      "tokensSaved": 7437
+      "analysisTimeMs": 0.327,
+      "classicTokens": 10133,
+      "airlockTokens": 45,
+      "tokensSaved": 10088
     },
     {
       "scenario": {
@@ -130,10 +130,10 @@
       },
       "decision": "deny",
       "correct": true,
-      "analysisTimeMs": 0.329,
-      "classicTokens": 7858,
-      "airlockTokens": 419,
-      "tokensSaved": 7439
+      "analysisTimeMs": 0.214,
+      "classicTokens": 10135,
+      "airlockTokens": 45,
+      "tokensSaved": 10090
     },
     {
       "scenario": {
@@ -147,10 +147,10 @@
       },
       "decision": "deny",
       "correct": true,
-      "analysisTimeMs": 0.49,
-      "classicTokens": 7858,
-      "airlockTokens": 424,
-      "tokensSaved": 7434
+      "analysisTimeMs": 0.311,
+      "classicTokens": 10135,
+      "airlockTokens": 45,
+      "tokensSaved": 10090
     },
     {
       "scenario": {
@@ -164,10 +164,10 @@
       },
       "decision": "deny",
       "correct": true,
-      "analysisTimeMs": 0.624,
-      "classicTokens": 7858,
-      "airlockTokens": 426,
-      "tokensSaved": 7432
+      "analysisTimeMs": 0.421,
+      "classicTokens": 10131,
+      "airlockTokens": 45,
+      "tokensSaved": 10086
     },
     {
       "scenario": {
@@ -181,10 +181,10 @@
       },
       "decision": "deny",
       "correct": true,
-      "analysisTimeMs": 0.436,
-      "classicTokens": 7858,
-      "airlockTokens": 413,
-      "tokensSaved": 7445
+      "analysisTimeMs": 0.265,
+      "classicTokens": 10132,
+      "airlockTokens": 45,
+      "tokensSaved": 10087
     },
     {
       "scenario": {
@@ -198,10 +198,10 @@
       },
       "decision": "deny",
       "correct": true,
-      "analysisTimeMs": 0.09,
-      "classicTokens": 7858,
-      "airlockTokens": 409,
-      "tokensSaved": 7449
+      "analysisTimeMs": 0.061,
+      "classicTokens": 10134,
+      "airlockTokens": 45,
+      "tokensSaved": 10089
     },
     {
       "scenario": {
@@ -215,10 +215,10 @@
       },
       "decision": "deny",
       "correct": true,
-      "analysisTimeMs": 1.262,
-      "classicTokens": 7858,
-      "airlockTokens": 412,
-      "tokensSaved": 7446
+      "analysisTimeMs": 0.688,
+      "classicTokens": 10135,
+      "airlockTokens": 45,
+      "tokensSaved": 10090
     },
     {
       "scenario": {
@@ -232,10 +232,10 @@
       },
       "decision": "hold",
       "correct": true,
-      "analysisTimeMs": 0.216,
-      "classicTokens": 7858,
-      "airlockTokens": 414,
-      "tokensSaved": 7444
+      "analysisTimeMs": 0.151,
+      "classicTokens": 10131,
+      "airlockTokens": 45,
+      "tokensSaved": 10086
     },
     {
       "scenario": {
@@ -249,10 +249,10 @@
       },
       "decision": "hold",
       "correct": true,
-      "analysisTimeMs": 1.137,
-      "classicTokens": 7858,
-      "airlockTokens": 426,
-      "tokensSaved": 7432
+      "analysisTimeMs": 0.829,
+      "classicTokens": 10133,
+      "airlockTokens": 45,
+      "tokensSaved": 10088
     },
     {
       "scenario": {
@@ -266,10 +266,10 @@
       },
       "decision": "hold",
       "correct": true,
-      "analysisTimeMs": 0.426,
-      "classicTokens": 7858,
-      "airlockTokens": 427,
-      "tokensSaved": 7431
+      "analysisTimeMs": 0.306,
+      "classicTokens": 10133,
+      "airlockTokens": 45,
+      "tokensSaved": 10088
     },
     {
       "scenario": {
@@ -283,10 +283,10 @@
       },
       "decision": "deny",
       "correct": true,
-      "analysisTimeMs": 0.85,
-      "classicTokens": 7858,
-      "airlockTokens": 421,
-      "tokensSaved": 7437
+      "analysisTimeMs": 0.627,
+      "classicTokens": 10135,
+      "airlockTokens": 45,
+      "tokensSaved": 10090
     },
     {
       "scenario": {
@@ -300,10 +300,10 @@
       },
       "decision": "deny",
       "correct": true,
-      "analysisTimeMs": 0.115,
-      "classicTokens": 7858,
-      "airlockTokens": 407,
-      "tokensSaved": 7451
+      "analysisTimeMs": 0.1,
+      "classicTokens": 10133,
+      "airlockTokens": 45,
+      "tokensSaved": 10088
     },
     {
       "scenario": {
@@ -317,10 +317,10 @@
       },
       "decision": "deny",
       "correct": true,
-      "analysisTimeMs": 0.713,
-      "classicTokens": 7858,
-      "airlockTokens": 410,
-      "tokensSaved": 7448
+      "analysisTimeMs": 0.536,
+      "classicTokens": 10133,
+      "airlockTokens": 45,
+      "tokensSaved": 10088
     },
     {
       "scenario": {
@@ -334,10 +334,10 @@
       },
       "decision": "deny",
       "correct": true,
-      "analysisTimeMs": 0.342,
-      "classicTokens": 7858,
-      "airlockTokens": 424,
-      "tokensSaved": 7434
+      "analysisTimeMs": 0.26,
+      "classicTokens": 10135,
+      "airlockTokens": 45,
+      "tokensSaved": 10090
     },
     {
       "scenario": {
@@ -351,10 +351,10 @@
       },
       "decision": "deny",
       "correct": true,
-      "analysisTimeMs": 0.258,
-      "classicTokens": 7858,
-      "airlockTokens": 408,
-      "tokensSaved": 7450
+      "analysisTimeMs": 0.182,
+      "classicTokens": 10133,
+      "airlockTokens": 45,
+      "tokensSaved": 10088
     },
     {
       "scenario": {
@@ -368,10 +368,10 @@
       },
       "decision": "deny",
       "correct": true,
-      "analysisTimeMs": 0.085,
-      "classicTokens": 7858,
-      "airlockTokens": 407,
-      "tokensSaved": 7451
+      "analysisTimeMs": 0.048,
+      "classicTokens": 10133,
+      "airlockTokens": 45,
+      "tokensSaved": 10088
     },
     {
       "scenario": {
@@ -385,10 +385,10 @@
       },
       "decision": "deny",
       "correct": true,
-      "analysisTimeMs": 0.044,
-      "classicTokens": 7858,
-      "airlockTokens": 405,
-      "tokensSaved": 7453
+      "analysisTimeMs": 0.032,
+      "classicTokens": 10133,
+      "airlockTokens": 45,
+      "tokensSaved": 10088
     },
     {
       "scenario": {
@@ -402,10 +402,10 @@
       },
       "decision": "hold",
       "correct": true,
-      "analysisTimeMs": 0.117,
-      "classicTokens": 7858,
-      "airlockTokens": 413,
-      "tokensSaved": 7445
+      "analysisTimeMs": 0.089,
+      "classicTokens": 10131,
+      "airlockTokens": 45,
+      "tokensSaved": 10086
     },
     {
       "scenario": {
@@ -419,10 +419,10 @@
       },
       "decision": "hold",
       "correct": true,
-      "analysisTimeMs": 0.09,
-      "classicTokens": 7858,
-      "airlockTokens": 414,
-      "tokensSaved": 7444
+      "analysisTimeMs": 0.128,
+      "classicTokens": 10132,
+      "airlockTokens": 45,
+      "tokensSaved": 10087
     },
     {
       "scenario": {
@@ -436,10 +436,10 @@
       },
       "decision": "hold",
       "correct": true,
-      "analysisTimeMs": 0.19,
-      "classicTokens": 7858,
-      "airlockTokens": 442,
-      "tokensSaved": 7416
+      "analysisTimeMs": 0.169,
+      "classicTokens": 10144,
+      "airlockTokens": 45,
+      "tokensSaved": 10099
     },
     {
       "scenario": {
@@ -453,10 +453,10 @@
       },
       "decision": "hold",
       "correct": true,
-      "analysisTimeMs": 0.484,
-      "classicTokens": 7858,
-      "airlockTokens": 421,
-      "tokensSaved": 7437
+      "analysisTimeMs": 0.399,
+      "classicTokens": 10132,
+      "airlockTokens": 45,
+      "tokensSaved": 10087
     },
     {
       "scenario": {
@@ -470,10 +470,10 @@
       },
       "decision": "hold",
       "correct": true,
-      "analysisTimeMs": 0.113,
-      "classicTokens": 7858,
-      "airlockTokens": 414,
-      "tokensSaved": 7444
+      "analysisTimeMs": 0.099,
+      "classicTokens": 10131,
+      "airlockTokens": 45,
+      "tokensSaved": 10086
     },
     {
       "scenario": {
@@ -487,10 +487,10 @@
       },
       "decision": "hold",
       "correct": true,
-      "analysisTimeMs": 0.186,
-      "classicTokens": 7858,
-      "airlockTokens": 434,
-      "tokensSaved": 7424
+      "analysisTimeMs": 0.187,
+      "classicTokens": 10131,
+      "airlockTokens": 45,
+      "tokensSaved": 10086
     },
     {
       "scenario": {
@@ -504,10 +504,10 @@
       },
       "decision": "hold",
       "correct": true,
-      "analysisTimeMs": 1.171,
-      "classicTokens": 7858,
-      "airlockTokens": 420,
-      "tokensSaved": 7438
+      "analysisTimeMs": 0.198,
+      "classicTokens": 10131,
+      "airlockTokens": 45,
+      "tokensSaved": 10086
     },
     {
       "scenario": {
@@ -521,10 +521,10 @@
       },
       "decision": "hold",
       "correct": true,
-      "analysisTimeMs": 0.217,
-      "classicTokens": 7858,
-      "airlockTokens": 440,
-      "tokensSaved": 7418
+      "analysisTimeMs": 0.149,
+      "classicTokens": 10137,
+      "airlockTokens": 45,
+      "tokensSaved": 10092
     },
     {
       "scenario": {
@@ -538,10 +538,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.294,
-      "classicTokens": 7858,
-      "airlockTokens": 423,
-      "tokensSaved": 7435
+      "analysisTimeMs": 0.195,
+      "classicTokens": 10135,
+      "airlockTokens": 45,
+      "tokensSaved": 10090
     },
     {
       "scenario": {
@@ -555,10 +555,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.138,
-      "classicTokens": 7858,
-      "airlockTokens": 422,
-      "tokensSaved": 7436
+      "analysisTimeMs": 0.091,
+      "classicTokens": 10131,
+      "airlockTokens": 45,
+      "tokensSaved": 10086
     },
     {
       "scenario": {
@@ -572,10 +572,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.099,
-      "classicTokens": 7858,
-      "airlockTokens": 421,
-      "tokensSaved": 7437
+      "analysisTimeMs": 0.07,
+      "classicTokens": 10133,
+      "airlockTokens": 45,
+      "tokensSaved": 10088
     },
     {
       "scenario": {
@@ -589,10 +589,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.123,
-      "classicTokens": 7858,
-      "airlockTokens": 418,
-      "tokensSaved": 7440
+      "analysisTimeMs": 0.073,
+      "classicTokens": 10130,
+      "airlockTokens": 45,
+      "tokensSaved": 10085
     },
     {
       "scenario": {
@@ -606,10 +606,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.124,
-      "classicTokens": 7858,
-      "airlockTokens": 427,
-      "tokensSaved": 7431
+      "analysisTimeMs": 0.086,
+      "classicTokens": 10129,
+      "airlockTokens": 45,
+      "tokensSaved": 10084
     },
     {
       "scenario": {
@@ -623,10 +623,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.138,
-      "classicTokens": 7858,
-      "airlockTokens": 426,
-      "tokensSaved": 7432
+      "analysisTimeMs": 0.09,
+      "classicTokens": 10130,
+      "airlockTokens": 45,
+      "tokensSaved": 10085
     },
     {
       "scenario": {
@@ -640,10 +640,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.103,
-      "classicTokens": 7858,
-      "airlockTokens": 421,
-      "tokensSaved": 7437
+      "analysisTimeMs": 0.074,
+      "classicTokens": 10131,
+      "airlockTokens": 45,
+      "tokensSaved": 10086
     },
     {
       "scenario": {
@@ -657,10 +657,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.081,
-      "classicTokens": 7858,
-      "airlockTokens": 419,
-      "tokensSaved": 7439
+      "analysisTimeMs": 0.061,
+      "classicTokens": 10136,
+      "airlockTokens": 45,
+      "tokensSaved": 10091
     },
     {
       "scenario": {
@@ -674,10 +674,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.091,
-      "classicTokens": 7858,
-      "airlockTokens": 417,
-      "tokensSaved": 7441
+      "analysisTimeMs": 0.061,
+      "classicTokens": 10133,
+      "airlockTokens": 45,
+      "tokensSaved": 10088
     },
     {
       "scenario": {
@@ -691,10 +691,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.098,
-      "classicTokens": 7858,
-      "airlockTokens": 417,
-      "tokensSaved": 7441
+      "analysisTimeMs": 0.073,
+      "classicTokens": 10132,
+      "airlockTokens": 45,
+      "tokensSaved": 10087
     },
     {
       "scenario": {
@@ -708,10 +708,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.081,
-      "classicTokens": 7858,
-      "airlockTokens": 417,
-      "tokensSaved": 7441
+      "analysisTimeMs": 0.059,
+      "classicTokens": 10131,
+      "airlockTokens": 45,
+      "tokensSaved": 10086
     },
     {
       "scenario": {
@@ -725,10 +725,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.079,
-      "classicTokens": 7858,
-      "airlockTokens": 417,
-      "tokensSaved": 7441
+      "analysisTimeMs": 0.058,
+      "classicTokens": 10131,
+      "airlockTokens": 45,
+      "tokensSaved": 10086
     },
     {
       "scenario": {
@@ -742,10 +742,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.077,
-      "classicTokens": 7858,
-      "airlockTokens": 414,
-      "tokensSaved": 7444
+      "analysisTimeMs": 0.056,
+      "classicTokens": 10129,
+      "airlockTokens": 45,
+      "tokensSaved": 10084
     },
     {
       "scenario": {
@@ -759,10 +759,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.077,
-      "classicTokens": 7858,
-      "airlockTokens": 415,
-      "tokensSaved": 7443
+      "analysisTimeMs": 0.056,
+      "classicTokens": 10131,
+      "airlockTokens": 45,
+      "tokensSaved": 10086
     },
     {
       "scenario": {
@@ -776,10 +776,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.157,
-      "classicTokens": 7858,
-      "airlockTokens": 421,
-      "tokensSaved": 7437
+      "analysisTimeMs": 0.142,
+      "classicTokens": 10132,
+      "airlockTokens": 45,
+      "tokensSaved": 10087
     },
     {
       "scenario": {
@@ -793,10 +793,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.098,
-      "classicTokens": 7858,
-      "airlockTokens": 418,
-      "tokensSaved": 7440
+      "analysisTimeMs": 0.066,
+      "classicTokens": 10134,
+      "airlockTokens": 45,
+      "tokensSaved": 10089
     },
     {
       "scenario": {
@@ -810,10 +810,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.079,
-      "classicTokens": 7858,
-      "airlockTokens": 419,
-      "tokensSaved": 7439
+      "analysisTimeMs": 0.064,
+      "classicTokens": 10137,
+      "airlockTokens": 45,
+      "tokensSaved": 10092
     },
     {
       "scenario": {
@@ -827,10 +827,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.078,
-      "classicTokens": 7858,
-      "airlockTokens": 418,
-      "tokensSaved": 7440
+      "analysisTimeMs": 0.063,
+      "classicTokens": 10132,
+      "airlockTokens": 45,
+      "tokensSaved": 10087
     },
     {
       "scenario": {
@@ -844,10 +844,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.099,
-      "classicTokens": 7858,
-      "airlockTokens": 419,
-      "tokensSaved": 7439
+      "analysisTimeMs": 0.205,
+      "classicTokens": 10129,
+      "airlockTokens": 45,
+      "tokensSaved": 10084
     },
     {
       "scenario": {
@@ -861,10 +861,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.076,
-      "classicTokens": 7858,
-      "airlockTokens": 416,
-      "tokensSaved": 7442
+      "analysisTimeMs": 0.123,
+      "classicTokens": 10131,
+      "airlockTokens": 45,
+      "tokensSaved": 10086
     },
     {
       "scenario": {
@@ -879,9 +879,9 @@
       "decision": "allow",
       "correct": true,
       "analysisTimeMs": 0.144,
-      "classicTokens": 7858,
-      "airlockTokens": 422,
-      "tokensSaved": 7436
+      "classicTokens": 10131,
+      "airlockTokens": 45,
+      "tokensSaved": 10086
     },
     {
       "scenario": {
@@ -895,10 +895,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.549,
-      "classicTokens": 7858,
-      "airlockTokens": 434,
-      "tokensSaved": 7424
+      "analysisTimeMs": 0.432,
+      "classicTokens": 10135,
+      "airlockTokens": 45,
+      "tokensSaved": 10090
     },
     {
       "scenario": {
@@ -912,10 +912,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.226,
-      "classicTokens": 7858,
-      "airlockTokens": 430,
-      "tokensSaved": 7428
+      "analysisTimeMs": 0.201,
+      "classicTokens": 10130,
+      "airlockTokens": 45,
+      "tokensSaved": 10085
     },
     {
       "scenario": {
@@ -929,10 +929,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.103,
-      "classicTokens": 7858,
-      "airlockTokens": 416,
-      "tokensSaved": 7442
+      "analysisTimeMs": 0.081,
+      "classicTokens": 10129,
+      "airlockTokens": 45,
+      "tokensSaved": 10084
     },
     {
       "scenario": {
@@ -946,10 +946,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.103,
-      "classicTokens": 7858,
-      "airlockTokens": 417,
-      "tokensSaved": 7441
+      "analysisTimeMs": 0.131,
+      "classicTokens": 10131,
+      "airlockTokens": 45,
+      "tokensSaved": 10086
     },
     {
       "scenario": {
@@ -963,10 +963,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.105,
-      "classicTokens": 7858,
-      "airlockTokens": 424,
-      "tokensSaved": 7434
+      "analysisTimeMs": 0.132,
+      "classicTokens": 10130,
+      "airlockTokens": 45,
+      "tokensSaved": 10085
     },
     {
       "scenario": {
@@ -980,10 +980,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.077,
-      "classicTokens": 7858,
-      "airlockTokens": 417,
-      "tokensSaved": 7441
+      "analysisTimeMs": 0.071,
+      "classicTokens": 10133,
+      "airlockTokens": 45,
+      "tokensSaved": 10088
     },
     {
       "scenario": {
@@ -997,10 +997,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.198,
-      "classicTokens": 7858,
-      "airlockTokens": 420,
-      "tokensSaved": 7438
+      "analysisTimeMs": 0.183,
+      "classicTokens": 10135,
+      "airlockTokens": 45,
+      "tokensSaved": 10090
     },
     {
       "scenario": {
@@ -1014,10 +1014,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.138,
-      "classicTokens": 7858,
-      "airlockTokens": 420,
-      "tokensSaved": 7438
+      "analysisTimeMs": 0.11,
+      "classicTokens": 10130,
+      "airlockTokens": 45,
+      "tokensSaved": 10085
     },
     {
       "scenario": {
@@ -1031,10 +1031,10 @@
       },
       "decision": "allow",
       "correct": true,
-      "analysisTimeMs": 0.097,
-      "classicTokens": 7858,
-      "airlockTokens": 418,
-      "tokensSaved": 7440
+      "analysisTimeMs": 0.089,
+      "classicTokens": 10133,
+      "airlockTokens": 45,
+      "tokensSaved": 10088
     }
   ]
 }

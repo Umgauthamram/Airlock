@@ -72,39 +72,47 @@ export async function executeScriptInSandbox(
     }
   );
 
-  // Construct isolated sandbox globals
-  const sandboxContext = {
-    tools: toolsProxy,
-    console: {
-      log: (...msgs: any[]) => {
-        const text = msgs.map((m) => (typeof m === 'object' ? JSON.stringify(m) : String(m))).join(' ');
-        if (logs.length < 50 && logs.join('\n').length < 8192) {
-          logs.push(text);
-        }
-      },
-      warn: (...msgs: any[]) => logs.push(`[WARN] ${msgs.join(' ')}`),
-      error: (...msgs: any[]) => logs.push(`[ERROR] ${msgs.join(' ')}`),
+  // Construct isolated sandbox context without host primitives
+  // node:vm generates its own realm intrinsics (Object, Array, Map, Date, etc.)
+  const sandboxContext = Object.create(null);
+  sandboxContext.tools = toolsProxy;
+  sandboxContext.console = {
+    log: (...msgs: any[]) => {
+      const text = msgs.map((m) => (typeof m === 'object' ? JSON.stringify(m) : String(m))).join(' ');
+      if (logs.length < 50 && logs.join('\n').length < 8192) {
+        logs.push(text);
+      }
     },
-    Map,
-    Set,
-    Date,
-    Math,
-    JSON,
-    Array,
-    Object,
-    Number,
-    String,
-    Boolean,
-    Promise,
-    parseInt,
-    parseFloat,
-    isNaN,
-    isFinite,
+    warn: (...msgs: any[]) => logs.push(`[WARN] ${msgs.join(' ')}`),
+    error: (...msgs: any[]) => logs.push(`[ERROR] ${msgs.join(' ')}`),
   };
 
   const context = vm.createContext(sandboxContext, {
-    codeGeneration: { strings: false, wasm: false }, // Disables eval() and Function() entirely
+    codeGeneration: { strings: false, wasm: false }, // Disables eval() and Function() string compilation
   });
+
+  // Execute realm hardening inside context to scrub any host/process bridge
+  try {
+    vm.runInContext(
+      `
+      try { delete this.process; } catch(e) {}
+      try { delete this.global; } catch(e) {}
+      try { delete this.queueMicrotask; } catch(e) {}
+      try { delete this.setImmediate; } catch(e) {}
+      try { delete this.clearImmediate; } catch(e) {}
+      try { delete this.setTimeout; } catch(e) {}
+      try { delete this.clearTimeout; } catch(e) {}
+      try { delete this.setInterval; } catch(e) {}
+      try { delete this.clearInterval; } catch(e) {}
+      try { Object.freeze(Object.prototype); } catch(e) {}
+      try { Object.freeze(Function.prototype); } catch(e) {}
+      try { Object.freeze(Array.prototype); } catch(e) {}
+    `,
+      context
+    );
+  } catch {
+    // Best-effort realm hardening
+  }
 
   try {
     // Wrap code in an async IIFE to support top-level await
@@ -113,21 +121,35 @@ export async function executeScriptInSandbox(
       filename: 'airlock-sandbox.js',
     });
 
+    // 1. Synchronous CPU execution timeout handled by script.runInContext
     const executionPromise = script.runInContext(context, {
       timeout: timeoutMs,
       displayErrors: true,
     });
 
-    const rawResult = await executionPromise;
-    const wallClockMs = Date.now() - startTime;
+    // 2. Asynchronous wall-clock timeout race for pending promises and async hangs
+    let timerHandle: NodeJS.Timeout | undefined;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timerHandle = setTimeout(() => {
+        reject(new Error(`Execution timed out after ${timeoutMs}ms (wall-clock limit).`));
+      }, timeoutMs);
+      if (typeof timerHandle.unref === 'function') timerHandle.unref();
+    });
 
-    return {
-      status: 'completed',
-      result: rawResult ?? null,
-      logs,
-      toolCallCount,
-      wallClockMs,
-    };
+    try {
+      const rawResult = await Promise.race([executionPromise, timeoutPromise]);
+      const wallClockMs = Date.now() - startTime;
+
+      return {
+        status: 'completed',
+        result: rawResult ?? null,
+        logs,
+        toolCallCount,
+        wallClockMs,
+      };
+    } finally {
+      if (timerHandle) clearTimeout(timerHandle);
+    }
   } catch (err: any) {
     const wallClockMs = Date.now() - startTime;
     return {

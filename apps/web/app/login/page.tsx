@@ -35,7 +35,7 @@ export default function LoginPage() {
             type="button"
             className="w-full py-2.5 px-4 border border-[#d6d3d1] text-[#1c1917] rounded text-center text-sm font-medium hover:bg-[#f5f5f4] transition-colors flex items-center justify-center gap-2 cursor-pointer"
             onClick={() => {
-              window.location.href = '/api/auth/demo';
+              window.location.href = '/api/auth/google';
             }}
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">

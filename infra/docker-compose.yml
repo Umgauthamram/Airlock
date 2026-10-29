@@ -10,6 +10,49 @@ services:
     volumes:
       - redis-data:/data
     restart: unless-stopped
+    networks:
+      - airlock-net
+
+  gateway:
+    build:
+      context: ..
+      dockerfile: apps/gateway/Dockerfile
+    container_name: airlock-gateway
+    environment:
+      - PORT=4000
+      - REDIS_URL=redis://:airlocklocal@redis:6379
+      - AIRLOCK_MASTER_KEY=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      - NEBIUS_API_KEY=${NEBIUS_API_KEY}
+      - NVIDIA_API_KEY=${NVIDIA_API_KEY}
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - airlock-net
+
+  caddy:
+    image: caddy:2.8-alpine
+    container_name: airlock-caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - GATEWAY_DOMAIN=${GATEWAY_DOMAIN:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - gateway
+    restart: unless-stopped
+    networks:
+      - airlock-net
 
 volumes:
   redis-data:
+  caddy-data:
+  caddy-config:
+
+networks:
+  airlock-net:
+    driver: bridge

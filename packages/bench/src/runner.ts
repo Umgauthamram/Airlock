@@ -81,16 +81,30 @@ export async function runBenchmark(): Promise<{ results: ScenarioResult[]; summa
       }
     }
 
-    // Token comparison
+    // Extract tools actually referenced in scenario code to build realistic targeted TypeScript stubs
+    const serversUsed = new Set<string>();
+    const matches = scenario.code.matchAll(/tools\.([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]+)/g);
+    for (const m of matches) {
+      serversUsed.add(m[1]);
+    }
+    const serversArray = Array.from(serversUsed);
+    const targetToolStubs =
+      serversArray.length > 0
+        ? serversArray
+            .map((s) => `interface ${s}Tools { [tool: string]: (args?: any) => Promise<any>; }\ndeclare const tools: { ${s}: ${s}Tools };`)
+            .join('\n')
+        : 'declare const tools: Record<string, Record<string, (args?: any) => Promise<any>>>;';
+
+    // Token comparison using realistic catalog schemas vs targeted TypeScript stubs
     const classicRun = await harness.runClassic(scenario.taskPrompt, catalog, [
-      { toolKey: 'inbox.get_emails', result: { ok: true } },
+      { toolKey: 'inbox.get_emails', result: { ok: true, count: 2 } },
     ]);
 
     const airlockRun = await harness.runAirlock(
       scenario.taskPrompt,
-      'declare const tools: any;',
-      scenario.code,
-      decision
+      targetToolStubs,
+      decision,
+      scenario.code
     );
 
     totalClassicTokens += classicRun.totalTokens;

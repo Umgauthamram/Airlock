@@ -13,6 +13,7 @@ import { RedisKeys } from '@airlock/shared';
 import { analyzeScript } from '@airlock/analyzer';
 import { evaluatePolicy, DEFAULT_POLICY } from '@airlock/policy';
 import { generateFullToolCatalog } from '@airlock/mocks';
+import { NebiusTokenFactoryClient } from '@airlock/nebius';
 import { StorageAdapter, MemoryStorageAdapter } from './redis.js';
 import { executeScriptInSandbox } from './executor.js';
 
@@ -20,12 +21,14 @@ export interface GatewayConfig {
   orgId: string;
   storage?: StorageAdapter;
   policy?: PolicyDocument;
+  nebius?: NebiusTokenFactoryClient;
 }
 
 export class AirlockGateway {
   public readonly orgId: string;
   public readonly storage: StorageAdapter;
   public policy: PolicyDocument;
+  public readonly nebius: NebiusTokenFactoryClient;
   private toolCatalog: ToolDefinition[];
   private toolTagMap: Record<string, ToolTag[]>;
 
@@ -33,6 +36,7 @@ export class AirlockGateway {
     this.orgId = config.orgId;
     this.storage = config.storage || new MemoryStorageAdapter();
     this.policy = config.policy || DEFAULT_POLICY;
+    this.nebius = config.nebius || new NebiusTokenFactoryClient();
 
     // Load tool catalog
     this.toolCatalog = generateFullToolCatalog();
@@ -198,6 +202,31 @@ export class AirlockGateway {
       const approvalId = `appr_${randomUUID().replace(/-/g, '')}`;
       const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
+      // Generate human-readable risk explanation with Nemotron Nano via Token Factory
+      let explanation = policyResult.reasons.join(' ') || 'Script held by deterministic policy rules.';
+      try {
+        const nanoResp = await this.nebius.generateCompletion(
+          'nano',
+          [
+            {
+              role: 'system',
+              content:
+                'You are Airlock Security Policy Explainer. Summarize why this script was held for operator review.',
+            },
+            {
+              role: 'user',
+              content: `Flagged data flows: ${policyResult.flaggedFlows.join(', ')}.\nCode:\n${code}\nExplain the security risk and why an operator must approve it before execution. Keep it under 2 sentences.`,
+            },
+          ],
+          { maxTokens: 120 }
+        );
+        if (nanoResp.content) {
+          explanation = nanoResp.content;
+        }
+      } catch {
+        // Fall back to deterministic policy reason
+      }
+
       const approvalDoc: ApprovalDocument = {
         id: approvalId,
         orgId: this.orgId,
@@ -206,7 +235,7 @@ export class AirlockGateway {
         code,
         intent,
         flaggedFlows: policyResult.flaggedFlows,
-        explanation: policyResult.reasons.join(' ') || 'Script held by deterministic policy rules.',
+        explanation,
         status: 'pending',
         policyVersion: this.policy.version,
         createdAt: new Date().toISOString(),
@@ -316,12 +345,12 @@ export class AirlockGateway {
       };
     }
 
-    approval.status = decision;
-    approval.decidedBy = decidedBy;
-    approval.decidedAt = new Date().toISOString();
-    approval.decisionNote = note;
-
     if (decision === 'denied') {
+      approval.status = 'denied';
+      approval.decidedBy = decidedBy;
+      approval.decidedAt = new Date().toISOString();
+      approval.decisionNote = note;
+
       await this.storage.set(RedisKeys.approval(this.orgId, approvalId), JSON.stringify(approval));
       await this.logAuditEvent({
         eventType: 'script_denied',
@@ -333,33 +362,142 @@ export class AirlockGateway {
       return { success: true, status: 'denied' };
     }
 
-    // On Approved: execute script once through sandbox
-    const analysis = analyzeScript(approval.code, { knownTagsByTool: this.toolTagMap });
-    const runResult = await this.executeAndRecord(approval.code, approval.agentId, analysis);
-
-    // Save result associated with approvalId
-    await this.storage.set(
-      RedisKeys.result(this.orgId, approvalId),
-      JSON.stringify(runResult),
-      86400 // 24 hours TTL
-    );
-
-    // Update approval status
+    // Atomic state transition: mark 'executing' immediately to prevent race conditions & double-spend
+    approval.status = 'executing';
+    approval.decidedBy = decidedBy;
+    approval.decidedAt = new Date().toISOString();
+    approval.decisionNote = note;
     await this.storage.set(RedisKeys.approval(this.orgId, approvalId), JSON.stringify(approval));
 
-    await this.logAuditEvent({
-      eventType: 'script_approved',
-      userId: decidedBy,
-      approvalId,
-      scriptHash: approval.scriptHash,
-      details: { note, toolCallCount: runResult.toolCallCount },
-    });
+    // Execute script once through sandbox
+    try {
+      const analysis = analyzeScript(approval.code, { knownTagsByTool: this.toolTagMap });
+      const runResult = await this.executeAndRecord(approval.code, approval.agentId, analysis);
 
+      // Save result associated with approvalId
+      await this.storage.set(
+        RedisKeys.result(this.orgId, approvalId),
+        JSON.stringify(runResult),
+        86400 // 24 hours TTL
+      );
+
+      // Transition to final 'approved' state
+      approval.status = 'approved';
+      await this.storage.set(RedisKeys.approval(this.orgId, approvalId), JSON.stringify(approval));
+
+      await this.logAuditEvent({
+        eventType: 'script_approved',
+        userId: decidedBy,
+        approvalId,
+        scriptHash: approval.scriptHash,
+        details: { note, toolCallCount: runResult.toolCallCount },
+      });
+
+      return {
+        success: true,
+        status: 'approved',
+        result: runResult.result,
+      };
+    } catch (err: any) {
+      approval.status = 'failed';
+      await this.storage.set(RedisKeys.approval(this.orgId, approvalId), JSON.stringify(approval));
+      return {
+        success: false,
+        status: 'failed',
+        error: err.message || String(err),
+      };
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Nemotron Model-Driven Intelligence (Super, Ultra, Nano)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Synthesize an agent execution script from natural language using Nemotron Super.
+   */
+  async synthesizeScript(
+    intent: string,
+    toolStubs: string
+  ): Promise<{ code: string; tokensUsed: number; reasoning?: string }> {
+    const resp = await this.nebius.generateCompletion(
+      'super',
+      [
+        {
+          role: 'system',
+          content:
+            'You are an AI Agent operating within the Airlock Security Gateway. You write executable JavaScript/TypeScript code using only the provided tools.<server>.<tool>(args) interfaces. Never alias or destructure tools. Return ONLY executable code.',
+        },
+        {
+          role: 'user',
+          content: `Task Intent: ${intent}\n\nAvailable Tool Stubs:\n${toolStubs}\n\nWrite an execution script to achieve this task:`,
+        },
+      ],
+      { maxTokens: 1024 }
+    );
+
+    const code = resp.content.replace(/^```[a-z]*\n/i, '').replace(/\n```$/, '').trim();
+    return { code, tokensUsed: resp.usage.totalTokens, reasoning: resp.reasoning };
+  }
+
+  /**
+   * Rewrite a rejected or held script into a safe, compliant script using Nemotron Ultra.
+   */
+  async repairScript(
+    code: string,
+    reasons: string[]
+  ): Promise<{ repairedCode: string; explanation: string; tokensUsed: number }> {
+    const resp = await this.nebius.generateCompletion(
+      'ultra',
+      [
+        {
+          role: 'system',
+          content:
+            'You are Airlock Security Policy Repair Engine. Analyze the rejected agent script and rewrite it to adhere strictly to zero-trust policy without violating data flows.',
+        },
+        {
+          role: 'user',
+          content: `Rejection reasons:\n${reasons.join('\n')}\n\nOriginal Code:\n${code}\n\nRewrite the script safely to remove insecure exfiltration or forbidden syntax:`,
+        },
+      ],
+      { maxTokens: 1024 }
+    );
+
+    const repairedCode = resp.content.replace(/^```[a-z]*\n/i, '').replace(/\n```$/, '').trim();
     return {
-      success: true,
-      status: 'approved',
-      result: runResult.result,
+      repairedCode,
+      explanation: resp.reasoning || 'Rewritten with Nemotron Ultra to remove policy violations.',
+      tokensUsed: resp.usage.totalTokens,
     };
+  }
+
+  /**
+   * Suggest semantic tags for tools using Nemotron Nano.
+   */
+  async suggestToolTags(server: string, name: string, description: string): Promise<ToolTag[]> {
+    const resp = await this.nebius.generateCompletion(
+      'nano',
+      [
+        {
+          role: 'system',
+          content:
+            'Classify this tool by semantic risk tags: reads_untrusted, reads_private, writes_external, writes_internal, destructive. Return ONLY a JSON array of matching tags.',
+        },
+        {
+          role: 'user',
+          content: `Tool: ${server}.${name}\nDescription: ${description}`,
+        },
+      ],
+      { maxTokens: 60 }
+    );
+
+    try {
+      const parsed = JSON.parse(resp.content);
+      if (Array.isArray(parsed)) return parsed as ToolTag[];
+    } catch {
+      // Fallback
+    }
+    return ['reads_untrusted'];
   }
 
   // ---------------------------------------------------------------------------

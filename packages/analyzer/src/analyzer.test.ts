@@ -104,11 +104,28 @@ test('Analyzer: Rejects process and globalThis environment probing', () => {
   assert.ok(res2.errors.some((e) => e.message.includes('globalThis')));
 });
 
-test('Analyzer: Rejects prototype pollution attempts', () => {
-  const code = `const p = Object.__proto__;`;
-  const res = analyzeScript(code);
-  assert.equal(res.valid, false);
-  assert.ok(res.errors.some((e) => e.message.includes('__proto__')));
+test('Analyzer: Rejects prototype pollution and constructor escape attempts', () => {
+  const code1 = `const p = Object.__proto__;`;
+  const res1 = analyzeScript(code1);
+  assert.equal(res1.valid, false);
+  assert.ok(res1.errors.some((e) => e.message.includes('__proto__')));
+
+  // Specifically test the exact sandbox escape vector:
+  const codeEscape1 = `return Object['constructor']('return typeof process')();`;
+  const resEscape1 = analyzeScript(codeEscape1);
+  assert.equal(resEscape1.valid, false);
+  assert.ok(resEscape1.errors.length > 0);
+
+  // Template literal constructor escape:
+  const codeEscape2 = "return Object[`constructor`]('return typeof process')();";
+  const resEscape2 = analyzeScript(codeEscape2);
+  assert.equal(resEscape2.valid, false);
+  assert.ok(resEscape2.errors.length > 0);
+
+  // Array constructor escape:
+  const codeEscape3 = `const c = [].constructor;`;
+  const resEscape3 = analyzeScript(codeEscape3);
+  assert.equal(resEscape3.valid, false);
 });
 
 test('Analyzer: Rejects classes, this, var, and tagged templates', () => {

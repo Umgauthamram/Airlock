@@ -13,6 +13,7 @@
   "dependencies": {
     "@airlock/analyzer": "workspace:*",
     "@airlock/mocks": "workspace:*",
+    "@airlock/nebius": "workspace:*",
     "@airlock/policy": "workspace:*",
     "@airlock/shared": "workspace:*",
     "dotenv": "^16.4.7",
