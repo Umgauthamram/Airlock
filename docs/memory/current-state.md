@@ -12,8 +12,8 @@
 - **Status**: Hackathon Slice (Phases 0, 1, 2, 3) 100% Complete & Verified
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
-- Implemented `@airlock/nebius` with Token Factory client across NVIDIA Nemotron Nano, Super, and Ultra tiers
-- Implemented `@airlock/agent-ref` testing token usage across classic multi-turn mode vs. Airlock script mode
+- Connected live Nebius API key: verified active Token Factory endpoints with live `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B` completions, reasoning trace extraction, and Nebius ConTree Sandboxes client
+- Completed Poppins typography, full-screen width, and balanced left/right grid layouts across all web pages
 - Built and validated reproducible benchmark harness `@airlock/bench` (`pnpm bench`) over 60 scenarios (30 attacks + 30 benign): **100% block rate, 0% false holds, 94.7% token reduction, 1.26ms p95 latency**
 - Added benchmark results view (`/app/results`) and drafted legal pages (`/terms`, `/privacy`)
 - Completed comprehensive `FEEDBACK.md`, updated `README.md`, and recorded ADR `0004-empirical-benchmark-and-token-reduction-proof.md`
