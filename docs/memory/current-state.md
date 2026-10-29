@@ -16,6 +16,7 @@
 - Added Apache-2.0 `LICENSE`, `FEEDBACK.md`, and top-level `README.md`
 - Created `infra/docker-compose.yml` for local Redis Stack (JSON + RediSearch)
 - Implemented and tested `@airlock/shared` with cluster slot hash-tag builders, RBAC, and Zod schemas
+- Configured `.env` and `.env.example` templates for local Redis, Auth.js, and Nebius Token Factory
 - Documented ADR `0001-monorepo-and-redis-cluster-affinity.md`
 
 ## 4. Next Immediate Steps
