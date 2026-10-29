@@ -5,6 +5,7 @@
     "dev:web": "pnpm --filter @airlock/web dev",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
+    "bench": "pnpm --filter @airlock/bench run bench",
     "lint": "pnpm -r lint"
   },
   "devDependencies": {

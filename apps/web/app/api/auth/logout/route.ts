@@ -7,3 +7,4 @@ export async function GET(req: Request) {
   const redirectUrl = new URL('/login', url.origin);
   return NextResponse.redirect(redirectUrl);
 }
+

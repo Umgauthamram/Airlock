@@ -100,6 +100,14 @@ export function analyzeScript(code: string, options: AnalyzerOptions = {}): Anal
       });
     },
 
+    ImportExpression(node: any) {
+      errors.push({
+        line: node.loc.start.line,
+        message: "Dynamic import() is not permitted in agent scripts.",
+        code: 'DISALLOWED_IMPORT',
+      });
+    },
+
     // Member expression property checks (e.g. prototype traversal)
     MemberExpression(node: any) {
       if (!node.computed && node.property.type === 'Identifier') {

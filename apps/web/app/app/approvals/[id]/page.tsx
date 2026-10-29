@@ -103,3 +103,4 @@ export default async function ApprovalDetailPage({ params }: { params: Promise<{
     </div>
   );
 }
+

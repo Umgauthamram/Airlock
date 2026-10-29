@@ -77,3 +77,4 @@ return { status: "processed", count: emails.length };`,
   const redirectUrl = new URL('/app', url.origin);
   return NextResponse.redirect(redirectUrl);
 }
+

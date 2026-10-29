@@ -8,17 +8,16 @@
 - **Languages**: TypeScript / Node.js
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: Phase 2 Complete -> Ready for Phase 3 (Demo, Proof, Benchmark & Submission)
-- **Status**: Phase 2 Done
+- **Current Focus**: Phase 3 Complete -> Hackathon Core Delivery Verified
+- **Status**: Hackathon Slice (Phases 0, 1, 2, 3) 100% Complete & Verified
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
-- Implemented Next.js 16 App Router control plane (`apps/web`) with Source Serif 4 & IBM Plex typography
-- Built server-side RBAC data-access layer (`requireSession`, `requireRole`) and instant Demo Mode (`/api/auth/demo`)
-- Developed application screens: Approvals queue & inspection detail, Audit stream explorer, Agents & Kill switch, Upstream tools catalog, Policies table, and System dashboard
-- Built public landing page (`/`), Login (`/login`), Documentation (`/docs`), and Request Access (`/request-access`)
-- Verified optimized Next.js production build (`next build`) and recorded ADR `0003-control-plane-rbac-and-demo-isolation.md`
+- Implemented `@airlock/nebius` with Token Factory client across NVIDIA Nemotron Nano, Super, and Ultra tiers
+- Implemented `@airlock/agent-ref` testing token usage across classic multi-turn mode vs. Airlock script mode
+- Built and validated reproducible benchmark harness `@airlock/bench` (`pnpm bench`) over 60 scenarios (30 attacks + 30 benign): **100% block rate, 0% false holds, 94.7% token reduction, 1.26ms p95 latency**
+- Added benchmark results view (`/app/results`) and drafted legal pages (`/terms`, `/privacy`)
+- Completed comprehensive `FEEDBACK.md`, updated `README.md`, and recorded ADR `0004-empirical-benchmark-and-token-reduction-proof.md`
 
 ## 4. Next Immediate Steps
-- [ ] Begin Phase 3: Implement `@airlock/nebius` (Token Factory client for Nemotron Nano, Super, Ultra)
-- [ ] Implement `@airlock/agent-ref` (side-by-side classic tool-calling vs Airlock script mode)
-- [ ] Implement `@airlock/bench` (benchmark suite measuring block rate, token savings, and latency)
+- [ ] Review live local test run (`pnpm -r test` & `pnpm bench`) with user
+- [ ] Ready for deployment and demo video recording

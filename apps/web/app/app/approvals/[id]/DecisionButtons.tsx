@@ -77,3 +77,4 @@ export default function DecisionButtons({ approvalId }: { approvalId: string }) 
     </div>
   );
 }
+

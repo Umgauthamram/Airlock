@@ -23,3 +23,4 @@ Airlock's control plane allows human operators and security administrators to in
 - Hackathon judges can instantly test the end-to-end approval and audit workflow with one click.
 - Enforced server-side RBAC guarantees viewers cannot approve scripts or manipulate agent kill switches.
 - Strict Redis key isolation guarantees demo exploration cannot corrupt production data.
+

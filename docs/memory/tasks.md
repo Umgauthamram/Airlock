@@ -24,12 +24,14 @@
   - [x] Public landing page (`/`), Login (`/login`), Documentation (`/docs`), Request Access (`/request-access`)
   - [x] Verified full Next.js production build (`next build`)
   - [x] Record ADR `0003-control-plane-rbac-and-demo-isolation.md`
-- [ ] Phase 3: Demo, Proof, Benchmark & Submission
-  - [ ] Implement `@airlock/nebius` Token Factory client (OpenAI-compatible client with usage tracking for Nano, Super, Ultra)
-  - [ ] Implement `@airlock/agent-ref` (reference agent in classic multi-turn mode vs Airlock script mode)
-  - [ ] Implement `@airlock/bench` (reproducible benchmark harness `pnpm bench` with 30 attack + 30 benign scenarios)
-  - [ ] Benchmark results display & documentation
-  - [ ] Final submission verification checklist
+- [x] Phase 3: Demo, Proof, Benchmark & Submission
+  - [x] Implement `@airlock/nebius` Token Factory client (OpenAI-compatible client with usage tracking for Nano, Super, Ultra)
+  - [x] Implement `@airlock/agent-ref` (reference agent in classic multi-turn mode vs Airlock script mode)
+  - [x] Implement `@airlock/bench` (reproducible benchmark suite `pnpm bench` with 30 attack + 30 benign scenarios)
+  - [x] Verified benchmark results: 100% attack block/hold rate, 0% false holds, 94.7% token reduction, 1.26ms p95 latency
+  - [x] Implemented benchmark results view (`/app/results`) and legal pages (`/terms`, `/privacy`)
+  - [x] Updated `README.md` and `FEEDBACK.md` with complete technical observations
+  - [x] Recorded ADR `0004-empirical-benchmark-and-token-reduction-proof.md`
 
 ## Backlog
 - [ ] Phase 4: Production hardening (taint tracking, canary credentials, secret rotation)

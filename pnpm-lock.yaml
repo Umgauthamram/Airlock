@@ -96,6 +96,25 @@ importers:
         specifier: ^5
         version: 5.9.3
 
+  packages/agent-ref:
+    dependencies:
+      '@airlock/mocks':
+        specifier: workspace:*
+        version: link:../mocks
+      '@airlock/nebius':
+        specifier: workspace:*
+        version: link:../nebius
+      '@airlock/shared':
+        specifier: workspace:*
+        version: link:../shared
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.5
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+
   packages/analyzer:
     dependencies:
       '@airlock/shared':
@@ -118,7 +137,45 @@ importers:
         specifier: ^5.7.0
         version: 5.9.3
 
+  packages/bench:
+    dependencies:
+      '@airlock/agent-ref':
+        specifier: workspace:*
+        version: link:../agent-ref
+      '@airlock/analyzer':
+        specifier: workspace:*
+        version: link:../analyzer
+      '@airlock/mocks':
+        specifier: workspace:*
+        version: link:../mocks
+      '@airlock/policy':
+        specifier: workspace:*
+        version: link:../policy
+      '@airlock/shared':
+        specifier: workspace:*
+        version: link:../shared
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.5
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+
   packages/mocks:
+    dependencies:
+      '@airlock/shared':
+        specifier: workspace:*
+        version: link:../shared
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.5
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+
+  packages/nebius:
     dependencies:
       '@airlock/shared':
         specifier: workspace:*

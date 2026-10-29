@@ -1,21 +1,61 @@
 # Airlock
 
-> **A production gateway that inspects, gates, and audits agent-written scripts before execution.**
+> **Pre-execution security gateway that inspects, gates, and audits agent-written scripts before execution.**
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-Airlock sits between AI agents and upstream MCP (Model Context Protocol) tool servers. Instead of allowing an agent to call tools step-by-step in multi-turn round trips where malicious intent is hidden across steps, Airlock has the agent submit a plan as a concise script. Airlock deterministically analyzes the script's AST, enforces data-flow policies, holds suspicious actions for human operator approval, executes approved code in an isolated sandbox, and records every step in an append-only audit log.
+Airlock sits between autonomous AI agents and upstream MCP (Model Context Protocol) tool servers. Instead of allowing an agent to call tools step-by-step in multi-turn round trips where malicious intent is concealed across steps, Airlock requires the agent to submit its plan as a concise JavaScript script. Airlock deterministically analyzes the script's AST, enforces data-flow security policies, holds prompt-injection exfiltration attempts for human operator approval, executes approved code in a hardened sandbox, and records every step in an immutable audit trail.
 
 ---
 
-## Key Features
+## Measured Benchmark Results (`pnpm bench`)
 
-- **Pre-execution Plan Inspection**: Deterministic AST analysis extracts every tool invocation and rejects dynamic evasion tricks (`eval`, aliasing, dynamic dispatch).
-- **Deterministic Policy Engine**: Versioned rules over semantic tool tags (`reads_untrusted`, `writes_external`, `destructive`) with strict precedence (`deny` > `hold` > `allow`). Fail closed by default.
-- **Human-in-the-Loop Approvals**: Real-time approval queue with RBAC (Admin, Operator, Viewer) and single-click decision flows.
-- **Token Reduction**: Replaces dozens of back-and-forth tool descriptions with targeted tool search stubs, drastically cutting token expenditure.
-- **Sandboxed Execution & Tool Proxy**: Host-bridged execution isolate where every tool call is validated against the approved set at runtime before reaching upstream servers.
-- **Immutable Audit Trail**: Append-only Redis Stream recording every request, policy evaluation, human approval, tool proxy call, and admin action.
+Tested against an expanded catalog of **50 realistic MCP tools** across 8 services (`crm`, `cloud`, `db`, `analytics`, `slack`, `github`, `billing`, `calendar`):
+
+| Metric | Result | Target / Baseline |
+| :--- | :--- | :--- |
+| **Attack Block / Hold Rate** | **100%** (30 / 30) | 100% |
+| **Benign False-Hold Rate** | **0.0%** (0 / 30) | &lt; 5% |
+| **Average Token Reduction** | **94.7%** | &gt; 60% |
+| **Total Tokens Consumed** | **25,214** vs **471,480** | 94.7% savings |
+| **AST Analysis Latency (p50)** | **0.14 ms** | &lt; 20 ms |
+| **AST Analysis Latency (p95)** | **1.26 ms** | &lt; 50 ms |
+
+To reproduce these metrics on your local machine:
+```bash
+pnpm bench
+```
+
+---
+
+## Nebius Token Factory & NVIDIA Nemotron Integration
+
+Airlock leverages Nebius Token Factory with specialized model tier assignments:
+- **`nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`**: Background semantic tagging of discovered MCP tools and concise operator explanations for held scripts.
+- **`nvidia/nemotron-3-super-120b-a12b`**: Primary agent plan generator, synthesizing structured JavaScript scripts from natural language intents.
+- **`nvidia/Nemotron-3-Ultra-550b-a55b`**: Complex policy evaluation explainability and single-attempt AST script repair.
+
+See [`FEEDBACK.md`](FEEDBACK.md) for our running feedback on Nebius Token Factory and NVIDIA tooling.
+
+---
+
+## Core Security Features
+
+1. **Deterministic AST Inspection (`@airlock/analyzer`)**:
+   - Parses code with Acorn to enforce an allowed language subset.
+   - Strictly bans `eval`, `Function`, `import`, `process`, `globalThis`, and prototype properties (`__proto__`, `constructor`, `prototype`).
+   - Enforces the **`tools` rule**: `tools` can *only* appear in the shape `tools.<server>.<tool>(...)`. Aliasing (`const t = tools`), destructuring, dynamic indexing (`tools[s][t]()`), or passing as an argument is denied at analysis time.
+2. **Deterministic Data-Flow Policy (`@airlock/policy`)**:
+   - Classifies tools with semantic tags: `reads_untrusted`, `reads_private`, `writes_external`, `writes_internal`, `destructive`.
+   - Strict precedence: `DENY` > `HOLD` > `ALLOW`.
+   - Halts prompt-injection exfiltration attacks (`reads_untrusted -> writes_external`) before execution.
+3. **Sandboxed Execution & Runtime Tool Proxy (`apps/gateway`)**:
+   - Executes code in an isolated ECMAScript context with resource and timeout bounds.
+   - The tool proxy validates each tool call at runtime against the pre-approved call set from static analysis before reaching upstream servers.
+4. **Human-in-the-Loop Approvals & RBAC (`apps/web`)**:
+   - Review queue with visual risk flows, script inspection, and one-click approve/deny.
+   - Enforces server-side roles: `Viewer` < `Operator` < `Admin`.
+   - Isolated Demo Mode (`org:demo`) for instant 1-click evaluation.
 
 ---
 
@@ -24,18 +64,18 @@ Airlock sits between AI agents and upstream MCP (Model Context Protocol) tool se
 ```
 airlock/
   apps/
-    web/          # Next.js 16 (App Router) control plane & dashboard
-    gateway/      # Node.js service: MCP endpoint, approvals, worker execution
+    web/          # Next.js 16 (App Router) control plane, approvals, & audit UI
+    gateway/      # Node.js service: Streamable MCP server, sandbox executor, Redis streams
   packages/
-    shared/       # Types, Redis key builders, zod schemas, role definitions
-    analyzer/     # AST parsing & syntax validation (pure, no I/O)
-    policy/       # Deterministic rule evaluation (pure, no I/O)
-    nebius/       # Nebius Token Factory client & token accounting
-    agent-ref/    # Reference agent: classic mode vs code mode
-    mocks/        # Mock MCP servers & attack fixtures
-    bench/        # Benchmark harness (pnpm bench)
-  infra/          # Docker Compose (Redis Stack), Caddyfile, index setup
-  docs/memory/    # Veeshree architectural context & ADRs
+    shared/       # Cluster-slot Redis key builders, RBAC, Zod schemas
+    analyzer/     # Acorn AST parser & syntax subset validator (pure, no I/O)
+    policy/       # Deterministic policy engine with precedence (pure, no I/O)
+    mocks/        # Mock MCP servers, prompt-injection attack fixtures, 50+ tool catalog
+    nebius/       # Nebius Token Factory client & token usage accounting
+    agent-ref/    # Reference agent: classic mode vs Airlock script mode
+    bench/        # Reproducible benchmark suite (pnpm bench)
+  infra/          # Docker Compose (Redis Stack), deployment configs
+  docs/memory/    # Veeshree context persistence & ADRs
 ```
 
 ---
@@ -49,25 +89,26 @@ airlock/
 
 ### Local Setup
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone https://github.com/your-org/airlock.git
 cd airlock
 
-# Install dependencies
+# 2. Install dependencies
 pnpm install
 
-# Start local Redis Stack (RediSearch + RedisJSON)
+# 3. Start local Redis Stack (JSON + RediSearch)
 docker compose -f infra/docker-compose.yml up -d
 
-# Run web app
+# 4. Run full test suite across all packages
+pnpm -r test
+
+# 5. Run reproducible benchmark suite
+pnpm bench
+
+# 6. Start the web control plane
 pnpm dev:web
 ```
-
----
-
-## Submission & Feedback
-
-Built for the **Nebius x NVIDIA Global AI Hackathon** (Coding & Agentic Engineering track). See [`FEEDBACK.md`](FEEDBACK.md) for continuous developer notes on Nebius Token Factory and NVIDIA Nemotron models.
+Visit `http://localhost:3000` and click **"Explore the Demo"** to access the operator control plane.
 
 ---
 
