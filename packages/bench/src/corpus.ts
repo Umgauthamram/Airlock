@@ -555,3 +555,4 @@ export const BENIGN_SCENARIOS: BenchmarkScenario[] = [
     category: 'tickets',
   },
 ];
+

@@ -22,3 +22,4 @@ test('NebiusClient: Model tier mappings & offline fallback generation', async ()
   assert.equal(superRes.tier, 'super');
   assert.ok(superRes.content.includes('tools.inbox.get_emails'));
 });
+

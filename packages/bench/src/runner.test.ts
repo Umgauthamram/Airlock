@@ -27,3 +27,4 @@ test('Benchmark: Evaluates all 60 scenarios with high accuracy and token savings
     `Expected p95 latency < 50ms, got ${summary.latencyP95Ms}ms`
   );
 });
+

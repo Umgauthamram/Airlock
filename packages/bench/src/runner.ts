@@ -145,3 +145,4 @@ export async function runBenchmark(): Promise<{ results: ScenarioResult[]; summa
 
   return { results, summary };
 }
+

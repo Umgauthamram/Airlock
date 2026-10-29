@@ -26,3 +26,4 @@ These claims must be backed by reproducible empirical benchmarks (`pnpm bench`) 
 ## Consequences
 - Hackathon judges and developers can independently execute `pnpm bench` to verify all claims in seconds.
 - Published numbers on the landing page and dashboard reflect measured realities.
+

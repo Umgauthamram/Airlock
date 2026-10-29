@@ -35,3 +35,4 @@ test('AgentRef: Compares token use in classic vs airlock mode', async () => {
     `Expected token savings > 60%, got ${tokenSavingsPercent.toFixed(1)}%`
   );
 });
+
