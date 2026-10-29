@@ -33,3 +33,4 @@ COPY --from=builder /app/apps/gateway/package.json ./apps/gateway/package.json
 EXPOSE 4000
 
 CMD ["node", "apps/gateway/dist/server.js"]
+
