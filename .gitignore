@@ -2,6 +2,8 @@
 /.vee/config.json
 /.vee/index.json
 .env
+.env*.local
+.env.production
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
