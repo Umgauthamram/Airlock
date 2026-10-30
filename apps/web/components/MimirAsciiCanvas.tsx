@@ -24,8 +24,8 @@ export default function MimirAsciiCanvas({
   const [renderMode, setRenderMode] = useState(initialRenderMode);
   const mousePos = useRef<{ x: number; y: number } | null>(null);
 
-  // Default background color matching the dark atmospheric Mimir palette (#080c14)
-  const effectiveBgColor = backgroundColor || (theme === 'dark' ? '#080c14' : '#e6ece6');
+  // Default background color matching the dark atmospheric Mimir palette (#0f172b)
+  const effectiveBgColor = backgroundColor || (theme === 'dark' ? '#0f172b' : '#e6ece6');
 
   useEffect(() => {
     const canvas = canvasRef.current;

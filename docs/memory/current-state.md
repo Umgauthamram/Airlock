@@ -8,15 +8,15 @@
 - **Languages**: TypeScript / Node.js
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: Landing Page Elevation & Post-Auth Control Plane Isolation
-- **Status**: Completed Mimir sculpture centering within dedicated hero viewport, polished rounded UI design, automated dashboard redirect for authenticated users, and added comprehensive enterprise security sections.
+- **Current Focus**: Google-Only Dedicated Demo Allocation, Strict Dark Landing Theme & Light Mode App
+- **Status**: Completed Google-only authentication workflow with instant 12-hour demo allocation by email, strict dark mode landing page (`#0f172b`), normal light mode app pages (`#f8fafc`), and authenticated dashboard auto-redirect.
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
-- **Prominent Mimir Sculpture Centering**: Encapsulated the hero viewport into its own height-constrained container, scaling and centering the chiseled bust of Mimir directly beside the headline with smooth rounded corners (`rounded-2xl`, `rounded-xl`).
+- **Google-Only Sign-In & Dedicated Demo Allocation**: Removed email/password inputs and waitlist requests; users sign in via Google and receive an instantly provisioned 12-hour demo environment keyed to their email (`demo_<email>`).
+- **Strict Theme Segregation**: Standardized landing page strictly on dark mode (`#0f172b`) with polished rounded geometry and centered Mimir sculpture; all other pages (`/app/*`, `/login`, `/quickstart`) operate in clean light mode (`#f8fafc`).
 - **Post-Auth Landing Page Bypass**: Added server-side session checks in `page.tsx` that automatically redirect authenticated and 12-hour demo users straight to the dashboard (`/app`).
-- **Control Plane Isolation**: Removed internal control plane cards from the public landing page, keeping management endpoints protected behind active sessions.
-- **Rich Technical Landing Sections**: Added 5 new high-impact product sections: (1) 3-Step Pre-Execution Pipeline, (2) Enterprise Threat Matrix covering 6 attack vectors, (3) Multi-Turn vs. Script Mode benchmark table, (4) 60-Second Client Setup (Cursor & Claude), and (5) Interactive Technical FAQ.
-- **Pure Midnight Theme**: Retired the light theme switcher, standardizing on the polished dark obsidian aesthetic (`#080c14`) matching the 21st.dev reference.
+- **Control Plane Isolation**: Protected control plane operations behind authenticated sessions with per-org Redis sandboxing.
+- **Rich Technical Landing Sections**: Added 5 technical product sections (Pre-Execution Pipeline, Enterprise Threat Matrix, Benchmark Comparison, 60s Client Setup, Interactive FAQ).
 
 ## 4. Next Immediate Steps
 - [ ] Review live local test run (`pnpm -r test` & `pnpm bench`) with user

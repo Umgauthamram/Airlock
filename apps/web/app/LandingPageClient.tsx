@@ -8,12 +8,30 @@ import MimirAsciiCanvas from '@/components/MimirAsciiCanvas';
 export default function LandingPageClient() {
   const router = useRouter();
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  function handleAccessSubmit(e: React.FormEvent) {
+  async function handleAccessSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (email) {
-      router.push(`/demo-request?email=${encodeURIComponent(email)}`);
+    if (!email) {
+      router.push('/login');
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok && data.redirect) {
+        router.push(data.redirect);
+      } else {
+        router.push(`/login?email=${encodeURIComponent(email)}`);
+      }
+    } catch {
+      router.push('/login');
     }
   }
 
@@ -80,9 +98,9 @@ export default function LandingPageClient() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#080c14] text-slate-100 font-sans antialiased selection:bg-emerald-500 selection:text-black">
+    <div className="min-h-screen flex flex-col bg-[#0f172b] text-slate-100 font-sans antialiased selection:bg-emerald-500 selection:text-black">
       {/* Top Header */}
-      <header className="w-full px-6 lg:px-12 py-6 flex items-center justify-between border-b border-slate-800/80 z-30 bg-[#080c14]/90 backdrop-blur-md sticky top-0">
+      <header className="w-full px-6 lg:px-12 py-6 flex items-center justify-between border-b border-slate-800/80 z-30 bg-[#0f172b]/95 backdrop-blur-md sticky top-0">
         <Link href="/" className="flex items-center gap-2 group">
           <span className="font-mono font-black text-xl tracking-[0.25em] text-white uppercase">AIRLOCK</span>
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 group-hover:scale-125 transition-transform"></span>
@@ -92,14 +110,11 @@ export default function LandingPageClient() {
           <Link href="/quickstart" className="text-slate-400 hover:text-white transition-colors">
             Quick Start
           </Link>
-          <Link href="/login" className="text-slate-400 hover:text-white transition-colors">
-            Sign In
-          </Link>
           <Link
-            href="/demo-request"
-            className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl transition-all shadow-lg shadow-emerald-500/20 hover:scale-[1.02]"
+            href="/login"
+            className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl transition-all shadow-lg shadow-emerald-500/20 hover:scale-[1.02] flex items-center gap-2"
           >
-            Get 12H Pass →
+            <span>Sign in with Google →</span>
           </Link>
         </nav>
       </header>
@@ -114,7 +129,7 @@ export default function LandingPageClient() {
               cellSize={13}
               renderMode="mosaic"
               theme="dark"
-              backgroundColor="#080c14"
+              backgroundColor="#0f172b"
               className="w-full h-full"
             />
           </div>
@@ -148,7 +163,7 @@ export default function LandingPageClient() {
               {/* Polished Rounded Access Box */}
               <div className="flex flex-col gap-3 pt-2 max-w-md">
                 <span className="text-xs font-mono tracking-wider text-slate-400">
-                  Available now. Request your 12-hour operator license:
+                  Instant allocated demo for each Google account:
                 </span>
 
                 <form onSubmit={handleAccessSubmit} className="flex p-1.5 bg-slate-900/90 border border-slate-700 rounded-2xl shadow-xl backdrop-blur-md focus-within:border-emerald-400 transition-colors">
@@ -157,19 +172,20 @@ export default function LandingPageClient() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="ENTER YOUR WORK EMAIL"
+                    placeholder="YOUR GOOGLE EMAIL"
                     className="px-4 py-3 bg-transparent text-xs font-mono tracking-wider text-white placeholder:text-slate-500 outline-none flex-1 min-w-0"
                   />
                   <button
                     type="submit"
-                    className="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-md hover:scale-[1.02] shrink-0"
+                    disabled={loading}
+                    className="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-md hover:scale-[1.02] shrink-0 disabled:opacity-50"
                   >
-                    REQUEST ACCESS →
+                    {loading ? 'SIGNING IN...' : 'CONTINUE →'}
                   </button>
                 </form>
 
                 <div className="flex items-center gap-4 text-[11px] text-slate-500 font-mono pt-1">
-                  <span>⚡ 5-min auto-approval</span>
+                  <span>⚡ Instant Google allocation</span>
                   <span>·</span>
                   <span>🔒 Isolated MicroVM sandbox</span>
                   <span>·</span>
@@ -181,7 +197,7 @@ export default function LandingPageClient() {
         </section>
 
         {/* SECTION 1: HOW AIRLOCK WORKS (3-STEP PIPELINE) */}
-        <section className="w-full py-24 px-6 lg:px-12 border-b border-slate-800/80 bg-[#080c14]">
+        <section className="w-full py-24 px-6 lg:px-12 border-b border-slate-800/80 bg-[#0f172b]">
           <div className="max-w-7xl mx-auto flex flex-col gap-14">
             <div className="flex flex-col gap-2 max-w-2xl">
               <span className="text-xs font-mono uppercase tracking-widest text-emerald-400 font-bold">
@@ -286,7 +302,7 @@ export default function LandingPageClient() {
         </section>
 
         {/* SECTION 3: COMPARISON TABLE (TRADITIONAL VS AIRLOCK) */}
-        <section className="w-full py-24 px-6 lg:px-12 border-b border-slate-800/80 bg-[#080c14]">
+        <section className="w-full py-24 px-6 lg:px-12 border-b border-slate-800/80 bg-[#0f172b]">
           <div className="max-w-7xl mx-auto flex flex-col gap-12">
             <div className="flex flex-col gap-2 text-center items-center max-w-2xl mx-auto">
               <span className="text-xs font-mono uppercase tracking-widest text-emerald-400 font-bold">
@@ -426,7 +442,7 @@ export default function LandingPageClient() {
         </section>
 
         {/* SECTION 5: FREQUENTLY ASKED QUESTIONS */}
-        <section className="w-full py-24 px-6 lg:px-12 border-b border-slate-800/80 bg-[#080c14]">
+        <section className="w-full py-24 px-6 lg:px-12 border-b border-slate-800/80 bg-[#0f172b]">
           <div className="max-w-4xl mx-auto flex flex-col gap-12">
             <div className="flex flex-col gap-2 text-center items-center">
               <span className="text-xs font-mono uppercase tracking-widest text-emerald-400 font-bold">
@@ -463,7 +479,7 @@ export default function LandingPageClient() {
         </section>
 
         {/* FINAL CALL TO ACTION */}
-        <section className="w-full py-24 px-6 lg:px-12 bg-gradient-to-b from-[#080c14] to-slate-950 text-center flex flex-col items-center gap-6">
+        <section className="w-full py-24 px-6 lg:px-12 bg-gradient-to-b from-[#0f172b] to-slate-950 text-center flex flex-col items-center gap-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-semibold">
             Ready in 60 Seconds
           </div>
@@ -475,10 +491,10 @@ export default function LandingPageClient() {
           </p>
           <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
             <Link
-              href="/demo-request"
+              href="/login"
               className="px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold font-mono text-xs uppercase tracking-wider rounded-xl transition-all shadow-xl shadow-emerald-500/20 hover:scale-[1.02]"
             >
-              Request 12H Demo Pass →
+              Sign in with Google →
             </Link>
             <Link
               href="/quickstart"
