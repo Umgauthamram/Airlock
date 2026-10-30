@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { requireSession } from '@/lib/auth';
 import { getDashboardStats } from '@/lib/data';
 import { AppNav } from '@/components/AppNav';
+import { DemoCountdown } from '@/components/DemoCountdown';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,9 +16,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <header className="border-b border-[#e2e8f0] bg-white sticky top-0 z-40 w-full">
         <div className="w-full px-6 lg:px-10 h-16 flex items-center justify-between">
           <div className="flex items-center gap-8">
-            <Link href="/app" className="flex items-center gap-2 font-bold text-xl text-[#0f172a] tracking-tight">
-              <span>Airlock</span>
-            </Link>
+            <div className="flex flex-col justify-center">
+              <Link href="/app" className="font-bold text-xl text-[#0f172a] tracking-tight leading-none">
+                <span>Airlock</span>
+              </Link>
+              {session.isDemo && (
+                <DemoCountdown initialExpiry={session.exp} />
+              )}
+            </div>
 
             <AppNav pendingApprovals={stats.pendingApprovals} />
           </div>

@@ -59,7 +59,6 @@ export default async function ApprovalDetailPage({ params }: { params: Promise<{
           {/* Risk Alert Box */}
           <div className="p-5 bg-amber-50/90 border border-amber-200 rounded-lg flex flex-col gap-2.5 shadow-xs">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-600 animate-pulse"></span>
               <span className="text-xs font-bold uppercase tracking-wider text-amber-900">
                 Policy Alert: Risky Data-Flow Intercepted
               </span>
@@ -79,17 +78,6 @@ export default async function ApprovalDetailPage({ params }: { params: Promise<{
 
           {/* Script Code Inspector */}
           <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-xs flex flex-col">
-            <div className="flex items-center justify-between px-5 py-3.5 bg-slate-900 border-b border-slate-800 text-slate-300 text-xs">
-              <div className="flex items-center gap-2 font-mono">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                <span className="ml-2 text-slate-400">Inspected Script Source</span>
-              </div>
-              <span className="font-mono text-slate-500 text-[11px]">
-                SHA-256: {approval.scriptHash.slice(0, 20)}...
-              </span>
-            </div>
             <pre className="p-6 bg-slate-950 text-slate-100 font-mono text-xs leading-relaxed overflow-x-auto">
               <code>{approval.code}</code>
             </pre>
@@ -160,10 +148,6 @@ export default async function ApprovalDetailPage({ params }: { params: Promise<{
               <h3 className="font-bold text-slate-900 text-xs uppercase tracking-wider text-slate-400">
                 Sandbox Environment
               </h3>
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                MicroVM Isolated
-              </span>
             </div>
 
             <div className="flex justify-between py-1.5 border-b border-slate-100">

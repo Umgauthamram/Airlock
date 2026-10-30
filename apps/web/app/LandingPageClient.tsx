@@ -80,23 +80,8 @@ export default function LandingPageClient() {
         onGoogleLogin={() => {
           window.location.href = '/api/auth/google';
         }}
-        onDemoRequest={async (demoEmail) => {
-          setLoading(true);
-          try {
-            const res = await fetch('/api/auth/google', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email: demoEmail }),
-            });
-            const data = await res.json();
-            if (res.ok && data.redirect) {
-              router.push(data.redirect);
-            } else {
-              router.push(`/login?email=${encodeURIComponent(demoEmail)}`);
-            }
-          } catch {
-            router.push(`/login?email=${encodeURIComponent(demoEmail)}`);
-          }
+        onDemoRequest={(demoEmail) => {
+          router.push(`/login?email=${encodeURIComponent(demoEmail)}`);
         }}
         navItems={[
           { label: "Pipeline", href: "#pipeline" },

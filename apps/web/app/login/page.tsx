@@ -10,8 +10,12 @@ function LoginContent() {
 
   const initialEmail = searchParams.get('email') || '';
   const [demoEmail, setDemoEmail] = useState(initialEmail);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [devCode, setDevCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
 
   const errorParam = searchParams.get('error');
 
@@ -21,22 +25,57 @@ function LoginContent() {
 
     setLoading(true);
     setError(null);
+    setInfoMessage(null);
 
     try {
-      const res = await fetch('/api/auth/google', {
+      const res = await fetch('/api/auth/demo-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: demoEmail.trim(), name: demoEmail.split('@')[0] }),
+        body: JSON.stringify({ email: demoEmail.trim() }),
       });
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to process demo request');
+        throw new Error(data.error || 'Failed to send verification email');
+      }
+
+      setIsVerifying(true);
+      if (data.devCode) {
+        setDevCode(data.devCode);
+      }
+      setInfoMessage(`Verification code sent to ${demoEmail.trim()}`);
+    } catch (err: any) {
+      setError(err.message || 'Failed to process demo request');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleVerifyCode(e: React.FormEvent) {
+    e.preventDefault();
+    if (!verificationCode.trim()) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/auth/demo-verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: demoEmail.trim(),
+          code: verificationCode.trim(),
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Invalid verification code');
       }
 
       router.push(data.redirect || '/app');
     } catch (err: any) {
-      setError(err.message || 'Failed to process demo request');
+      setError(err.message || 'Verification failed');
       setLoading(false);
     }
   }
@@ -61,12 +100,23 @@ function LoginContent() {
         <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-8 sm:p-10 shadow-xl flex flex-col gap-6">
           <div className="flex flex-col gap-2 text-center items-center">
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Access Airlock Platform</h1>
-            <p className="text-xs text-slate-500">Sign in with Google or request instant demo access</p>
+            <p className="text-xs text-slate-500">Sign in with Google or request instant verified demo access</p>
           </div>
 
           {(error || errorParam) && (
             <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs font-mono">
               {error || (errorParam === 'oauth_error' ? 'Google authentication failed. Please try again.' : errorParam)}
+            </div>
+          )}
+
+          {infoMessage && (
+            <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-mono flex flex-col gap-1">
+              <span>{infoMessage}</span>
+              {devCode && (
+                <span className="font-bold text-[11px] text-emerald-900">
+                  Dev Code: {devCode}
+                </span>
+              )}
             </div>
           )}
 
@@ -108,30 +158,75 @@ function LoginContent() {
             <div className="flex-1 h-px bg-slate-200"></div>
           </div>
 
-          {/* OPTION 2: DEMO REQUEST FOR USERS WHO ENTER EMAIL ID */}
-          <form onSubmit={handleDemoRequest} className="flex flex-col gap-3">
+          {/* OPTION 2: DEMO REQUEST WITH EMAIL VERIFICATION */}
+          <div className="flex flex-col gap-3">
             <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 font-bold">
-              Option 2: Demo Request
+              Option 2: Verified Demo Access
             </span>
 
-            <div className="flex flex-col gap-2.5">
-              <input
-                type="email"
-                required
-                value={demoEmail}
-                onChange={(e) => setDemoEmail(e.target.value)}
-                placeholder="Enter email for demo request (e.g. name@company.com)"
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-sans text-slate-900 placeholder:text-slate-400 outline-none focus:border-emerald-500 focus:bg-white transition-colors"
-              />
-              <button
-                type="submit"
-                disabled={loading || !demoEmail.trim()}
-                className="w-full py-3.5 px-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs font-mono uppercase tracking-wider rounded-xl transition-all shadow-md hover:scale-[1.01] cursor-pointer disabled:opacity-50"
-              >
-                {loading ? 'Allocating Demo...' : 'Request Demo Access →'}
-              </button>
-            </div>
-          </form>
+            {!isVerifying ? (
+              <form onSubmit={handleDemoRequest} className="flex flex-col gap-2.5">
+                <input
+                  type="email"
+                  required
+                  value={demoEmail}
+                  onChange={(e) => setDemoEmail(e.target.value)}
+                  placeholder="Enter email (e.g. name@company.com)"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-sans text-slate-900 placeholder:text-slate-400 outline-none focus:border-emerald-500 focus:bg-white transition-colors"
+                />
+                <button
+                  type="submit"
+                  disabled={loading || !demoEmail.trim()}
+                  className="w-full py-3.5 px-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs font-mono uppercase tracking-wider rounded-xl transition-all shadow-md hover:scale-[1.01] cursor-pointer disabled:opacity-50"
+                >
+                  {loading ? 'Sending Verification...' : 'Send Verification Code →'}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyCode} className="flex flex-col gap-3 animate-in fade-in">
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-xs font-medium text-slate-700">Enter 6-digit code sent to {demoEmail}:</span>
+                  <input
+                    type="text"
+                    required
+                    maxLength={6}
+                    autoFocus
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value.replace(/[^0-9]/g, ''))}
+                    placeholder="123456"
+                    className="w-full px-4 py-3 bg-slate-50 border-2 border-emerald-500 rounded-xl text-center text-lg font-mono tracking-[0.4em] font-bold text-slate-900 outline-none focus:bg-white transition-colors"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading || verificationCode.length < 6}
+                  className="w-full py-3.5 px-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs font-mono uppercase tracking-wider rounded-xl transition-all shadow-md hover:scale-[1.01] cursor-pointer disabled:opacity-50"
+                >
+                  {loading ? 'Verifying...' : 'Verify & Launch Demo →'}
+                </button>
+                <div className="flex items-center justify-between text-[11px] pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsVerifying(false);
+                      setVerificationCode('');
+                    }}
+                    className="text-slate-500 hover:text-slate-800 underline cursor-pointer"
+                  >
+                    Change email
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDemoRequest}
+                    disabled={loading}
+                    className="text-emerald-700 font-semibold hover:underline cursor-pointer"
+                  >
+                    Resend code
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
         </div>
       </main>
     </div>

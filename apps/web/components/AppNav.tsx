@@ -53,3 +53,4 @@ export function AppNav({ pendingApprovals }: AppNavProps) {
     </nav>
   );
 }
+
