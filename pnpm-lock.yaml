@@ -7,14 +7,13 @@ settings:
 importers:
 
   .:
-    dependencies:
-      veeshree:
-        specifier: ^1.0.0-rc.1
-        version: 1.0.0-rc.1
     devDependencies:
       typescript:
         specifier: ^5.7.0
         version: 5.9.3
+      veeshree:
+        specifier: ^1.0.0-rc.1
+        version: 1.0.0-rc.1
 
   apps/gateway:
     dependencies:
