@@ -8,15 +8,15 @@
 - **Languages**: TypeScript / Node.js
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: Dedicated Email Demo Allocation, Underscore Removal & UI Cleanup
-- **Status**: Implemented dedicated email display for allocated demo sessions, removed "12H Demo Pass" badge, and replaced all underscore words across approvals, audit trail, policies, tools, and agents with clean typography and formatting.
+- **Current Focus**: White Landing Page Theme & Direct Google OAuth Redirect
+- **Status**: Updated landing page to clean white background (`bg-white`), routed "Sign in with Google" directly to the real Google OAuth consent screen (`accounts.google.com`), removed mock account chooser modal, and eliminated the 12-hour demo copy string.
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
-- **User Email in Demo Allocation**: Authenticated user emails (e.g. `alex.developer@gmail.com`) are now bound to demo sessions and prominently displayed in the top navbar instead of placeholder emails.
-- **Removed 12H Demo Pass Badge**: Completely eliminated the "12H Demo Pass" badge from the application header.
-- **Zero-Underscore Display Typography**: Built and integrated universal formatting helpers (`cleanUnderscores`, `formatFlowTag`, `formatEventType`) across approvals, audit, agents, policies, and tools to eliminate all displayed underscores (e.g. `appr-demo-prompt-injection`, `reads untrusted → writes external`, `agent-nemotron-super`).
-- **Strict Theme Segregation**: Standardized landing page strictly on dark mode (`#0f172b`) with polished rounded geometry and centered Mimir sculpture; all other pages (`/app/*`, `/login`, `/quickstart`) operate in clean light mode (`#f8fafc`).
-- **Post-Auth Landing Page Bypass**: Added server-side session checks in `page.tsx` that automatically redirect authenticated and demo users straight to the dashboard (`/app`).
+- **High-Contrast Emerald Accents**: Replaced `bg-emerald-50` and `text-emerald-700` across landing page badges, step indicators, inline code tags, and pills with higher-contrast `bg-emerald-200` and `text-emerald-900`.
+- **White Top Floating Navbar**: Styled the floating top navigation bar (`Pipeline`, `Quick Start`, `Sign In`) with a clean white background (`bg-white backdrop-blur-md`), slate border (`border-slate-200`), shadow, and high-contrast dark text (`text-slate-700 hover:text-slate-950`).
+- **White Landing Page Background**: Transitioned landing page from dark `#0f172b` to crisp white (`bg-white`, `bg-slate-50`, `text-slate-900`, `text-slate-600`, slate borders) with high-contrast sections and tables.
+- **Direct Real Google OAuth**: Connected all "Sign in with Google" triggers directly to `/api/auth/google`, redirecting to `https://accounts.google.com/o/oauth2/v2/auth` with configured client credentials.
+- **Removed Mock Account Chooser**: Eliminated the interactive mock "Choose Google Account" modal from `/login`.
 
 ## 4. Next Immediate Steps
 - [ ] Review live local test run (`pnpm -r test` & `pnpm bench`) with user

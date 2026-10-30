@@ -9,9 +9,6 @@ export default function QuickstartPage() {
           <div className="flex items-center gap-3">
             <Link href="/" className="font-bold text-xl tracking-tight text-slate-900 flex items-center gap-2">
               <span>Airlock</span>
-              <span className="text-xs font-mono font-semibold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
-                Gateway
-              </span>
             </Link>
           </div>
           <nav className="flex items-center gap-6 text-sm font-medium">
@@ -35,11 +32,6 @@ export default function QuickstartPage() {
       <main className="flex-1 w-full px-6 lg:px-12 py-12 flex flex-col gap-12 max-w-7xl mx-auto">
         {/* Page Title */}
         <div className="border-b border-slate-200 pb-6 flex flex-col gap-2">
-          <div className="flex items-center gap-2 text-xs font-mono font-semibold text-sky-600 uppercase tracking-wider">
-            <span>Setup &amp; Integration</span>
-            <span>·</span>
-            <span>Step-by-Step</span>
-          </div>
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
             Quick Start Guide
           </h1>
@@ -270,21 +262,7 @@ console.log("Airlock Outcome:", outcome);`}
           </div>
         </section>
 
-        {/* CTA Banner */}
-        <section className="p-8 bg-slate-900 rounded-xl text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
-          <div>
-            <h3 className="text-xl font-bold">Ready to see it in action?</h3>
-            <p className="text-xs text-slate-300 mt-1">
-              Explore the live operator approval queue, inspect scripts, and test policies right now.
-            </p>
-          </div>
-          <Link
-            href="/api/auth/demo"
-            className="px-6 py-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs uppercase tracking-wider transition-colors shadow-xs shrink-0"
-          >
-            Launch Live Demo →
-          </Link>
-        </section>
+       
       </main>
 
       {/* Footer */}

@@ -171,15 +171,9 @@ export default function LandingPageClient() {
           <div className="max-w-7xl mx-auto flex flex-col gap-14">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div className="flex flex-col gap-2 max-w-2xl">
-                <span className="text-xs font-mono uppercase tracking-widest text-emerald-600 font-bold">
-                  Zero-Day Protection
-                </span>
                 <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
                   Attack Vectors Neutralized Before Execution
                 </h2>
-                <p className="text-sm text-slate-600 leading-relaxed mt-1">
-                  Airlock was tested against 60 attack and benign scenarios across 50 MCP tools with 100% block rate.
-                </p>
               </div>
 
               <Link
@@ -214,15 +208,9 @@ export default function LandingPageClient() {
         <section className="w-full py-24 px-6 lg:px-12 border-b border-slate-200 bg-white">
           <div className="max-w-7xl mx-auto flex flex-col gap-12">
             <div className="flex flex-col gap-2 text-center items-center max-w-2xl mx-auto">
-              <span className="text-xs font-mono uppercase tracking-widest text-emerald-600 font-bold">
-                Measured Efficiency Benchmark
-              </span>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
-                Multi-Turn Tool Calling vs. Airlock Script Mode
+                Multi-Turn Tool Calling vs Airlock Script Mode
               </h2>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                Empirically tested across 50 tools and 8 simulated enterprise services.
-              </p>
             </div>
 
             <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -277,11 +265,9 @@ export default function LandingPageClient() {
         <section className="w-full py-24 px-6 lg:px-12 border-b border-slate-200 bg-slate-50/70">
           <div className="max-w-7xl mx-auto flex flex-col gap-12">
             <div className="flex flex-col gap-2 max-w-2xl">
-              <span className="text-xs font-mono uppercase tracking-widest text-emerald-600 font-bold">
-                Drop-in Agent Compatibility
-              </span>
+
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
-                Works With Your Favorite Agent Tools
+                 Agent Tools
               </h2>
               <p className="text-sm text-slate-600 leading-relaxed">
                 Connect your AI tools in seconds by adding the Airlock MCP gateway endpoint.
@@ -293,17 +279,11 @@ export default function LandingPageClient() {
               <div className="p-8 rounded-2xl bg-white border border-slate-200 flex flex-col gap-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-800 text-xs">
-                      ⚡
-                    </div>
                     <div>
                       <h3 className="text-base font-bold text-slate-900">Cursor IDE</h3>
                       <span className="text-xs text-slate-500">.cursor/mcp.json</span>
                     </div>
                   </div>
-                  <span className="px-2.5 py-1 rounded-md text-[10px] font-mono font-semibold bg-emerald-200 text-emerald-900 border border-emerald-300">
-                    Recommended
-                  </span>
                 </div>
                 <pre className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-[11px] font-mono text-emerald-400 overflow-x-auto leading-relaxed">
 {`{
@@ -323,17 +303,11 @@ export default function LandingPageClient() {
               <div className="p-8 rounded-2xl bg-white border border-slate-200 flex flex-col gap-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-800 text-xs">
-                      🧠
-                    </div>
                     <div>
                       <h3 className="text-base font-bold text-slate-900">Claude Desktop</h3>
                       <span className="text-xs text-slate-500">claude_desktop_config.json</span>
                     </div>
                   </div>
-                  <span className="px-2.5 py-1 rounded-md text-[10px] font-mono font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-                    Native MCP
-                  </span>
                 </div>
                 <pre className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-[11px] font-mono text-emerald-400 overflow-x-auto leading-relaxed">
 {`{
@@ -354,9 +328,6 @@ export default function LandingPageClient() {
         <section className="w-full py-24 px-6 lg:px-12 border-b border-slate-200 bg-white">
           <div className="max-w-4xl mx-auto flex flex-col gap-12">
             <div className="flex flex-col gap-2 text-center items-center">
-              <span className="text-xs font-mono uppercase tracking-widest text-emerald-600 font-bold">
-                Answers &amp; Technical Insights
-              </span>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
                 Frequently Asked Questions
               </h2>
@@ -387,32 +358,6 @@ export default function LandingPageClient() {
           </div>
         </section>
 
-        {/* FINAL CALL TO ACTION */}
-        <section className="w-full py-24 px-6 lg:px-12 bg-slate-50 border-b border-slate-200 text-center flex flex-col items-center gap-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-200 border border-emerald-300 text-emerald-900 text-xs font-mono font-semibold">
-            Ready in 60 Seconds
-          </div>
-          <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-slate-900 max-w-2xl">
-            Protect Your AI Agent Fleet From Exploits
-          </h2>
-          <p className="text-sm text-slate-600 max-w-xl leading-relaxed">
-            Get instant operator access with automatic compliance approval. Intercept attacks, view audit streams, and manage agent permissions.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
-            <a
-              href="/api/auth/google"
-              className="px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold font-mono text-xs uppercase tracking-wider rounded-xl transition-all shadow-md hover:scale-[1.02]"
-            >
-              Sign in with Google →
-            </a>
-            <Link
-              href="/quickstart"
-              className="px-8 py-3.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 hover:border-slate-400 font-mono text-xs font-semibold uppercase tracking-wider rounded-xl transition-colors shadow-xs"
-            >
-              Read Quick Start Guide
-            </Link>
-          </div>
-        </section>
 
         {/* Polished Minimal Footer */}
         <footer className="w-full py-8 px-6 lg:px-12 border-t border-slate-200 bg-white flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-500">
