@@ -12,7 +12,7 @@ export interface MimirAsciiCanvasProps {
 }
 
 export default function MimirAsciiCanvas({
-  sourcePhoto = '/ascii-editor/demos/generated/ref-008.webp',
+  sourcePhoto = '/mimir-reference.png',
   cellSize = 13,
   renderMode: initialRenderMode = 'mosaic',
   theme = 'dark',
@@ -44,6 +44,9 @@ export default function MimirAsciiCanvas({
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.src = sourcePhoto;
+    if (img.complete && img.naturalWidth > 0) {
+      imgLoaded = true;
+    }
     img.onload = () => {
       imgLoaded = true;
     };
@@ -399,34 +402,32 @@ export default function MimirAsciiCanvas({
         ctx.restore();
       }
 
-      // 5. Post-Effect: Vignette (intensity: 38)
-      // Radial perimeter darkening fading out to effectiveBgColor
+      // 5. Post-Effect: Vignette (subtle perimeter atmospheric darkening)
       ctx.save();
       const maxDim = Math.max(width, height);
       const vignette = ctx.createRadialGradient(
         rippleOriginX,
         rippleOriginY,
-        maxDim * 0.22,
+        maxDim * 0.35,
         rippleOriginX,
         rippleOriginY,
-        maxDim * 0.68
+        maxDim * 0.85
       );
       vignette.addColorStop(0, 'rgba(0, 0, 0, 0)');
-      vignette.addColorStop(0.65, 'rgba(0, 0, 0, 0.25)');
-      vignette.addColorStop(1, effectiveBgColor);
+      vignette.addColorStop(0.7, 'rgba(15, 23, 43, 0.25)');
+      vignette.addColorStop(1, 'rgba(15, 23, 43, 0.6)');
 
       ctx.fillStyle = vignette;
       ctx.fillRect(0, 0, width, height);
       ctx.restore();
 
       // 6. Seamless Blend Mask on Left Edge:
-      // Smooth horizontal gradient fading the left 30% of the canvas completely into effectiveBgColor
+      // Soft horizontal gradient fading the left edge into the hero background
       ctx.save();
-      const fadeWidth = width * 0.35;
+      const fadeWidth = width * 0.22;
       const leftFade = ctx.createLinearGradient(0, 0, fadeWidth, 0);
       leftFade.addColorStop(0, effectiveBgColor);
-      leftFade.addColorStop(0.5, `${effectiveBgColor}cc`);
-      leftFade.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      leftFade.addColorStop(1, 'rgba(15, 23, 43, 0)');
 
       ctx.fillStyle = leftFade;
       ctx.fillRect(0, 0, fadeWidth, height);
