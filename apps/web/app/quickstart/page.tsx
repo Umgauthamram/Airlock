@@ -8,6 +8,12 @@ export default function QuickstartPage() {
         <div className="w-full px-6 lg:px-10 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="font-bold text-xl tracking-tight text-slate-900 flex items-center gap-2">
+              <svg className="w-5 h-5 shrink-0" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="32" height="32" rx="7" fill="#0f172a"/>
+                <path d="M16 6L26.5 24.5H5.5L16 6Z" fill="#ffffff"/>
+                <polygon points="16,12.5 21.5,22 10.5,22" fill="#0f172a"/>
+                <circle cx="16" cy="18" r="2" fill="#10b981"/>
+              </svg>
               <span>Airlock</span>
             </Link>
           </div>
