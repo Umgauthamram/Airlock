@@ -111,9 +111,7 @@ export default function LandingPageClient() {
         <section id="pipeline" className="w-full py-24 px-6 lg:px-12 border-b border-slate-200 bg-white">
           <div className="max-w-7xl mx-auto flex flex-col gap-14">
             <div className="flex flex-col gap-2 max-w-2xl">
-              <span className="text-xs font-mono uppercase tracking-widest text-emerald-600 font-bold">
-                Deterministic Defense Architecture
-              </span>
+              
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
                 How Airlock Protects Agent Tool Invocations
               </h2>
@@ -125,12 +123,12 @@ export default function LandingPageClient() {
             <div className="grid md:grid-cols-3 gap-8">
               {/* Step 1 */}
               <div className="p-8 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col gap-4 shadow-sm hover:border-slate-300 hover:shadow-md transition-all">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center font-mono font-bold text-emerald-700 text-sm">
+                <div className="w-10 h-10 rounded-xl bg-emerald-200 border border-emerald-300 flex items-center justify-center font-mono font-bold text-emerald-900 text-sm">
                   01
                 </div>
                 <h3 className="text-lg font-bold text-slate-900">Stub Discovery &amp; Script Synthesis</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Agents discover tools via compact TypeScript interfaces (<code className="font-mono text-emerald-600 bg-emerald-50 px-1 py-0.5 rounded">search_tools</code>) rather than ingesting 50+ monolithic JSON schemas. The agent generates a single-shot execution plan script.
+                  Agents discover tools via compact TypeScript interfaces (<code className="font-mono text-emerald-900 bg-emerald-200 px-1 py-0.5 rounded">search_tools</code>) rather than ingesting 50+ monolithic JSON schemas. The agent generates a single-shot execution plan script.
                 </p>
                 <div className="mt-auto pt-4 border-t border-slate-200 text-[11px] font-mono text-emerald-600 font-semibold">
                   ✓ 94.7% token reduction
@@ -139,7 +137,7 @@ export default function LandingPageClient() {
 
               {/* Step 2 */}
               <div className="p-8 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col gap-4 shadow-sm hover:border-slate-300 hover:shadow-md transition-all">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center font-mono font-bold text-emerald-700 text-sm">
+                <div className="w-10 h-10 rounded-xl bg-emerald-200 border border-emerald-300 flex items-center justify-center font-mono font-bold text-emerald-900 text-sm">
                   02
                 </div>
                 <h3 className="text-lg font-bold text-slate-900">Deterministic AST Inspection</h3>
@@ -153,7 +151,7 @@ export default function LandingPageClient() {
 
               {/* Step 3 */}
               <div className="p-8 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col gap-4 shadow-sm hover:border-slate-300 hover:shadow-md transition-all">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center font-mono font-bold text-emerald-700 text-sm">
+                <div className="w-10 h-10 rounded-xl bg-emerald-200 border border-emerald-300 flex items-center justify-center font-mono font-bold text-emerald-900 text-sm">
                   03
                 </div>
                 <h3 className="text-lg font-bold text-slate-900">Sandboxed MicroVM Execution</h3>
@@ -303,7 +301,7 @@ export default function LandingPageClient() {
                       <span className="text-xs text-slate-500">.cursor/mcp.json</span>
                     </div>
                   </div>
-                  <span className="px-2.5 py-1 rounded-md text-[10px] font-mono font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="px-2.5 py-1 rounded-md text-[10px] font-mono font-semibold bg-emerald-200 text-emerald-900 border border-emerald-300">
                     Recommended
                   </span>
                 </div>
@@ -391,7 +389,7 @@ export default function LandingPageClient() {
 
         {/* FINAL CALL TO ACTION */}
         <section className="w-full py-24 px-6 lg:px-12 bg-slate-50 border-b border-slate-200 text-center flex flex-col items-center gap-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-mono font-semibold">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-200 border border-emerald-300 text-emerald-900 text-xs font-mono font-semibold">
             Ready in 60 Seconds
           </div>
           <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-slate-900 max-w-2xl">
