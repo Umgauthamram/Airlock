@@ -8,15 +8,15 @@
 - **Languages**: TypeScript / Node.js
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: External Audit & Hardening Remediation (`changes.md`)
-- **Status**: Completed full resolution of Vercel build issues, sandbox escape vector blocking, OAuth/demo verification hardening, rate limiting, Docker and secret unification, and benchmark metric alignment.
+- **Current Focus**: Clean Initial Account State & Comprehensive Feature Walkthrough Guide
+- **Status**: Completed clean zero-state for new demo and Google Auth accounts (0 calls, 0 tokens, 0 pending), created interactive [FeatureGuide.tsx](file:///g:/projects/AirLock/apps/web/components/FeatureGuide.tsx) with platform preview, real vs demo account setup guides, and one-click test simulation controls at `/app/guide` and on `/app`.
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
-- **Vercel Build Fix**: Removed stray root and web `package-lock.json` and root `vercel.json`; configured `apps/web/vercel.json` with pinned `npx pnpm@9.15.4` install and filtered build command to resolve lockfile version mismatch and `ERR_INVALID_THIS`.
-- **Sandbox Escapes & AST Hardening**: Banned `Reflect`, `Proxy`, reflection properties (`getOwnPropertyNames`, `getPrototypeOf`, etc.), dynamic computed members, infinite loops (`while(true)`, `for(;;)`), and loop `await` non-tool starvation in [analyzer.ts](file:///g:/projects/AirLock/packages/analyzer/src/analyzer.ts) and [executor.ts](file:///g:/projects/AirLock/apps/gateway/src/executor.ts); added comprehensive test suite in [analyzer.test.ts](file:///g:/projects/AirLock/packages/analyzer/src/analyzer.test.ts).
-- **Auth Hardening & Rate Limiting**: Added `email_verified` check, `ALLOWED_EMAIL_DOMAIN` enforcement, and status preservation in [google callback](file:///g:/projects/AirLock/apps/web/app/api/auth/callback/google/route.ts); removed unverified demo backdoors in `POST /api/auth/google` and `GET /api/auth/demo`; enforced crypto randomInt, 3-req/10min rate limiting, and 5-attempt brute-force protection in [verification.ts](file:///g:/projects/AirLock/apps/web/lib/verification.ts); salted demo orgIds with email hash to eliminate collisions; capped demo extensions to 16h total.
-- **Docker, Caddy & Secret Unification**: Bound Redis (6379) and RedisInsight (8001) to `127.0.0.1` in [docker-compose.yml](file:///g:/projects/AirLock/infra/docker-compose.yml); pinned `pnpm@9.15.4` with `--frozen-lockfile` and unprivileged `USER node` in [Dockerfile](file:///g:/projects/AirLock/apps/gateway/Dockerfile); authored production [Caddyfile](file:///g:/projects/AirLock/infra/Caddyfile); unified master keys across gateway and web.
-- **Decision & Benchmark Consistency**: Tied gateway decision route to `x-org-id`; aligned all benchmark token numbers to 99.6% (2,700 vs 607,957 tokens) across README, `benchmark-results.json`, and results page; added `isFallback` telemetry in Nebius client.
+- **Fresh Account Zero-State**: Removed automatic test data and fabricated metric fallbacks in [data.ts](file:///g:/projects/AirLock/apps/web/lib/data.ts) and [demo-verify](file:///g:/projects/AirLock/apps/web/app/api/auth/demo-verify/route.ts); accounts now initialize with 0 runs, 0 tokens saved, and an empty pending queue.
+- **Interactive Feature & Setup Guide**: Created [FeatureGuide.tsx](file:///g:/projects/AirLock/apps/web/components/FeatureGuide.tsx) and `/app/guide` covering AST deterministic analysis, R1-R6 policy rules, approval flows, sandbox isolation, and audit streams.
+- **Dedicated Real Account & Demo Account Guides**: Structured walkthroughs detailing how to configure production MCP agents (Claude Desktop, Cursor, LangChain) with `Authorization: Bearer <AIRLOCK_MASTER_KEY>` vs how to test the 12-hour evaluation sandbox.
+- **Interactive Testing Simulation Endpoint**: Created `/api/demo/simulate` allowing evaluators to simulate prompt injection holding, run benign tasks, or reset state to 0 on demand.
+- **Vercel & Security Hardening Push**: Pushed all audit fixes to GitHub `main` (`commit 5bd4372`), verified frozen lockfile builds, and passed all 25 unit/integration tests across monorepo packages.
 
 ## 4. Next Immediate Steps
 - [ ] Review live local test run (`pnpm -r test` & `pnpm bench`) with user

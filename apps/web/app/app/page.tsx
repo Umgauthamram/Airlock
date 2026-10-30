@@ -2,12 +2,17 @@ import Link from 'next/link';
 import { requireSession } from '@/lib/auth';
 import { getDashboardStats, getApprovals, getAuditEvents } from '@/lib/data';
 import { cleanUnderscores, formatFlowTag } from '@/lib/format';
+import { FeatureGuide } from '@/components/FeatureGuide';
+
+export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
   const session = await requireSession();
   const stats = await getDashboardStats(session.orgId);
   const pendingApprovals = await getApprovals(session.orgId, 'pending');
   const recentEvents = await getAuditEvents(session.orgId, 8);
+
+  const isBrandNew = stats.todayCalls === 0 && stats.pendingApprovals === 0;
 
   return (
     <div className="w-full flex flex-col gap-8">
@@ -19,6 +24,12 @@ export default async function DashboardPage() {
         </div>
         <div className="flex items-center gap-3">
           <Link
+            href="/app/guide"
+            className="px-3.5 py-2 bg-white border border-slate-200 hover:border-slate-300 text-slate-700 rounded-md text-xs font-semibold transition-all shadow-xs flex items-center gap-1.5"
+          >
+            <span>🧭 Feature Guide & Setup</span>
+          </Link>
+          <Link
             href="/app/approvals"
             className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-semibold transition-colors shadow-xs"
           >
@@ -26,6 +37,13 @@ export default async function DashboardPage() {
           </Link>
         </div>
       </div>
+
+      {/* Feature Preview & Setup Walkthrough Component */}
+      <FeatureGuide
+        isDemo={session.isDemo}
+        userEmail={session.email}
+        defaultExpanded={isBrandNew}
+      />
 
       {/* Metrics Row - Full Screen 4 Columns */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -51,7 +69,9 @@ export default async function DashboardPage() {
 
         <div className="p-5 bg-white border border-slate-200 rounded-lg flex flex-col gap-1.5 shadow-xs">
           <span className="text-xs uppercase font-semibold text-slate-500 tracking-wider">Avg Added Latency</span>
-          <span className="text-3xl font-bold font-mono text-slate-900">{stats.avgAddedLatencyMs} ms</span>
+          <span className="text-3xl font-bold font-mono text-slate-900">
+            {stats.todayCalls > 0 ? `${stats.avgAddedLatencyMs} ms` : '0.0 ms'}
+          </span>
           <span className="text-xs text-slate-400 mt-0.5">Deterministic AST analysis</span>
         </div>
       </div>
@@ -68,8 +88,24 @@ export default async function DashboardPage() {
           </div>
 
           {pendingApprovals.length === 0 ? (
-            <div className="p-12 bg-white border border-slate-200 rounded-lg text-center text-sm text-slate-500">
-              No scripts currently waiting for human operator approval.
+            <div className="p-10 bg-white border border-slate-200 rounded-lg flex flex-col items-center justify-center text-center gap-3 shadow-xs">
+              <span className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-lg">
+                ✓
+              </span>
+              <div>
+                <h3 className="text-sm font-bold text-slate-900">Gateway Operational — No Pending Approvals</h3>
+                <p className="text-xs text-slate-500 max-w-md mt-1 leading-relaxed">
+                  Your organization queue is clean. When agent scripts trigger policy guardrails (such as reading untrusted data and sending to external webhooks), they will be held here for operator review.
+                </p>
+              </div>
+              <div className="pt-2">
+                <Link
+                  href="/app/guide"
+                  className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-semibold transition-colors"
+                >
+                  Test Simulation in Feature Guide →
+                </Link>
+              </div>
             </div>
           ) : (
             <div className="flex flex-col gap-3.5">
@@ -124,7 +160,11 @@ export default async function DashboardPage() {
 
           <div className="p-5 bg-white border border-slate-200 rounded-lg shadow-xs flex flex-col gap-3">
             {recentEvents.length === 0 ? (
-              <span className="text-xs text-slate-400">No audit events logged yet.</span>
+              <div className="p-6 text-center text-xs text-slate-400 flex flex-col items-center gap-1.5">
+                <span>⚡</span>
+                <span>No audit events logged yet.</span>
+                <span className="text-[11px] text-slate-400">Events appear here in real time as agent scripts run.</span>
+              </div>
             ) : (
               recentEvents.map((evt) => (
                 <div key={evt.id} className="text-xs flex flex-col gap-1 pb-2.5 border-b border-slate-100 last:border-0 last:pb-0">

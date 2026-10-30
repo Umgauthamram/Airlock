@@ -18,6 +18,7 @@ export function AppNav({ pendingApprovals }: AppNavProps) {
     { label: 'Tools', href: '/app/tools' },
     { label: 'Policies', href: '/app/policies' },
     { label: 'Benchmark', href: '/app/results' },
+    { label: 'Feature Guide', href: '/app/guide' },
   ];
 
   return (

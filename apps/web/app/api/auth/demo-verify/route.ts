@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
 import { verifyCode } from '@/lib/verification';
 import { createDemoSession } from '@/lib/auth';
-import { ensureDemoOrgSeeded } from '@/lib/data';
 
 export async function POST(req: Request) {
   try {
@@ -23,10 +22,7 @@ export async function POST(req: Request) {
     // Unique deterministic orgId prevents collision across domains or sanitized prefixes
     const orgId = `demo-${cleanPrefix}-${emailHash}`;
 
-    // Seed distinct data for this individual demo account
-    await ensureDemoOrgSeeded(orgId, normalizedEmail);
-
-    // Create 12-hour operator session
+    // Create 12-hour operator session in clean initial state
     await createDemoSession({
       email: normalizedEmail,
       name: cleanPrefix.replace(/-/g, ' '),
