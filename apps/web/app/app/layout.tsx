@@ -32,12 +32,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <div className="flex items-center gap-3 text-sm">
             <ProductTourLauncher />
             <span className="text-xs text-slate-600 font-medium">{session.email}</span>
-            <Link
-              href="/api/auth/logout"
-              className="text-xs font-medium text-slate-600 hover:text-slate-900 border border-slate-200 px-3 py-1.5 rounded-md hover:bg-slate-50 transition-colors"
-            >
-              Sign out
-            </Link>
+            <form action="/api/auth/logout" method="POST">
+              <button
+                type="submit"
+                className="text-xs font-medium text-slate-600 hover:text-slate-900 border border-slate-200 px-3 py-1.5 rounded-md hover:bg-slate-50 transition-colors cursor-pointer"
+              >
+                Sign out
+              </button>
+            </form>
           </div>
         </div>
       </header>

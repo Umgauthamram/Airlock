@@ -31,27 +31,43 @@ function getSessionSecret(): string {
 const SESSION_SECRET = getSessionSecret();
 
 function signPayload(payload: string): string {
-  const hmac = createHmac('sha256', SESSION_SECRET).update(payload).digest('hex');
-  return `${payload}.${hmac}`;
+  const base64Payload = Buffer.from(payload, 'utf8').toString('base64url');
+  const hmac = createHmac('sha256', SESSION_SECRET).update(base64Payload).digest('hex');
+  return `${base64Payload}.${hmac}`;
 }
 
 function verifyPayload(signedValue: string): string | null {
+  if (!signedValue) return null;
   const lastDot = signedValue.lastIndexOf('.');
   if (lastDot === -1) return null;
 
-  const payload = signedValue.substring(0, lastDot);
+  const payloadPart = signedValue.substring(0, lastDot);
   const signature = signedValue.substring(lastDot + 1);
 
-  const expectedHmac = createHmac('sha256', SESSION_SECRET).update(payload).digest('hex');
-
+  // 1. Verify standard Base64URL payload signature
+  const expectedHmac = createHmac('sha256', SESSION_SECRET).update(payloadPart).digest('hex');
   const sigBuf = Buffer.from(signature, 'utf8');
   const expBuf = Buffer.from(expectedHmac, 'utf8');
 
-  if (sigBuf.length !== expBuf.length || !timingSafeEqual(sigBuf, expBuf)) {
+  let isValid = sigBuf.length === expBuf.length && timingSafeEqual(sigBuf, expBuf);
+
+  // 2. Backward compatibility: verify raw unencoded payload
+  if (!isValid) {
+    const rawHmac = createHmac('sha256', SESSION_SECRET).update(payloadPart).digest('hex');
+    const rawExpBuf = Buffer.from(rawHmac, 'utf8');
+    if (sigBuf.length === rawExpBuf.length && timingSafeEqual(sigBuf, rawExpBuf)) {
+      return payloadPart;
+    }
     return null;
   }
 
-  return payload;
+  // Attempt base64url decode
+  try {
+    const decoded = Buffer.from(payloadPart, 'base64url').toString('utf8');
+    return decoded;
+  } catch {
+    return payloadPart;
+  }
 }
 
 export function createSignedOAuthState(): string {
