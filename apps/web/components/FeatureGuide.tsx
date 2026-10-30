@@ -132,7 +132,7 @@ export function FeatureGuide({
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              Interactive Test Simulations ⚡
+              Interactive Test Simulations
             </button>
           </div>
 
@@ -148,9 +148,9 @@ export function FeatureGuide({
               <span>{simMessage.text}</span>
               <button
                 onClick={() => setSimMessage(null)}
-                className="text-slate-400 hover:text-slate-700 font-bold ml-4"
+                className="text-slate-400 hover:text-slate-700 text-xs font-bold ml-4"
               >
-                ✕
+                Dismiss
               </button>
             </div>
           )}
@@ -159,10 +159,7 @@ export function FeatureGuide({
           {activeTab === 'features' && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-base">🛡️</span>
-                  <h3 className="text-xs font-bold text-slate-900">Deterministic AST Analysis</h3>
-                </div>
+                <h3 className="text-xs font-bold text-slate-900">Deterministic AST Analysis</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Statically validates agent JavaScript via Acorn prior to execution. Banned AST constructs (eval,
                   Function constructors, prototype pollution, reflection methods, and infinite loops) are stopped
@@ -172,10 +169,7 @@ export function FeatureGuide({
               </div>
 
               <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-base">⚖️</span>
-                  <h3 className="text-xs font-bold text-slate-900">Data Flow Guardrails (R1-R6)</h3>
-                </div>
+                <h3 className="text-xs font-bold text-slate-900">Data Flow Guardrails (R1-R6)</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Enforces fine-grained semantic policy rules. Automatically intercepts untrusted input reading
                   (inbox, customer tickets) paired with unauthorized external egress (HTTP webhooks, Slack leaks).
@@ -184,10 +178,7 @@ export function FeatureGuide({
               </div>
 
               <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-base">👤</span>
-                  <h3 className="text-xs font-bold text-slate-900">Human-in-the-Loop Approvals</h3>
-                </div>
+                <h3 className="text-xs font-bold text-slate-900">Human-in-the-Loop Approvals</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Quarantined high-risk operations enter the human approval queue. Operators inspect side-by-side AST
                   diffs, tool call signatures, and model explanations before deciding to Approve or Deny.
@@ -196,10 +187,7 @@ export function FeatureGuide({
               </div>
 
               <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-base">📦</span>
-                  <h3 className="text-xs font-bold text-slate-900">Air-Gapped Sandbox Isolation</h3>
-                </div>
+                <h3 className="text-xs font-bold text-slate-900">Air-Gapped Sandbox Isolation</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Approved scripts execute in sterile VM realms. Host process bridges, timers, and microtask queues
                   are eradicated. Enforces 64 KB response caps and per-script tool call quotas.
@@ -208,10 +196,7 @@ export function FeatureGuide({
               </div>
 
               <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-base">📜</span>
-                  <h3 className="text-xs font-bold text-slate-900">Real-Time Audit Telemetry</h3>
-                </div>
+                <h3 className="text-xs font-bold text-slate-900">Real-Time Audit Telemetry</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Immutable Redis streams record every script submission, AST analysis outcome, operator review,
                   and mock/live tool result with cryptographic SHA-256 hashes.
@@ -220,10 +205,7 @@ export function FeatureGuide({
               </div>
 
               <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-base">⚡</span>
-                  <h3 className="text-xs font-bold text-slate-900">99.6% Token Reduction</h3>
-                </div>
+                <h3 className="text-xs font-bold text-slate-900">99.6% Token Reduction</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Eliminates verbose multi-turn schema re-ingestion. Instead of sending 50 tool schemas across 10 LLM
                   turns (607,957 tokens), agents fetch minimal stubs and submit single script plans (2,700 tokens).
@@ -237,7 +219,6 @@ export function FeatureGuide({
           {activeTab === 'real_account' && (
             <div className="flex flex-col gap-5 text-xs text-slate-700 leading-relaxed">
               <div className="p-4 bg-blue-50/60 border border-blue-200 rounded-lg flex items-start gap-3">
-                <span className="text-base">💡</span>
                 <div>
                   <h4 className="font-bold text-blue-950">Operating Airlock with a Real Google Workspace Account</h4>
                   <p className="text-blue-800 text-xs mt-0.5">
@@ -314,7 +295,6 @@ export function FeatureGuide({
           {activeTab === 'demo_account' && (
             <div className="flex flex-col gap-5 text-xs text-slate-700 leading-relaxed">
               <div className="p-4 bg-amber-50/70 border border-amber-200 rounded-lg flex items-start gap-3">
-                <span className="text-base">⏱️</span>
                 <div>
                   <h4 className="font-bold text-amber-950">Evaluating Airlock with a Demo Account</h4>
                   <p className="text-amber-900 text-xs mt-0.5">
@@ -383,14 +363,14 @@ export function FeatureGuide({
                     onClick={() => handleSimulate('simulate_attack')}
                     className="px-3.5 py-2 bg-rose-700 hover:bg-rose-800 text-white rounded-md text-xs font-semibold transition-all shadow-xs disabled:opacity-50"
                   >
-                    {simulating === 'simulate_attack' ? 'Injecting...' : 'Simulate Prompt Injection Attack 🚨'}
+                    {simulating === 'simulate_attack' ? 'Injecting...' : 'Simulate Prompt Injection Attack'}
                   </button>
                   <button
                     disabled={!!simulating}
                     onClick={() => handleSimulate('simulate_benign')}
                     className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-semibold transition-all shadow-xs disabled:opacity-50"
                   >
-                    {simulating === 'simulate_benign' ? 'Processing...' : 'Simulate Benign Task ✅'}
+                    {simulating === 'simulate_benign' ? 'Processing...' : 'Simulate Benign Task'}
                   </button>
                   <button
                     disabled={!!simulating}
@@ -482,4 +462,3 @@ return { status: "processed", count: emails.length };`}
     </div>
   );
 }
-

@@ -27,7 +27,7 @@ export default async function DashboardPage() {
             href="/app/guide"
             className="px-3.5 py-2 bg-white border border-slate-200 hover:border-slate-300 text-slate-700 rounded-md text-xs font-semibold transition-all shadow-xs flex items-center gap-1.5"
           >
-            <span> Feature Guide & Setup</span>
+            <span>Feature Guide & Setup</span>
           </Link>
           <Link
             href="/app/approvals"
@@ -89,9 +89,7 @@ export default async function DashboardPage() {
 
           {pendingApprovals.length === 0 ? (
             <div className="p-10 bg-white border border-slate-200 rounded-lg flex flex-col items-center justify-center text-center gap-3 shadow-xs">
-              <span className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-lg">
-                ✓
-              </span>
+              <span className="w-3 h-3 rounded-full bg-emerald-500"></span>
               <div>
                 <h3 className="text-sm font-bold text-slate-900">Gateway Operational — No Pending Approvals</h3>
                 <p className="text-xs text-slate-500 max-w-md mt-1 leading-relaxed">
@@ -161,7 +159,6 @@ export default async function DashboardPage() {
           <div className="p-5 bg-white border border-slate-200 rounded-lg shadow-xs flex flex-col gap-3">
             {recentEvents.length === 0 ? (
               <div className="p-6 text-center text-xs text-slate-400 flex flex-col items-center gap-1.5">
-                <span>⚡</span>
                 <span>No audit events logged yet.</span>
                 <span className="text-[11px] text-slate-400">Events appear here in real time as agent scripts run.</span>
               </div>

@@ -4,6 +4,18 @@ import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+const ERROR_DESCRIPTIONS: Record<string, string> = {
+  invalid_oauth_state: 'Authentication session expired or restarted. Please click "Sign in with Google" again.',
+  missing_credentials: 'OAuth credentials not configured in production.',
+  missing_code: 'Authentication cancelled or missing authorization code from Google.',
+  token_exchange_failed: 'Unable to verify code with Google. Please try again.',
+  profile_fetch_failed: 'Failed to retrieve profile from Google.',
+  email_not_verified: 'Google account email is not verified.',
+  account_deactivated: 'This account has been deactivated.',
+  domain_not_allowed: 'Your email domain is not authorized for access.',
+  oauth_exception: 'Authentication encountered an unexpected error. Please retry.',
+};
+
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -105,7 +117,7 @@ function LoginContent() {
 
           {(error || errorParam) && (
             <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs font-mono">
-              {error || (errorParam === 'oauth_error' ? 'Google authentication failed. Please try again.' : errorParam)}
+              {error || (errorParam ? (ERROR_DESCRIPTIONS[errorParam] || errorParam) : 'Authentication failed')}
             </div>
           )}
 

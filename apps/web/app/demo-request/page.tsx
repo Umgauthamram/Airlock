@@ -312,7 +312,7 @@ function DemoRequestContent() {
 
                 <div className="absolute inset-0 flex flex-col items-center justify-center font-mono">
                   {isApproved ? (
-                    <span className="text-4xl text-emerald-400">✓</span>
+                    <span className="text-xl font-bold text-emerald-400">Ready</span>
                   ) : (
                     <>
                       <span className="text-3xl font-bold text-white tracking-wider">{timeFormatted}</span>
@@ -335,7 +335,7 @@ function DemoRequestContent() {
                 <div className="flex justify-between">
                   <span className="text-slate-500">Approval Policy:</span>
                   <span className="text-amber-300 font-semibold">
-                    {isApproved ? 'Approved ✓' : 'Auto-approves at 00:00'}
+                    {isApproved ? 'Approved' : 'Auto-approves at 00:00'}
                   </span>
                 </div>
               </div>
@@ -351,7 +351,6 @@ function DemoRequestContent() {
                   disabled={loading || isApproved}
                   className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 rounded-md font-mono text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  <span>⚡</span>
                   <span>Fast-Track Instant Approval</span>
                 </button>
               </div>

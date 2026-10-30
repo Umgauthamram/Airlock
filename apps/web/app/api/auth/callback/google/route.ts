@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { attachSessionCookie, createSessionCookie } from '@/lib/auth';
+import { attachSessionCookie, createSessionCookie, getAuthBaseUrl, verifySignedOAuthState } from '@/lib/auth';
 import { Role } from '@airlock/shared';
 import { getRedisClient, RedisKeys } from '@/lib/redis';
 
@@ -8,7 +8,7 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const code = url.searchParams.get('code');
   const state = url.searchParams.get('state');
-  const authUrl = process.env.AUTH_URL || 'http://localhost:3000';
+  const authUrl = getAuthBaseUrl(req);
 
   const cookieStore = await cookies();
   const savedState = cookieStore.get('airlock_oauth_state')?.value;
@@ -18,8 +18,13 @@ export async function GET(req: Request) {
     return NextResponse.redirect(`${authUrl}/login?error=missing_code`);
   }
 
-  // Verify anti-CSRF state token if cookie was preserved across redirects
-  if (savedState && state && state !== savedState) {
+  // Verify anti-CSRF state token:
+  // 1. Verify cryptographic HMAC signature (resilient against multi-tab, double clicks, partitioned cookies)
+  // 2. Or fallback to matching the saved cookie
+  const isCryptographicallyValid = verifySignedOAuthState(state);
+  const matchesCookie = Boolean(savedState && state && state === savedState);
+
+  if (state && !isCryptographicallyValid && !matchesCookie) {
     return NextResponse.redirect(`${authUrl}/login?error=invalid_oauth_state`);
   }
 

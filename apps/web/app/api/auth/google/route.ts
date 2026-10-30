@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { randomBytes } from 'node:crypto';
+import { createSignedOAuthState, getAuthBaseUrl } from '@/lib/auth';
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const mode = url.searchParams.get('mode') || 'login';
   const googleId = process.env.AUTH_GOOGLE_ID;
-  const authUrl = process.env.AUTH_URL || 'http://localhost:3000';
+  const authUrl = getAuthBaseUrl(req);
   const redirectUri = `${authUrl}/api/auth/callback/google`;
 
   if (!googleId) {
@@ -13,7 +13,8 @@ export async function GET(req: Request) {
     return NextResponse.redirect(`${authUrl}/login?google_picker=1&mode=${mode}`);
   }
 
-  const state = randomBytes(16).toString('hex');
+  // Create cryptographically signed and timestamped state token
+  const state = createSignedOAuthState();
 
   const params = new URLSearchParams({
     client_id: googleId,

@@ -54,6 +54,41 @@ function verifyPayload(signedValue: string): string | null {
   return payload;
 }
 
+export function createSignedOAuthState(): string {
+  const nonce = randomBytes(16).toString('hex');
+  const timestamp = Date.now().toString();
+  return signPayload(`${nonce}:${timestamp}`);
+}
+
+export function verifySignedOAuthState(state: string | null | undefined): boolean {
+  if (!state) return false;
+  const payload = verifyPayload(state);
+  if (!payload) return false;
+  const parts = payload.split(':');
+  if (parts.length < 2) return false;
+  const timestamp = parseInt(parts[1], 10);
+  if (isNaN(timestamp)) return false;
+  const now = Date.now();
+  // Valid for 15 minutes, allowing for clock skew
+  if (now - timestamp > 15 * 60 * 1000 || timestamp > now + 60 * 1000) {
+    return false;
+  }
+  return true;
+}
+
+export function getAuthBaseUrl(req: Request): string {
+  const forwardedHost = req.headers.get('x-forwarded-host');
+  const host = forwardedHost || req.headers.get('host');
+  if (host) {
+    const proto = req.headers.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https');
+    return `${proto}://${host}`;
+  }
+  if (process.env.AUTH_URL && !process.env.AUTH_URL.includes('localhost')) {
+    return process.env.AUTH_URL.replace(/\/$/, '');
+  }
+  return 'http://localhost:3000';
+}
+
 export async function createSessionCookie(session: Omit<UserSession, 'exp'> & { exp?: number }): Promise<void> {
   const sessionWithExp: UserSession = {
     ...session,
