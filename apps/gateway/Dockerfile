@@ -2,7 +2,7 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 # Copy root monorepo configs
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.json ./
@@ -11,8 +11,8 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.json ./
 COPY packages/ packages/
 COPY apps/gateway/ apps/gateway/
 
-# Install dependencies and build packages
-RUN pnpm install --frozen-lockfile=false
+# Install dependencies with exact frozen lockfile and build packages
+RUN pnpm install --frozen-lockfile
 RUN pnpm -r --filter "./packages/*" build
 RUN pnpm --filter @airlock/gateway build
 
@@ -30,7 +30,9 @@ COPY --from=builder /app/packages/ packages/
 COPY --from=builder /app/apps/gateway/dist ./apps/gateway/dist
 COPY --from=builder /app/apps/gateway/package.json ./apps/gateway/package.json
 
+# Run as unprivileged node user
+USER node
+
 EXPOSE 4000
 
 CMD ["node", "apps/gateway/dist/server.js"]
-

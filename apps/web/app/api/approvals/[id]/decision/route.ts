@@ -26,7 +26,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
   try {
     // Try calling the gateway service
-    const gatewayOutcome = await decideApprovalViaGateway(id, decision, session.userId, note);
+    const gatewayOutcome = await decideApprovalViaGateway(id, decision, session.userId, note, session.orgId);
     return NextResponse.json(gatewayOutcome);
   } catch {
     // If gateway HTTP server is unreachable in standalone web mode, perform direct atomic state update in Redis

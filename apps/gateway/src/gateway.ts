@@ -316,13 +316,16 @@ export class AirlockGateway {
   // Approval Decisions (Human Operator / Admin)
   // ---------------------------------------------------------------------------
 
-  async getApproval(approvalId: string): Promise<ApprovalDocument | null> {
-    const raw = await this.storage.get(RedisKeys.approval(this.orgId, approvalId));
-    return raw ? (JSON.parse(raw) as ApprovalDocument) : null;
+  async getApproval(approvalId: string, targetOrgId: string = this.orgId): Promise<ApprovalDocument | null> {
+    const raw = await this.storage.get(RedisKeys.approval(targetOrgId, approvalId));
+    if (raw) return JSON.parse(raw) as ApprovalDocument;
+    const altId = approvalId.includes('_') ? approvalId.replace(/_/g, '-') : approvalId.replace(/-/g, '_');
+    const altRaw = await this.storage.get(RedisKeys.approval(targetOrgId, altId));
+    return altRaw ? (JSON.parse(altRaw) as ApprovalDocument) : null;
   }
 
-  async getResult(runOrApprovalId: string): Promise<ExecutionResult | null> {
-    const raw = await this.storage.get(RedisKeys.result(this.orgId, runOrApprovalId));
+  async getResult(runOrApprovalId: string, targetOrgId: string = this.orgId): Promise<ExecutionResult | null> {
+    const raw = await this.storage.get(RedisKeys.result(targetOrgId, runOrApprovalId));
     return raw ? (JSON.parse(raw) as ExecutionResult) : null;
   }
 
@@ -330,9 +333,10 @@ export class AirlockGateway {
     approvalId: string,
     decision: 'approved' | 'denied',
     decidedBy: string,
-    note?: string
+    note?: string,
+    targetOrgId: string = this.orgId
   ): Promise<{ success: boolean; status: string; result?: any; error?: string }> {
-    const approval = await this.getApproval(approvalId);
+    const approval = await this.getApproval(approvalId, targetOrgId);
     if (!approval) {
       return { success: false, status: 'not_found', error: 'Approval record not found.' };
     }
@@ -351,7 +355,7 @@ export class AirlockGateway {
       approval.decidedAt = new Date().toISOString();
       approval.decisionNote = note;
 
-      await this.storage.set(RedisKeys.approval(this.orgId, approvalId), JSON.stringify(approval));
+      await this.storage.set(RedisKeys.approval(targetOrgId, approvalId), JSON.stringify(approval));
       await this.logAuditEvent({
         eventType: 'script_denied',
         userId: decidedBy,
@@ -367,7 +371,7 @@ export class AirlockGateway {
     approval.decidedBy = decidedBy;
     approval.decidedAt = new Date().toISOString();
     approval.decisionNote = note;
-    await this.storage.set(RedisKeys.approval(this.orgId, approvalId), JSON.stringify(approval));
+    await this.storage.set(RedisKeys.approval(targetOrgId, approvalId), JSON.stringify(approval));
 
     // Execute script once through sandbox
     try {
@@ -376,14 +380,14 @@ export class AirlockGateway {
 
       // Save result associated with approvalId
       await this.storage.set(
-        RedisKeys.result(this.orgId, approvalId),
+        RedisKeys.result(targetOrgId, approvalId),
         JSON.stringify(runResult),
         86400 // 24 hours TTL
       );
 
       // Transition to final 'approved' state
       approval.status = 'approved';
-      await this.storage.set(RedisKeys.approval(this.orgId, approvalId), JSON.stringify(approval));
+      await this.storage.set(RedisKeys.approval(targetOrgId, approvalId), JSON.stringify(approval));
 
       await this.logAuditEvent({
         eventType: 'script_approved',
@@ -400,7 +404,7 @@ export class AirlockGateway {
       };
     } catch (err: any) {
       approval.status = 'failed';
-      await this.storage.set(RedisKeys.approval(this.orgId, approvalId), JSON.stringify(approval));
+      await this.storage.set(RedisKeys.approval(targetOrgId, approvalId), JSON.stringify(approval));
       return {
         success: false,
         status: 'failed',

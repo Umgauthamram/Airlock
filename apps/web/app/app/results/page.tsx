@@ -29,13 +29,13 @@ export default async function ResultsPage() {
 
         <div className="p-6 bg-white border border-slate-200 rounded-lg shadow-xs flex flex-col gap-1.5">
           <span className="text-xs uppercase font-semibold text-slate-500 tracking-wider">Token Reduction</span>
-          <span className="text-4xl font-mono font-bold text-emerald-600">94.7%</span>
-          <span className="text-xs text-slate-400 mt-0.5">471k vs 25k tokens</span>
+          <span className="text-4xl font-mono font-bold text-emerald-600">99.6%</span>
+          <span className="text-xs text-slate-400 mt-0.5">608k vs 2.7k tokens</span>
         </div>
 
         <div className="p-6 bg-white border border-slate-200 rounded-lg shadow-xs flex flex-col gap-1.5">
           <span className="text-xs uppercase font-semibold text-slate-500 tracking-wider">Analysis Latency (p95)</span>
-          <span className="text-4xl font-mono font-bold text-slate-900">1.26 ms</span>
+          <span className="text-4xl font-mono font-bold text-slate-900">0.83 ms</span>
           <span className="text-xs text-slate-400 mt-0.5">Target was &lt; 50 ms</span>
         </div>
       </div>

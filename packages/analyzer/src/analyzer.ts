@@ -17,11 +17,22 @@ const BANNED_IDENTIFIERS = new Set([
   'constructor',
   '__proto__',
   'prototype',
+  'Reflect',
+  'Proxy',
 ]);
 
 const ALLOWED_NEW_CLASSES = new Set(['Map', 'Set', 'Date']);
 
 const BANNED_PROPERTIES = new Set(['__proto__', 'constructor', 'prototype']);
+const BANNED_REFLECTION_METHODS = new Set([
+  'getOwnPropertyNames',
+  'getOwnPropertyDescriptors',
+  'getOwnPropertyDescriptor',
+  'getPrototypeOf',
+  'setPrototypeOf',
+  'defineProperty',
+  'defineProperties',
+]);
 const GLOBAL_PRIMITIVES = new Set([
   'Object',
   'Array',
@@ -125,6 +136,78 @@ export function analyzeScript(code: string, options: AnalyzerOptions = {}): Anal
       });
     },
 
+    // Strict loop safety: block infinite loops
+    WhileStatement(node: any) {
+      if (
+        (node.test.type === 'Literal' && Boolean(node.test.value) === true) ||
+        (node.test.type === 'Identifier' && node.test.name === 'true')
+      ) {
+        errors.push({
+          line: node.loc.start.line,
+          message: "Unbounded 'while(true)' loops are strictly prohibited in agent scripts.",
+          code: 'DISALLOWED_INFINITE_LOOP',
+        });
+      }
+    },
+
+    ForStatement(node: any) {
+      if (!node.test && !node.init && !node.update) {
+        errors.push({
+          line: node.loc.start.line,
+          message: "Unbounded 'for(;;)' loops are strictly prohibited in agent scripts.",
+          code: 'DISALLOWED_INFINITE_LOOP',
+        });
+      }
+    },
+
+    DoWhileStatement(node: any) {
+      if (
+        (node.test.type === 'Literal' && Boolean(node.test.value) === true) ||
+        (node.test.type === 'Identifier' && node.test.name === 'true')
+      ) {
+        errors.push({
+          line: node.loc.start.line,
+          message: "Unbounded 'do-while(true)' loops are strictly prohibited in agent scripts.",
+          code: 'DISALLOWED_INFINITE_LOOP',
+        });
+      }
+    },
+
+    // Block non-tool await expressions inside loops (e.g. while(true){ await null } or while(true){ await Promise.resolve() })
+    AwaitExpression(node: any, ancestors: any[]) {
+      const inLoop = ancestors.some(
+        (a) =>
+          a.type === 'ForStatement' ||
+          a.type === 'ForOfStatement' ||
+          a.type === 'ForInStatement' ||
+          a.type === 'WhileStatement' ||
+          a.type === 'DoWhileStatement'
+      );
+
+      if (inLoop) {
+        // Ensure the awaited expression is actually a tool call: tools.<server>.<tool>(...)
+        const arg = node.argument;
+        const isToolCall =
+          arg &&
+          arg.type === 'CallExpression' &&
+          arg.callee &&
+          arg.callee.type === 'MemberExpression' &&
+          arg.callee.object &&
+          arg.callee.object.type === 'MemberExpression' &&
+          arg.callee.object.object &&
+          arg.callee.object.object.type === 'Identifier' &&
+          arg.callee.object.object.name === 'tools';
+
+        if (!isToolCall) {
+          errors.push({
+            line: node.loc.start.line,
+            message: "Awaiting non-tool expressions inside loops is prohibited to prevent event-loop starvation.",
+            code: 'DISALLOWED_LOOP_AWAIT',
+          });
+        }
+      }
+    },
+
     TaggedTemplateExpression(node: any) {
       errors.push({
         line: node.loc.start.line,
@@ -154,6 +237,15 @@ export function analyzeScript(code: string, options: AnalyzerOptions = {}): Anal
         });
       }
 
+      // Block reflection methods on Object/Reflect
+      if (propName && BANNED_REFLECTION_METHODS.has(propName)) {
+        errors.push({
+          line: node.loc.start.line,
+          message: `Disallowed reflection method '${propName}'. Dynamic property introspection is prohibited.`,
+          code: 'BANNED_REFLECTION',
+        });
+      }
+
       // 2. Block computed member access on global primitives (e.g. Object['constructor'], Array[x])
       if (
         node.computed &&
@@ -165,6 +257,23 @@ export function analyzeScript(code: string, options: AnalyzerOptions = {}): Anal
           message: `Computed property access on global primitive '${node.object.name}' is prohibited.`,
           code: 'BANNED_COMPUTED_PRIMITIVE',
         });
+      }
+
+      // Block dynamic expressions in computed property access that attempt key synthesis (e.g. ['con','structor'].join(''), 'con'+'structor')
+      if (node.computed) {
+        if (node.property.type === 'CallExpression') {
+          errors.push({
+            line: node.loc.start.line,
+            message: "Dynamic computed member access via function call is prohibited.",
+            code: 'BANNED_DYNAMIC_COMPUTED',
+          });
+        } else if (node.property.type === 'BinaryExpression') {
+          errors.push({
+            line: node.loc.start.line,
+            message: "Binary concatenated computed member expressions are prohibited.",
+            code: 'BANNED_DYNAMIC_COMPUTED',
+          });
+        }
       }
 
       // 3. Block dynamic template literals with expressions inside computed properties (e.g. obj[`${'const' + 'ructor'}`])

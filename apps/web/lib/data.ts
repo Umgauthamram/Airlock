@@ -208,19 +208,26 @@ export async function decideApprovalViaGateway(
   approvalId: string,
   decision: 'approved' | 'denied',
   decidedBy: string,
-  note?: string
+  note?: string,
+  orgId: string = 'main'
 ) {
-  const masterKey = process.env.AIRLOCK_MASTER_KEY || '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+  const masterKey =
+    process.env.AIRLOCK_MASTER_KEY || 'airlock_default_master_key_for_local_development_32_chars';
   const res = await fetch(`${GATEWAY_URL}/api/approvals/${approvalId}/decision`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${masterKey}`,
       'X-Operator-Id': decidedBy,
+      'X-Org-Id': orgId,
     },
     body: JSON.stringify({ decision, note }),
     cache: 'no-store',
   });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || `Gateway decision returned HTTP ${res.status}`);
+  }
   return res.json();
 }
 

@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { randomBytes } from 'node:crypto';
-import { createDemoSession } from '@/lib/auth';
-import { ensureDemoOrgSeeded } from '@/lib/data';
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -12,7 +10,7 @@ export async function GET(req: Request) {
   const redirectUri = `${authUrl}/api/auth/callback/google`;
 
   if (!googleId) {
-    // When live Google Client ID is not configured, redirect to the interactive Google Account Chooser
+    // When live Google Client ID is not configured, redirect to login with notification
     return NextResponse.redirect(`${authUrl}/login?google_picker=1&mode=${mode}`);
   }
 
@@ -38,31 +36,3 @@ export async function GET(req: Request) {
 
   return NextResponse.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
 }
-
-export async function POST(req: Request) {
-  try {
-    const { email, name } = await req.json();
-    if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
-    }
-
-    const normalizedEmail = email.trim().toLowerCase();
-    const cleanPrefix = normalizedEmail.split('@')[0].replace(/[^a-zA-Z0-9]/g, '-');
-    const orgId = `demo-${cleanPrefix}`;
-
-    // Seed allocated demo org data for this specific email
-    await ensureDemoOrgSeeded(orgId);
-
-    // Create 12-hour operator session with exact email and role
-    await createDemoSession({
-      email: normalizedEmail,
-      name: name || cleanPrefix.replace(/-/g, ' '),
-      orgId,
-    });
-
-    return NextResponse.json({ success: true, redirect: '/app' });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'Login failed' }, { status: 500 });
-  }
-}
-

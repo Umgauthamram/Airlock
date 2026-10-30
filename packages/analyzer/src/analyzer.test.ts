@@ -142,3 +142,49 @@ test('Analyzer: Rejects classes, this, var, and tagged templates', () => {
   assert.equal(analyzeScript(codeTagged).valid, false);
 });
 
+test('Analyzer: Rejects reflection escapes (getOwnPropertyNames and Reflect.get)', () => {
+  // Attack vector 1: Object.getOwnPropertyNames followed by dynamic indexing
+  const codeEscape1 = `
+    const p = Object.getOwnPropertyNames(Object).find(x => x.startsWith('con'));
+    const c = Object[p];
+  `;
+  const resEscape1 = analyzeScript(codeEscape1);
+  assert.equal(resEscape1.valid, false);
+  assert.ok(
+    resEscape1.errors.some((e) => e.code === 'BANNED_REFLECTION' || e.code === 'BANNED_COMPUTED_PRIMITIVE')
+  );
+
+  // Attack vector 2: Reflect.get with runtime key synthesis
+  const codeEscape2 = `
+    const c = Reflect.get(Object, ['con', 'structor'].join(''));
+  `;
+  const resEscape2 = analyzeScript(codeEscape2);
+  assert.equal(resEscape2.valid, false);
+  assert.ok(resEscape2.errors.some((e) => e.code === 'BANNED_IDENTIFIER'));
+});
+
+test('Analyzer: Rejects infinite loops and loop await starvation (DoS prevention)', () => {
+  const codeInfiniteWhile = `
+    while (true) {
+      await null;
+    }
+  `;
+  const resWhile = analyzeScript(codeInfiniteWhile);
+  assert.equal(resWhile.valid, false);
+  assert.ok(
+    resWhile.errors.some((e) => e.code === 'DISALLOWED_INFINITE_LOOP' || e.code === 'DISALLOWED_LOOP_AWAIT')
+  );
+
+  const codeInfiniteFor = `
+    for (;;) {
+      await null;
+    }
+  `;
+  const resFor = analyzeScript(codeInfiniteFor);
+  assert.equal(resFor.valid, false);
+  assert.ok(
+    resFor.errors.some((e) => e.code === 'DISALLOWED_INFINITE_LOOP' || e.code === 'DISALLOWED_LOOP_AWAIT')
+  );
+});
+
+

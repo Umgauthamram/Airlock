@@ -22,6 +22,7 @@ export interface ModelResponse {
   model: string;
   tier: NemotronTier;
   usage: CompletionUsage;
+  isFallback?: boolean;
 }
 
 export class NebiusTokenFactoryClient {
@@ -85,6 +86,7 @@ export class NebiusTokenFactoryClient {
             reasoning,
             model,
             tier,
+            isFallback: false,
             usage: {
               promptTokens: usage.prompt_tokens || 0,
               completionTokens: usage.completion_tokens || 0,
@@ -118,6 +120,7 @@ export class NebiusTokenFactoryClient {
       content,
       model,
       tier,
+      isFallback: true,
       usage: {
         promptTokens: estimatedPromptTokens,
         completionTokens: estimatedCompletionTokens,

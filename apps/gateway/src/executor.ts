@@ -104,6 +104,8 @@ export async function executeScriptInSandbox(
       `
       try { delete this.process; } catch(e) {}
       try { delete this.global; } catch(e) {}
+      try { delete this.Reflect; } catch(e) {}
+      try { delete this.Proxy; } catch(e) {}
       try { delete this.queueMicrotask; } catch(e) {}
       try { delete this.setImmediate; } catch(e) {}
       try { delete this.clearImmediate; } catch(e) {}
@@ -111,6 +113,35 @@ export async function executeScriptInSandbox(
       try { delete this.clearTimeout; } catch(e) {}
       try { delete this.setInterval; } catch(e) {}
       try { delete this.clearInterval; } catch(e) {}
+      try { delete Object.getOwnPropertyNames; } catch(e) {}
+      try { delete Object.getOwnPropertyDescriptors; } catch(e) {}
+      try { delete Object.getOwnPropertyDescriptor; } catch(e) {}
+      try { delete Object.getPrototypeOf; } catch(e) {}
+      try { delete Object.setPrototypeOf; } catch(e) {}
+      try { delete Object.defineProperty; } catch(e) {}
+      try { delete Object.defineProperties; } catch(e) {}
+      try {
+        Object.defineProperty(Object.prototype, 'constructor', {
+          get() { throw new Error('Access to constructor is prohibited'); },
+          set() { throw new Error('Access to constructor is prohibited'); },
+          configurable: false,
+        });
+      } catch(e) {}
+      try {
+        Object.defineProperty(Function.prototype, 'constructor', {
+          get() { throw new Error('Access to constructor is prohibited'); },
+          set() { throw new Error('Access to constructor is prohibited'); },
+          configurable: false,
+        });
+      } catch(e) {}
+      try {
+        const AsyncFn = Object.getPrototypeOf(async function(){}).constructor;
+        Object.defineProperty(AsyncFn.prototype, 'constructor', {
+          get() { throw new Error('Access to constructor is prohibited'); },
+          set() { throw new Error('Access to constructor is prohibited'); },
+          configurable: false,
+        });
+      } catch(e) {}
       try { Object.freeze(Object.prototype); } catch(e) {}
       try { Object.freeze(Function.prototype); } catch(e) {}
       try { Object.freeze(Array.prototype); } catch(e) {}

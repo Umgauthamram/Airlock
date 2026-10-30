@@ -24,6 +24,9 @@ function getSessionSecret(): string {
   if (process.env.AUTH_SECRET) {
     return process.env.AUTH_SECRET;
   }
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('AUTH_SECRET environment variable (minimum 32 characters) is strictly required in production.');
+  }
   return 'airlock_dev_secret_key_minimum_32_characters_12345';
 }
 

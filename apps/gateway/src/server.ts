@@ -243,7 +243,12 @@ export async function createServer() {
   // ---------------------------------------------------------------------------
   // Authenticated Control Plane Endpoints (Restricted to Internal Web App)
   // ---------------------------------------------------------------------------
-  const masterKey = process.env.AIRLOCK_MASTER_KEY || 'master_dev_secret_key_32_characters';
+  const masterKey =
+    process.env.AIRLOCK_MASTER_KEY || 'airlock_default_master_key_for_local_development_32_chars';
+
+  if (process.env.NODE_ENV === 'production' && !process.env.AIRLOCK_MASTER_KEY) {
+    app.log.warn('[SECURITY WARNING] AIRLOCK_MASTER_KEY is not set in production. Using default fallback key.');
+  }
 
   function verifyControlPlaneAuth(req: any, reply: any): boolean {
     const auth = req.headers.authorization;
@@ -262,14 +267,16 @@ export async function createServer() {
     const { id } = req.params as { id: string };
     const body = req.body as { decision: 'approved' | 'denied'; note?: string };
     const operatorId = (req.headers['x-operator-id'] as string) || 'operator';
+    const orgId = (req.headers['x-org-id'] as string) || 'main';
 
     if (!body?.decision || (body.decision !== 'approved' && body.decision !== 'denied')) {
       return reply.status(400).send({ error: "decision must be 'approved' or 'denied'." });
     }
 
-    const outcome = await gateway.decideApproval(id, body.decision, operatorId, body.note);
+    const outcome = await gateway.decideApproval(id, body.decision, operatorId, body.note, orgId);
     if (!outcome.success) {
-      return reply.status(409).send(outcome);
+      const statusCode = outcome.status === 'not_found' ? 404 : 409;
+      return reply.status(statusCode).send(outcome);
     }
     return outcome;
   });

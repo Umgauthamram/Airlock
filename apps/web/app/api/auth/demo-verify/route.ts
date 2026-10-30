@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createHash } from 'node:crypto';
 import { verifyCode } from '@/lib/verification';
 import { createDemoSession } from '@/lib/auth';
 import { ensureDemoOrgSeeded } from '@/lib/data';
@@ -18,7 +19,9 @@ export async function POST(req: Request) {
     }
 
     const cleanPrefix = normalizedEmail.split('@')[0].replace(/[^a-zA-Z0-9]/g, '-');
-    const orgId = `demo-${cleanPrefix}`;
+    const emailHash = createHash('sha256').update(normalizedEmail).digest('hex').slice(0, 10);
+    // Unique deterministic orgId prevents collision across domains or sanitized prefixes
+    const orgId = `demo-${cleanPrefix}-${emailHash}`;
 
     // Seed distinct data for this individual demo account
     await ensureDemoOrgSeeded(orgId, normalizedEmail);
@@ -38,4 +41,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: err.message || 'Verification failed' }, { status: 500 });
   }
 }
-

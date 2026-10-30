@@ -16,10 +16,10 @@ Tested against an expanded catalog of **50 realistic MCP tools** across 8 servic
 | :--- | :--- | :--- |
 | **Attack Block / Hold Rate** | **100%** (30 / 30) | 100% |
 | **Benign False-Hold Rate** | **0.0%** (0 / 30) | &lt; 5% |
-| **Average Token Reduction** | **94.7%** | &gt; 60% |
-| **Total Tokens Consumed** | **25,214** vs **471,480** | 94.7% savings |
+| **Average Token Reduction** | **99.6%** | &gt; 60% |
+| **Total Tokens Consumed** | **2,700** vs **607,957** | 99.6% savings |
 | **AST Analysis Latency (p50)** | **0.14 ms** | &lt; 20 ms |
-| **AST Analysis Latency (p95)** | **1.26 ms** | &lt; 50 ms |
+| **AST Analysis Latency (p95)** | **0.83 ms** | &lt; 50 ms |
 
 To reproduce these metrics on your local machine:
 ```bash

@@ -57,29 +57,63 @@ export async function GET(req: Request) {
     }
 
     const profile = await userRes.json();
+    if (!profile.email_verified) {
+      return NextResponse.redirect(`${authUrl}/login?error=email_not_verified`);
+    }
+
     const email = profile.email?.toLowerCase();
+    if (!email) {
+      return NextResponse.redirect(`${authUrl}/login?error=missing_email`);
+    }
+
+    // Enforce allowed email domain if configured
+    const allowedDomain = process.env.ALLOWED_EMAIL_DOMAIN?.trim().toLowerCase();
+    if (allowedDomain) {
+      const emailDomain = email.split('@')[1];
+      if (emailDomain !== allowedDomain) {
+        return NextResponse.redirect(`${authUrl}/login?error=domain_not_allowed`);
+      }
+    }
+
     const name = profile.name || email.split('@')[0];
     const orgId = 'main';
 
-    // 3. Determine user role from bootstrap admin list
+    // Check existing user in Redis to avoid overwriting roles or reactivating deactivated users
+    let existingUser: any = null;
+    const redis = getRedisClient();
+    try {
+      const rawUser = await redis.get(RedisKeys.user(orgId, email));
+      if (rawUser) {
+        existingUser = JSON.parse(rawUser);
+      }
+    } catch {
+      // Best-effort in offline dev
+    }
+
+    if (existingUser && existingUser.status === 'deactivated') {
+      return NextResponse.redirect(`${authUrl}/login?error=account_deactivated`);
+    }
+
+    // Determine user role: preserve existing role, or check bootstrap admin list, or default to operator
     const bootstrapAdmins = (process.env.BOOTSTRAP_ADMIN_EMAILS || '')
       .split(',')
       .map((e) => e.trim().toLowerCase())
       .filter(Boolean);
 
-    const role = bootstrapAdmins.includes(email) ? Role.ADMIN : Role.OPERATOR;
+    const role = existingUser?.role || (bootstrapAdmins.includes(email) ? Role.ADMIN : Role.OPERATOR);
+    const status = existingUser?.status || 'active';
 
-    // 4. Upsert user record in Redis
+    // Upsert user record in Redis without stomping role/status
     try {
-      const redis = getRedisClient();
       await redis.set(
         RedisKeys.user(orgId, email),
         JSON.stringify({
           id: email,
           email,
-          name,
+          name: existingUser?.name || name,
           role,
-          status: 'active',
+          status,
+          createdAt: existingUser?.createdAt || new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         })
       );
