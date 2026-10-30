@@ -89,11 +89,20 @@ export async function getDashboardStats(orgId: string) {
 
   try {
     const keys = await redis.keys(`org:{${orgId}}:approval:*`);
+    const seen = new Set<string>();
     for (const key of keys) {
       const raw = await redis.get(key);
       if (raw) {
-        const doc = JSON.parse(raw);
-        if (doc.status === 'pending') pendingCount++;
+        try {
+          const doc = JSON.parse(raw);
+          const normId = (doc.id || doc.approvalId || '').replace(/_/g, '-');
+          if (normId && !seen.has(normId)) {
+            seen.add(normId);
+            if (doc.status === 'pending') pendingCount++;
+          }
+        } catch {
+          // ignore corrupted
+        }
       }
     }
 
