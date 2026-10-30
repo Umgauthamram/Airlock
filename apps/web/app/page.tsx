@@ -1,318 +1,315 @@
+'use client';
+
+import React, { useState } from 'react';
 import Link from 'next/link';
-import VignetteBloomCanvas from '@/components/VignetteBloomCanvas';
+import AsciiVignetteBloom from '@/components/AsciiVignetteBloom';
 
 export default function LandingPage() {
+  const [email, setEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (email) setSubmitted(true);
+  }
+
   return (
-    <div className="flex-1 flex flex-col w-full bg-[#f8fafc] text-slate-900">
-      {/* Top Header */}
-      <header className="border-b border-slate-200 bg-white/80 backdrop-blur sticky top-0 z-50 w-full">
-        <div className="w-full px-6 lg:px-10 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="font-bold text-xl tracking-tight text-slate-900 flex items-center gap-2">
-              <span>Airlock</span>
-              <span className="text-xs font-mono font-semibold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
-                Gateway
-              </span>
-            </Link>
-          </div>
-          <nav className="flex items-center gap-6 text-sm font-medium">
-            <Link href="/quickstart" className="text-slate-600 hover:text-slate-900 transition-colors">
-              Quick Start
-            </Link>
-            <Link href="/login" className="text-slate-600 hover:text-slate-900 transition-colors">
-              Sign In
-            </Link>
-            <Link
-              href="/api/auth/demo"
-              className="px-4 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800 transition-colors text-xs font-semibold shadow-xs"
-            >
-              Explore Live Demo
-            </Link>
-          </nav>
-        </div>
+    <div className="min-h-screen flex flex-col bg-[#e6ece6] text-[#0b3320] selection:bg-[#0b3320] selection:text-white font-sans antialiased">
+      {/* Minimal Top Brand Bar */}
+      <header className="w-full px-8 lg:px-14 py-8 flex items-center justify-between z-30">
+        <Link href="/" className="flex items-center gap-2 group">
+          <span className="font-mono font-black text-xl tracking-[0.25em] text-[#0b3320] uppercase">
+            AIRLOCK
+          </span>
+          <span className="w-2 h-2 rounded-full bg-[#0b3320] group-hover:scale-125 transition-transform"></span>
+        </Link>
+
+        <nav className="flex items-center gap-8 text-xs font-mono uppercase tracking-wider font-semibold">
+          <Link
+            href="/quickstart"
+            className="text-[#3b5945] hover:text-[#0b3320] transition-colors"
+          >
+            Quick Start
+          </Link>
+          <Link
+            href="/login"
+            className="text-[#3b5945] hover:text-[#0b3320] transition-colors"
+          >
+            Sign In
+          </Link>
+          <Link
+            href="/api/auth/demo"
+            className="px-5 py-2.5 bg-[#0b3320] hover:bg-[#12452c] text-white rounded-none transition-colors shadow-xs"
+          >
+            Explore Demo →
+          </Link>
+        </nav>
       </header>
 
-      {/* Hero Section */}
-      <main className="flex-1 w-full px-6 lg:px-12 py-16 flex flex-col gap-20 max-w-7xl mx-auto">
-        <section className="flex flex-col items-center text-center max-w-4xl mx-auto gap-6 pt-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-medium text-slate-700 shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Security Gateway for AI Agents &amp; MCP Tools</span>
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 leading-[1.15]">
-            Prevent autonomous AI agents from leaking data or running destructive commands.
-          </h1>
-
-          <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl">
-            Airlock sits in front of your Model Context Protocol tools. Instead of letting agents blindly execute multi-turn calls, it intercepts execution plans, stops prompt-injection exfiltration, and requires operator approval for sensitive actions.
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-4 mt-2">
-            <Link
-              href="/api/auth/demo"
-              className="px-6 py-3 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors shadow-xs"
-            >
-              Explore Live Demo (Operator Access)
-            </Link>
-            <Link
-              href="/quickstart"
-              className="px-6 py-3 border border-slate-300 bg-white text-slate-800 text-sm font-semibold rounded-lg hover:bg-slate-50 transition-colors shadow-xs"
-            >
-              Quick Start Guide →
-            </Link>
-          </div>
-        </section>
-
-        {/* Centerpiece: Vignette Bloom Canvas2D Raster */}
-        <section className="w-full flex flex-col gap-3">
-          <div className="flex items-center justify-between text-xs text-slate-500 px-1">
-            <span className="font-semibold uppercase tracking-wider text-slate-400">
-              Interactive Execution &amp; Inspection Lens
-            </span>
-            <span>Render Mode: Vignette Bloom (21st.dev Canvas2D)</span>
-          </div>
-          <VignetteBloomCanvas
-            cellSize={16}
-            initialRenderMode="mosaic"
-            className="w-full shadow-xl"
+      {/* Main Hero Showcase */}
+      <main className="flex-1 flex flex-col justify-between relative overflow-hidden">
+        {/* Full-bleed ASCII Canvas on Right Side */}
+        <div className="absolute inset-y-0 right-0 w-full lg:w-3/5 z-0 pointer-events-auto">
+          <AsciiVignetteBloom
+            cellSize={14}
+            initialRenderMode="characters"
+            theme="light-sage"
+            className="w-full h-full"
           />
-        </section>
+        </div>
 
-        {/* Section: What Airlock Provides */}
-        <section className="flex flex-col gap-8 pt-6">
-          <div className="text-center max-w-2xl mx-auto flex flex-col gap-2">
-            <span className="text-xs uppercase font-mono font-bold tracking-wider text-sky-600">
-              Platform Capabilities
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-              What Airlock Provides
-            </h2>
-            <p className="text-sm text-slate-500">
-              Core security mechanisms engineered specifically for autonomous agent workflows.
+        {/* Hero Left Content Column */}
+        <div className="w-full px-8 lg:px-14 pt-8 lg:pt-16 pb-20 z-10 flex flex-col justify-between max-w-7xl mx-auto pointer-events-none">
+          <div className="max-w-2xl flex flex-col gap-8 pointer-events-auto">
+            {/* Title Block in Dark Forest Green */}
+            <div className="flex flex-col">
+              <h1 className="text-6xl sm:text-7xl lg:text-[5.5rem] font-bold tracking-[-0.04em] leading-[0.95] text-[#0b3320]">
+                Security Mode <br />
+                for Cursor
+              </h1>
+            </div>
+
+            {/* Subtitle */}
+            <p className="text-xl sm:text-2xl font-bold tracking-tight text-[#0b3320] max-w-lg leading-snug">
+              Introducing a new way to protect tools right where your agents code.
             </p>
-          </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="p-6 bg-white border border-slate-200 rounded-xl shadow-xs flex flex-col gap-3">
-              <div className="w-10 h-10 rounded-lg bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-700 font-bold text-lg">
-                🛡️
-              </div>
-              <h3 className="font-bold text-base text-slate-900">Prompt Injection Shield</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Stops hidden prompt injection inside emails, web pages, or tickets from tricking the agent into exfiltrating confidential data to external sinks.
-              </p>
-            </div>
-
-            <div className="p-6 bg-white border border-slate-200 rounded-xl shadow-xs flex flex-col gap-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 font-bold text-lg">
-                👤
-              </div>
-              <h3 className="font-bold text-base text-slate-900">Human Operator Queue</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Risky or destructive operations pause in a real-time queue. Human operators review the script, inspect flagged data flows, and approve with one click.
-              </p>
-            </div>
-
-            <div className="p-6 bg-white border border-slate-200 rounded-xl shadow-xs flex flex-col gap-3">
-              <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-bold text-lg">
-                ⚡
-              </div>
-              <h3 className="font-bold text-base text-slate-900">Instant Kill Switch</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Instantly revoke or suspend machine agent API keys in sub-second time across all your connected servers if an agent exhibits runaway behavior.
-              </p>
-            </div>
-
-            <div className="p-6 bg-white border border-slate-200 rounded-xl shadow-xs flex flex-col gap-3">
-              <div className="w-10 h-10 rounded-lg bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-700 font-bold text-lg">
-                📜
-              </div>
-              <h3 className="font-bold text-base text-slate-900">Immutable Audit Trail</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Every request, policy evaluation, approval decision, and sandbox call is logged into a verifiable, append-only stream for compliance and debugging.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Section: How It Is Beneficial */}
-        <section className="p-8 sm:p-10 bg-slate-900 text-white rounded-2xl flex flex-col gap-8 shadow-sm">
-          <div className="flex flex-col gap-2">
-            <span className="text-xs uppercase font-mono font-bold tracking-wider text-emerald-400">
-              Proven Value
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-              Why Teams Put Airlock in Front of MCP Tools
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 text-xs text-slate-300 leading-relaxed">
-            <div className="flex flex-col gap-2">
-              <span className="text-sm font-bold text-white">For Security &amp; Compliance</span>
-              <p>
-                Complete peace of mind. Autonomous agents cannot access external networks or execute deletions without meeting deterministic policy rules and operator verification.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <span className="text-sm font-bold text-white">For Developers &amp; Platform Teams</span>
-              <p>
-                <strong>94%+ token reduction</strong>. Instead of sending 50+ tool schemas on every single turn, agents fetch concise TypeScript stubs and submit a single executable plan.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <span className="text-sm font-bold text-white">Zero Performance Overhead</span>
-              <p>
-                Deterministic AST parsing and policy evaluation complete in <strong>0.83ms (p95)</strong>, adding virtually zero latency to your agent pipelines.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Section: What You Can Use Directly From This Website */}
-        <section className="flex flex-col gap-8">
-          <div className="text-center max-w-2xl mx-auto flex flex-col gap-2">
-            <span className="text-xs uppercase font-mono font-bold tracking-wider text-sky-600">
-              Interactive Web App
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-              What You Can Do Right Now in the Web App
-            </h2>
-            <p className="text-sm text-slate-500">
-              Experience the complete operator and security workflow directly from your browser.
+            <p className="text-sm text-[#3b5945] max-w-md leading-relaxed font-normal">
+              Airlock intercepts MCP actions before execution. It stops prompt-injection exfiltration, gates risky external calls, and holds destructive changes for single-click human approval.
             </p>
+
+            {/* Email / Access Input Box (Exact style from screenshot) */}
+            <div className="flex flex-col gap-3 pt-4 max-w-md">
+              <span className="text-xs font-mono uppercase tracking-wider text-[#3b5945]">
+                Available now for Cursor, Claude &amp; MCP.
+              </span>
+
+              {submitted ? (
+                <div className="p-4 bg-white border border-[#0b3320] text-xs font-mono text-[#0b3320] flex items-center justify-between">
+                  <span>✓ Request recorded. Check your inbox for key access.</span>
+                  <Link href="/api/auth/demo" className="underline font-bold">
+                    Launch Demo →
+                  </Link>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="flex border border-[#0b3320] bg-white/70 backdrop-blur-xs">
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="YOUR EMAIL"
+                    className="px-4 py-3.5 bg-transparent text-xs font-mono tracking-wider uppercase text-[#0b3320] placeholder:text-[#6a8070] outline-none flex-1 min-w-0"
+                  />
+                  <button
+                    type="submit"
+                    className="px-6 py-3.5 bg-[#0b3320] hover:bg-[#12452c] text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors shrink-0 cursor-pointer"
+                  >
+                    REQUEST ACCESS
+                  </button>
+                </form>
+              )}
+            </div>
           </div>
+        </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Link
-              href="/app/approvals"
-              className="p-6 bg-white border border-slate-200 rounded-xl hover:border-slate-400 transition-colors shadow-xs flex flex-col gap-2.5 group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
-                  Approvals Queue
-                </span>
-                <span className="text-xs text-slate-400 group-hover:translate-x-1 transition-transform">→</span>
+        {/* Floating Right Mockup Overlay (as in the screenshot) */}
+        <div className="hidden xl:block absolute right-0 top-1/2 -translate-y-1/2 w-80 translate-x-6 z-20 pointer-events-auto">
+          <div className="bg-white border-2 border-[#0b3320] shadow-2xl rounded-l-2xl overflow-hidden flex flex-col">
+            <div className="bg-[#fbbf24] px-4 py-3 border-b border-[#0b3320] flex items-center justify-between">
+              <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-black">
+                Airlock · Gate Alert
+              </span>
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-600 animate-ping"></span>
+            </div>
+            <div className="p-4 flex flex-col gap-3 text-xs font-mono">
+              <div className="p-2.5 bg-amber-50 rounded border border-amber-200 text-amber-900 text-[11px]">
+                <strong>HELD:</strong> reads_untrusted &rarr; writes_external
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Review held scripts, inspect the exact code generated by the agent, see policy alerts, and click <em>Approve &amp; Execute Once</em>.
-              </p>
-            </Link>
-
-            <Link
-              href="/app/audit"
-              className="p-6 bg-white border border-slate-200 rounded-xl hover:border-slate-400 transition-colors shadow-xs flex flex-col gap-2.5 group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
-                  Audit Trail
-                </span>
-                <span className="text-xs text-slate-400 group-hover:translate-x-1 transition-transform">→</span>
+              <div className="p-3 bg-slate-900 text-slate-100 rounded text-[11px] leading-relaxed overflow-x-auto">
+                <span className="text-slate-400">// Injected payload intercepted</span>
+                <br />
+                <span className="text-rose-400">await tools.http.post(...)</span>
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Explore the immutable event stream recording every request, policy evaluation, approval decision, and sandbox call.
-              </p>
-            </Link>
-
-            <Link
-              href="/app/agents"
-              className="p-6 bg-white border border-slate-200 rounded-xl hover:border-slate-400 transition-colors shadow-xs flex flex-col gap-2.5 group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
-                  Agent Kill Switch
-                </span>
-                <span className="text-xs text-slate-400 group-hover:translate-x-1 transition-transform">→</span>
+              <div className="flex gap-2 pt-1">
+                <Link
+                  href="/api/auth/demo"
+                  className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-center font-bold text-[11px] rounded"
+                >
+                  Approve
+                </Link>
+                <Link
+                  href="/api/auth/demo"
+                  className="px-3 py-2 border border-rose-300 bg-rose-50 text-rose-800 text-center font-bold text-[11px] rounded"
+                >
+                  Deny
+                </Link>
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Manage machine agent API keys, check daily token budgets, and activate emergency kill switches to suspend rogue keys instantly.
-              </p>
-            </Link>
-
-            <Link
-              href="/app/tools"
-              className="p-6 bg-white border border-slate-200 rounded-xl hover:border-slate-400 transition-colors shadow-xs flex flex-col gap-2.5 group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
-                  Tool Registry
-                </span>
-                <span className="text-xs text-slate-400 group-hover:translate-x-1 transition-transform">→</span>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Browse discovered upstream tools from your MCP servers with automatic semantic risk tags (<code>reads_untrusted</code>, <code>writes_external</code>).
-              </p>
-            </Link>
-
-            <Link
-              href="/app/policies"
-              className="p-6 bg-white border border-slate-200 rounded-xl hover:border-slate-400 transition-colors shadow-xs flex flex-col gap-2.5 group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
-                  Security Policies
-                </span>
-                <span className="text-xs text-slate-400 group-hover:translate-x-1 transition-transform">→</span>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Inspect active deterministic rules with strict evaluation precedence (<code>DENY</code> &gt; <code>HOLD</code> &gt; <code>ALLOW</code>).
-              </p>
-            </Link>
-
-            <Link
-              href="/app/results"
-              className="p-6 bg-white border border-slate-200 rounded-xl hover:border-slate-400 transition-colors shadow-xs flex flex-col gap-2.5 group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
-                  Benchmark Proof
-                </span>
-                <span className="text-xs text-slate-400 group-hover:translate-x-1 transition-transform">→</span>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Review reproducible benchmark results across 60 scenarios: 100% attack block rate, 0% false holds, and 94.7% token reduction.
-              </p>
-            </Link>
+            </div>
           </div>
-        </section>
+        </div>
 
-        {/* Bottom CTA */}
-        <section className="p-8 sm:p-10 bg-white border border-slate-200 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xs">
-          <div className="flex flex-col gap-1.5">
-            <h3 className="text-xl font-bold text-slate-900">Get Started with Airlock</h3>
-            <p className="text-xs sm:text-sm text-slate-600">
-              Connect Cursor, Claude Desktop, or your own agents in under two minutes.
-            </p>
+        {/* Value Proposition Grid (Clean Editorial Layout) */}
+        <div className="w-full bg-white/70 border-t border-[#ccd8cc] backdrop-blur-md z-10 py-16 px-8 lg:px-14">
+          <div className="max-w-7xl mx-auto flex flex-col gap-12">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#ccd8cc] pb-6">
+              <div>
+                <span className="text-xs font-mono uppercase tracking-widest text-[#415949] font-bold">
+                  What Airlock Provides
+                </span>
+                <h2 className="text-3xl font-bold tracking-tight text-[#0b3320] mt-1">
+                  Complete Pre-Execution Defense
+                </h2>
+              </div>
+              <Link
+                href="/quickstart"
+                className="text-xs font-mono uppercase tracking-wider font-bold text-[#0b3320] hover:underline"
+              >
+                Read Setup Guide →
+              </Link>
+            </div>
+
+            <div className="grid md:grid-cols-4 gap-8">
+              <div className="flex flex-col gap-2.5">
+                <span className="text-xs font-mono font-bold text-[#415949]">01 / SHIELD</span>
+                <h3 className="text-base font-bold text-[#0b3320]">Prompt Injection Defense</h3>
+                <p className="text-xs text-[#3b5945] leading-relaxed">
+                  Stops hidden instructions inside emails or scraped documents from exfiltrating data to external webhooks.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-2.5">
+                <span className="text-xs font-mono font-bold text-[#415949]">02 / OPERATOR</span>
+                <h3 className="text-base font-bold text-[#0b3320]">Human-in-the-Loop Review</h3>
+                <p className="text-xs text-[#3b5945] leading-relaxed">
+                  Destructive commands or sensitive transfers pause in a clean approval queue for human verification.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-2.5">
+                <span className="text-xs font-mono font-bold text-[#415949]">03 / KILL SWITCH</span>
+                <h3 className="text-base font-bold text-[#0b3320]">Instant Key Revocation</h3>
+                <p className="text-xs text-[#3b5945] leading-relaxed">
+                  Sub-second suspension of rogue machine keys across all connected servers before harm occurs.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-2.5">
+                <span className="text-xs font-mono font-bold text-[#415949]">04 / EFFICIENCY</span>
+                <h3 className="text-base font-bold text-[#0b3320]">94%+ Token Reduction</h3>
+                <p className="text-xs text-[#3b5945] leading-relaxed">
+                  Replaces heavy multi-turn catalog roundtrips with targeted code generation and sub-millisecond AST gating.
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-3 shrink-0">
-            <Link
-              href="/quickstart"
-              className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition-colors shadow-xs"
-            >
-              Quick Start Guide →
-            </Link>
-            <Link
-              href="/api/auth/demo"
-              className="px-5 py-2.5 border border-slate-300 hover:bg-slate-50 text-slate-800 rounded-lg text-xs font-semibold transition-colors shadow-xs"
-            >
-              Launch Demo
-            </Link>
+        </div>
+
+        {/* Live Website Workflow Cards */}
+        <div className="w-full bg-[#0b3320] text-white py-16 px-8 lg:px-14 z-10">
+          <div className="max-w-7xl mx-auto flex flex-col gap-10">
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-mono uppercase tracking-widest text-emerald-400 font-bold">
+                Control Plane Navigation
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                What You Can Use Right Now From This Website
+              </h2>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 text-xs">
+              <Link
+                href="/app/approvals"
+                className="p-6 bg-[#0f3d27] border border-[#165437] rounded-none hover:border-emerald-400 transition-colors flex flex-col gap-2"
+              >
+                <div className="flex justify-between items-center text-emerald-300 font-mono font-bold text-sm">
+                  <span>Approvals Queue</span>
+                  <span>→</span>
+                </div>
+                <p className="text-slate-300 leading-relaxed">
+                  Inspect held scripts, review flagged data flows, and click <em>Approve &amp; Execute Once</em>.
+                </p>
+              </Link>
+
+              <Link
+                href="/app/audit"
+                className="p-6 bg-[#0f3d27] border border-[#165437] rounded-none hover:border-emerald-400 transition-colors flex flex-col gap-2"
+              >
+                <div className="flex justify-between items-center text-emerald-300 font-mono font-bold text-sm">
+                  <span>Immutable Audit Trail</span>
+                  <span>→</span>
+                </div>
+                <p className="text-slate-300 leading-relaxed">
+                  Browse append-only stream telemetry recording every agent execution, tool call, and decision.
+                </p>
+              </Link>
+
+              <Link
+                href="/app/agents"
+                className="p-6 bg-[#0f3d27] border border-[#165437] rounded-none hover:border-emerald-400 transition-colors flex flex-col gap-2"
+              >
+                <div className="flex justify-between items-center text-emerald-300 font-mono font-bold text-sm">
+                  <span>Agent Kill Switches</span>
+                  <span>→</span>
+                </div>
+                <p className="text-slate-300 leading-relaxed">
+                  Manage agent API credentials, monitor daily token budgets, and activate emergency suspensions.
+                </p>
+              </Link>
+
+              <Link
+                href="/app/tools"
+                className="p-6 bg-[#0f3d27] border border-[#165437] rounded-none hover:border-emerald-400 transition-colors flex flex-col gap-2"
+              >
+                <div className="flex justify-between items-center text-emerald-300 font-mono font-bold text-sm">
+                  <span>Tool Registry</span>
+                  <span>→</span>
+                </div>
+                <p className="text-slate-300 leading-relaxed">
+                  Explore upstream tools with automatic semantic risk tags (<code>reads_untrusted</code>, <code>writes_external</code>).
+                </p>
+              </Link>
+
+              <Link
+                href="/app/policies"
+                className="p-6 bg-[#0f3d27] border border-[#165437] rounded-none hover:border-emerald-400 transition-colors flex flex-col gap-2"
+              >
+                <div className="flex justify-between items-center text-emerald-300 font-mono font-bold text-sm">
+                  <span>Security Policies</span>
+                  <span>→</span>
+                </div>
+                <p className="text-slate-300 leading-relaxed">
+                  View deterministic rule tables enforcing strict <code>DENY &gt; HOLD &gt; ALLOW</code> precedence.
+                </p>
+              </Link>
+
+              <Link
+                href="/quickstart"
+                className="p-6 bg-[#0f3d27] border border-[#165437] rounded-none hover:border-emerald-400 transition-colors flex flex-col gap-2"
+              >
+                <div className="flex justify-between items-center text-emerald-300 font-mono font-bold text-sm">
+                  <span>Quick Start Guide</span>
+                  <span>→</span>
+                </div>
+                <p className="text-slate-300 leading-relaxed">
+                  Step-by-step setup for connecting Cursor, Claude Desktop, Python, or TypeScript agents.
+                </p>
+              </Link>
+            </div>
           </div>
-        </section>
+        </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-8 text-center text-xs text-slate-500 w-full mt-12">
-        <div className="w-full px-6 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span>Airlock · Pre-execution Security Gateway for AI Agents</span>
-          <div className="flex gap-6">
-            <Link href="/" className="hover:text-slate-900">Home</Link>
-            <Link href="/quickstart" className="hover:text-slate-900">Quick Start</Link>
-            <Link href="/terms" className="hover:text-slate-900">Terms</Link>
-            <Link href="/privacy" className="hover:text-slate-900">Privacy</Link>
-            <Link href="/login" className="hover:text-slate-900">Sign In</Link>
+      {/* Minimalist Footer */}
+      <footer className="border-t border-[#ccd8cc] py-8 px-8 lg:px-14 text-xs font-mono text-[#415949]">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <span>Airlock · Pre-Execution Security Gateway for AI Agents</span>
+          <div className="flex gap-6 uppercase">
+            <Link href="/" className="hover:text-[#0b3320]">Home</Link>
+            <Link href="/quickstart" className="hover:text-[#0b3320]">Quick Start</Link>
+            <Link href="/terms" className="hover:text-[#0b3320]">Terms</Link>
+            <Link href="/privacy" className="hover:text-[#0b3320]">Privacy</Link>
+            <Link href="/login" className="hover:text-[#0b3320]">Sign In</Link>
           </div>
         </div>
       </footer>
