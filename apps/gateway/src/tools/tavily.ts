@@ -61,3 +61,4 @@ export async function web_search(query: string, maxResults = 5): Promise<TavilyS
     clearTimeout(timer);
   }
 }
+

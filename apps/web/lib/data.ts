@@ -129,18 +129,29 @@ export async function getApprovals(orgId: string, status?: string): Promise<Appr
     for (const key of keys) {
       const raw = await redis.get(key);
       if (raw) {
-        const doc = JSON.parse(raw) as ApprovalDocument;
-        const normId = doc.id.replace(/_/g, '-');
-        if (!seen.has(normId)) {
-          seen.add(normId);
-          doc.id = normId;
-          if (doc.agentId) doc.agentId = doc.agentId.replace(/_/g, '-');
-          if (doc.flaggedFlows) {
-            doc.flaggedFlows = doc.flaggedFlows.map((f) => f.replace(/_/g, ' ').replace(/->/g, '→'));
+        try {
+          const doc = JSON.parse(raw) as any;
+          const rawId = doc.id || doc.approvalId || '';
+          if (!rawId) continue;
+          const normId = rawId.replace(/_/g, '-');
+          if (!seen.has(normId)) {
+            seen.add(normId);
+            doc.id = normId;
+            if (doc.agentId) doc.agentId = doc.agentId.replace(/_/g, '-');
+            if (doc.flaggedFlows && Array.isArray(doc.flaggedFlows)) {
+              doc.flaggedFlows = doc.flaggedFlows.map((f: string) => f.replace(/_/g, ' ').replace(/->/g, '→'));
+            } else if (!doc.flaggedFlows) {
+              doc.flaggedFlows = [];
+            }
+            if (!doc.explanation && doc.reasons) {
+              doc.explanation = Array.isArray(doc.reasons) ? doc.reasons.join('. ') : String(doc.reasons);
+            }
+            if (!status || doc.status === status) {
+              approvals.push(doc as ApprovalDocument);
+            }
           }
-          if (!status || doc.status === status) {
-            approvals.push(doc);
-          }
+        } catch {
+          // ignore malformed item and continue
         }
       }
     }
@@ -161,14 +172,20 @@ export async function getApprovalById(orgId: string, approvalId: string): Promis
       raw = await redis.get(RedisKeys.approval(orgId, altId));
     }
     if (raw) {
-      const doc = JSON.parse(raw) as ApprovalDocument;
-      doc.id = doc.id.replace(/_/g, '-');
+      const doc = JSON.parse(raw) as any;
+      const rawId = doc.id || doc.approvalId || approvalId;
+      doc.id = rawId.replace(/_/g, '-');
       if (doc.agentId) doc.agentId = doc.agentId.replace(/_/g, '-');
       if (doc.decidedBy) doc.decidedBy = doc.decidedBy.replace(/_/g, '-');
-      if (doc.flaggedFlows) {
-        doc.flaggedFlows = doc.flaggedFlows.map((f) => f.replace(/_/g, ' ').replace(/->/g, '→'));
+      if (doc.flaggedFlows && Array.isArray(doc.flaggedFlows)) {
+        doc.flaggedFlows = doc.flaggedFlows.map((f: string) => f.replace(/_/g, ' ').replace(/->/g, '→'));
+      } else if (!doc.flaggedFlows) {
+        doc.flaggedFlows = [];
       }
-      return doc;
+      if (!doc.explanation && doc.reasons) {
+        doc.explanation = Array.isArray(doc.reasons) ? doc.reasons.join('. ') : String(doc.reasons);
+      }
+      return doc as ApprovalDocument;
     }
     return null;
   } catch {
