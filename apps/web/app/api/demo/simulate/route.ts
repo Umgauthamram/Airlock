@@ -7,14 +7,6 @@ export async function POST(req: Request) {
   try {
     const session = await requireSession();
 
-    // Guard against unauthorized or destructive simulation on production orgs (F-06)
-    if (!session.isDemo || !session.orgId.startsWith('demo-') || session.orgId === 'main') {
-      return NextResponse.json(
-        { error: 'Forbidden: Simulation controls are restricted to demo evaluation sandboxes.' },
-        { status: 403 }
-      );
-    }
-
     const body = await req.json().catch(() => ({}));
     const action = body.action || 'simulate_attack';
 
@@ -51,10 +43,22 @@ export async function POST(req: Request) {
     }
 
     if (action === 'clear') {
-      await clearDemoData(session.orgId);
+      // For demo sandboxes, full reset of demo data
+      if (session.isDemo || session.orgId.startsWith('demo-')) {
+        await clearDemoData(session.orgId);
+        return NextResponse.json({
+          success: true,
+          message: 'Account data and history reset to clean initial state.',
+        });
+      }
+
+      // For production accounts (main), clear only simulated test approvals while keeping audit logs immutable (F-06)
+      const redis = getRedisClient();
+      await redis.del(RedisKeys.approval(session.orgId, 'appr-demo-prompt-injection'));
+      await redis.del(RedisKeys.approval(session.orgId, 'appr_demo_prompt_injection'));
       return NextResponse.json({
         success: true,
-        message: 'Account data and history reset to clean initial state.',
+        message: 'Simulated test approvals cleared. Production audit logs preserved as immutable record.',
       });
     }
 

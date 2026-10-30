@@ -8,15 +8,15 @@
 - **Languages**: TypeScript / Node.js
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: Comprehensive Security Audit Remediation & Hardening (F-01 through F-25)
-- **Status**: Completed full remediation of all 25 audit findings against rules to check.md. Sandbox escape eliminated via isolated Worker threads and AST computed property bans; event loop starvation neutralized with parent kill timers; secrets and master keys secured to fail closed in production; RBAC hardened with VIEWER default; Docker, Caddyfile, and GitHub CI added.
+- **Current Focus**: Real Account Simulation Enablement & Tab Isolation
+- **Status**: Enabled simulation workflows (`simulate_attack`, `simulate_benign`) for real logged-in Google accounts so operators can test held approvals and telemetry without 403 Forbidden errors; preserved audit log immutability by clearing only simulated test approvals on production orgs. Isolated the "How To Do: Demo Account" tab so it only renders for demo evaluation accounts.
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
-- **Sandbox Escape & Starvation Neutralized (F-01, F-04)**: Upgraded [executor.ts](file:///g:/projects/AirLock/apps/gateway/src/executor.ts) to execute untrusted scripts in dedicated `node:worker_threads` Workers with prototype scrubbing/freezing (`Object.prototype.constructor`, `Function.prototype.constructor`) and parent termination kill timers. AST analyzer in [analyzer.ts](file:///g:/projects/AirLock/packages/analyzer/src/analyzer.ts) strictly bans chained computed member access.
-- **Fail-Closed Secrets & RBAC Hardening (F-02, F-03, F-05)**: Throw in production on missing or weak `AUTH_SECRET` and `AIRLOCK_MASTER_KEY`. Google OAuth callback defaults new users to `Role.VIEWER`, enforces `email_verified`, and preserves existing user roles in Redis.
-- **Atomic Approvals & Policy Fail-Closed (F-07, F-08, F-10)**: Added atomic `SETNX` claim lock and expired approval rejection in [gateway.ts](file:///g:/projects/AirLock/apps/gateway/src/gateway.ts). Added rule `R6` to [engine.ts](file:///g:/projects/AirLock/packages/policy/src/engine.ts) denying scripts calling uncatalogued tools.
-- **Docker, Caddy & CI Infrastructure (F-14, F-15)**: Added root [tsconfig.json](file:///g:/projects/AirLock/tsconfig.json), configured reverse proxy in [infra/Caddyfile](file:///g:/projects/AirLock/infra/Caddyfile), hardened [Dockerfile](file:///g:/projects/AirLock/apps/gateway/Dockerfile) with unprivileged `USER node`, and created [.github/workflows/ci.yml](file:///g:/projects/AirLock/.github/workflows/ci.yml).
-- **Benchmark & Honest Claims Alignment (F-11, F-12)**: Replaced uninvoked microVM claims with "Hardened Sandboxed Worker Isolation", and unified benchmark reporting across README and UI to 62 scenarios, 31/31 attacks blocked (100%), and 99.5% token reduction.
+- **Real Account Simulation Access**: Allowed real authenticated Google accounts in [/api/demo/simulate](file:///g:/projects/AirLock/apps/web/app/api/demo/simulate/route.ts) to trigger prompt injection exfiltration attacks and benign agent runs, while keeping production audit logs strictly immutable.
+- **Demo Tab Separation in Guide**: Updated [FeatureGuide.tsx](file:///g:/projects/AirLock/apps/web/components/FeatureGuide.tsx) so logged-in Google users only see the "Real Account (Google Auth)" setup guide and test simulations, hiding the irrelevant demo account tab.
+- **Pnpm Lockfile Vercel CI Sync**: Synchronized `pnpm-lock.yaml` with `package.json` devDependencies, enabling clean frozen lockfile builds on Vercel.
+- **Sandbox Escape & Starvation Neutralized (F-01, F-04)**: Upgraded [executor.ts](file:///g:/projects/AirLock/apps/gateway/src/executor.ts) to execute untrusted scripts in dedicated `node:worker_threads` Workers with prototype scrubbing/freezing and parent termination kill timers.
+- **Fail-Closed Secrets & RBAC Hardening (F-02, F-03, F-05)**: Throw in production on missing or weak `AUTH_SECRET` and `AIRLOCK_MASTER_KEY`. Google OAuth callback defaults new users to `Role.VIEWER`.
 
 ## 4. Next Immediate Steps
 - [ ] Review live local test run (`pnpm -r test` & `pnpm bench`) with user

@@ -102,28 +102,31 @@ export function FeatureGuide({
             >
               Platform Capabilities & Features
             </button>
-            <button
-              onClick={() => setActiveTab('real_account')}
-              className={`px-3.5 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 ${
-                activeTab === 'real_account'
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              <span>How To Do: Real Account (Google Auth)</span>
-              {!isDemo && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>}
-            </button>
-            <button
-              onClick={() => setActiveTab('demo_account')}
-              className={`px-3.5 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 ${
-                activeTab === 'demo_account'
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              <span>How To Do: Demo Account</span>
-              {isDemo && <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>}
-            </button>
+            {!isDemo ? (
+              <button
+                onClick={() => setActiveTab('real_account')}
+                className={`px-3.5 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                  activeTab === 'real_account'
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                <span>How To Do: Real Account (Google Auth)</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              </button>
+            ) : (
+              <button
+                onClick={() => setActiveTab('demo_account')}
+                className={`px-3.5 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                  activeTab === 'demo_account'
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                <span>How To Do: Demo Account</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+              </button>
+            )}
             <button
               onClick={() => setActiveTab('simulate')}
               className={`px-3.5 py-1.5 rounded-md text-xs font-semibold transition-colors ${
@@ -288,6 +291,39 @@ export function FeatureGuide({
                   Inspect Registered MCP Tools
                 </Link>
               </div>
+
+              {/* Quick Action Simulation Buttons for Real Account Testing */}
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
+                <div>
+                  <h4 className="font-bold text-slate-900">Test Verification & Approvals:</h4>
+                  <p className="text-slate-500 text-xs">
+                    Trigger a sample held prompt-injection attack or routine task to verify policy enforcement.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    disabled={!!simulating}
+                    onClick={() => handleSimulate('simulate_attack')}
+                    className="px-3.5 py-2 bg-rose-700 hover:bg-rose-800 text-white rounded-md text-xs font-semibold transition-all shadow-xs disabled:opacity-50"
+                  >
+                    {simulating === 'simulate_attack' ? 'Injecting...' : 'Simulate Prompt Injection Attack'}
+                  </button>
+                  <button
+                    disabled={!!simulating}
+                    onClick={() => handleSimulate('simulate_benign')}
+                    className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-semibold transition-all shadow-xs disabled:opacity-50"
+                  >
+                    {simulating === 'simulate_benign' ? 'Processing...' : 'Simulate Benign Task'}
+                  </button>
+                  <button
+                    disabled={!!simulating}
+                    onClick={() => handleSimulate('clear')}
+                    className="px-3 py-2 bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 rounded-md text-xs font-medium transition-all disabled:opacity-50"
+                  >
+                    {simulating === 'clear' ? 'Clearing...' : 'Clear Test Items'}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
@@ -446,13 +482,15 @@ return { status: "processed", count: emails.length };`}
               </div>
 
               <div className="pt-2 flex items-center justify-between border-t border-slate-200">
-                <span className="text-slate-500">Want to start completely fresh?</span>
+                <span className="text-slate-500">
+                  {isDemo ? 'Want to start completely fresh?' : 'Reset simulated test items?'}
+                </span>
                 <button
                   disabled={!!simulating}
                   onClick={() => handleSimulate('clear')}
                   className="px-3.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-md text-xs font-medium transition-all"
                 >
-                  Clear Account Data to 0
+                  {simulating === 'clear' ? 'Resetting...' : isDemo ? 'Clear Account Data to 0' : 'Clear Simulated Approvals'}
                 </button>
               </div>
             </div>
