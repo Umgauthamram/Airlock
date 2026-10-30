@@ -14,3 +14,4 @@ Include the following in your report:
 - Potential impact and affected components
 
 We will acknowledge receipt within 48 hours and work with you on a resolution before public disclosure.
+
