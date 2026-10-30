@@ -35,9 +35,9 @@ export async function POST(req: Request) {
         'id', `evt-${Date.now()}`,
         'timestamp', new Date().toISOString(),
         'orgId', session.orgId,
-        'eventType', 'script.allowed',
+        'eventType', 'script_allowed',
         'agentId', 'agent-nemotron-super',
-        'details', JSON.stringify({ tools: ['inbox.get_emails'], decision: 'allow', runtimeMs: 0.7 })
+        'details', JSON.stringify({ tools: ['inbox.get_emails'], decision: 'allow', runtimeMs: 0.7, rule: 'R6 (safe read-only)' })
       );
 
       revalidatePath('/app');

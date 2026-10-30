@@ -313,7 +313,7 @@ export async function getAuditEvents(orgId: string, limit = 50): Promise<AuditEv
         ? await redis.xrevrange(streamKey, '+', '-', 'COUNT', limit)
         : (await redis.xrange(streamKey, '-', '+', 'COUNT', limit)).reverse();
     }
-    return raw
+    const mapped = raw
       .map(([id, entries]: [string, string[]]) => {
         const fields: Record<string, string> = {};
         for (let i = 0; i < entries.length; i += 2) {
@@ -336,8 +336,10 @@ export async function getAuditEvents(orgId: string, limit = 50): Promise<AuditEv
           approvalId: fields.approvalId ? fields.approvalId.replace(/_/g, '-') : undefined,
           details,
         };
-      })
-      .reverse(); // newest first
+      });
+
+    // Explicitly sort newest first by timestamp
+    return mapped.sort((a: AuditEvent, b: AuditEvent) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   } catch {
     return [];
   }

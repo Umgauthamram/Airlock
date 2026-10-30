@@ -44,7 +44,7 @@ export function FeatureGuide({
         router.refresh();
         if (onSimulationRun) {
           onSimulationRun();
-        } else if (action === 'clear' || action === 'simulate_attack') {
+        } else {
           setTimeout(() => {
             window.location.reload();
           }, 600);
