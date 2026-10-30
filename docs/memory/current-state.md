@@ -8,15 +8,15 @@
 - **Languages**: TypeScript / Node.js
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: UI Polish (Poppins, Full Screen, Left-Right Split) & Nebius Sandboxes Integration
-- **Status**: Completed full screen responsive layouts, guaranteed Poppins typography across all routes, and integrated Nebius Sandboxes microVM isolation.
+- **Current Focus**: Recreate "mimir" Mosaic ASCII Effect & Seamless Right-Side Integration
+- **Status**: Completed Canvas2D Mimir mosaic render pipeline with ripple animation, chromatic aberration, vignette, and seamless edge blending into the left-side text column.
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
+- **Mimir Canvas2D Effect (`MimirAsciiCanvas.tsx`)**: Recreated the exact 21st.dev "mimir" recipe with 13px cell mosaic grid, chiaroscuro classical bust generator, ripple wave animation (speed: 98, intensity: 60), chromatic aberration (15), and edge vignette (38).
+- **Seamless Left-Right Architecture**: Positioned the animated Mimir sculpture on the right side of the landing page, with texts and CTA on the left, connected via a smooth horizontal opacity mask that removes all borders or seams.
+- **Dynamic Palette Support**: Enabled direct toggle between Mimir Dark (`#080c14`) and Sage Light (`#e6ece6`), with unified background and tile shading in both themes.
 - **Poppins Typography & Full-Width Layout**: Bound Google Poppins via `<link>` and Tailwind theme across the entire application, eliminating serif font fallbacks and ensuring full-width responsive displays on all dashboard and approval views.
-- **Left-Right Component Architecture**: Restructured the Approval detail view and Dashboard into side-by-side split panels (left: Code Inspector & Policy Alert; right: Operator Decision, Metadata, and Execution Environment).
 - **Nebius Sandboxes Integration**: Wired Nebius Sandboxes microVM execution engine into `packages/nebius` and `apps/gateway`, surfacing microVM isolation telemetry in the operator review UI.
-- **Pencil Reference Landing Page**: Aligned the hero section with the pencil aesthetic (sage/mint `#e6ece6`, forest green `#0b3320`, full ASCII bust silhouette canvas with Vignette Bloom wave effects, and floating preview card).
-- **Comprehensive Verification**: All 10 workspace packages built with zero errors, and all monorepo test suites passed 100%.
 
 ## 4. Next Immediate Steps
 - [ ] Review live local test run (`pnpm -r test` & `pnpm bench`) with user
