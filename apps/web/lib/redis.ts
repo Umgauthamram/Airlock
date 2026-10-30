@@ -187,19 +187,23 @@ const globalForStore = globalThis as unknown as {
 export function getRedisClient(): any {
   if (!globalForStore.airlockStore) {
     const redisUrl = process.env.REDIS_URL || 'redis://:airlocklocal@127.0.0.1:6379';
+    const isUpstash = redisUrl.includes('upstash.io');
+    const isTls = redisUrl.startsWith('rediss://') || isUpstash;
     let isConnected = false;
+    let connectPromise: Promise<void> | null = null;
 
     const redis = new Redis(redisUrl, {
+      tls: isTls ? { rejectUnauthorized: false } : undefined,
+      family: 4,
       maxRetriesPerRequest: 1,
-      connectTimeout: 500,
+      connectTimeout: 5000,
       enableOfflineQueue: false,
-      retryStrategy: () => null, // Do not spam reconnect loops when Redis is offline
+      retryStrategy: () => null,
       lazyConnect: true,
     });
 
     const memoryFallback = new MemoryStore();
 
-    // Catch error events silently to suppress Unhandled error event dumps
     redis.on('error', () => {
       isConnected = false;
     });
@@ -208,37 +212,43 @@ export function getRedisClient(): any {
       isConnected = true;
     });
 
-    // Attempt connecting once in background
-    redis.connect().catch(() => {
-      isConnected = false;
-    });
+    async function ensureConnected(): Promise<boolean> {
+      if (isConnected) return true;
+      if (!connectPromise) {
+        connectPromise = redis
+          .connect()
+          .then(() => {
+            isConnected = true;
+          })
+          .catch(() => {
+            isConnected = false;
+          })
+          .finally(() => {
+            connectPromise = null;
+          });
+      }
+      await connectPromise;
+      return isConnected;
+    }
 
     // Smart Proxy: delegates to Redis if live, or MemoryStore if offline
     globalForStore.airlockStore = new Proxy(redis as any, {
       get(target, prop: string) {
-        if (!isConnected) {
-          if (prop in memoryFallback) {
-            return (memoryFallback as any)[prop].bind(memoryFallback);
-          }
-        }
         const orig = target[prop];
         if (typeof orig === 'function') {
           return async (...args: any[]) => {
-            if (!isConnected) {
-              if (prop in memoryFallback) {
-                return (memoryFallback as any)[prop](...args);
-              }
-              return null;
-            }
             try {
-              return await orig.apply(target, args);
+              const live = await ensureConnected();
+              if (live) {
+                return await orig.apply(target, args);
+              }
             } catch {
               isConnected = false;
-              if (prop in memoryFallback) {
-                return (memoryFallback as any)[prop](...args);
-              }
-              return null;
             }
+            if (prop in memoryFallback) {
+              return (memoryFallback as any)[prop](...args);
+            }
+            return null;
           };
         }
         return orig;
