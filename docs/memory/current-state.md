@@ -12,11 +12,11 @@
 - **Status**: Completed clean zero-state for new demo and Google Auth accounts (0 calls, 0 tokens, 0 pending), created interactive [FeatureGuide.tsx](file:///g:/projects/AirLock/apps/web/components/FeatureGuide.tsx) with platform preview, real vs demo account setup guides, and one-click test simulation controls at `/app/guide` and on `/app`.
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
-- **Fresh Account Zero-State**: Removed automatic test data and fabricated metric fallbacks in [data.ts](file:///g:/projects/AirLock/apps/web/lib/data.ts) and [demo-verify](file:///g:/projects/AirLock/apps/web/app/api/auth/demo-verify/route.ts); accounts now initialize with 0 runs, 0 tokens saved, and an empty pending queue.
-- **Interactive Feature & Setup Guide**: Created [FeatureGuide.tsx](file:///g:/projects/AirLock/apps/web/components/FeatureGuide.tsx) and `/app/guide` covering AST deterministic analysis, R1-R6 policy rules, approval flows, sandbox isolation, and audit streams.
-- **Dedicated Real Account & Demo Account Guides**: Structured walkthroughs detailing how to configure production MCP agents (Claude Desktop, Cursor, LangChain) with `Authorization: Bearer <AIRLOCK_MASTER_KEY>` vs how to test the 12-hour evaluation sandbox.
-- **Interactive Testing Simulation Endpoint**: Created `/api/demo/simulate` allowing evaluators to simulate prompt injection holding, run benign tasks, or reset state to 0 on demand.
-- **Vercel & Security Hardening Push**: Pushed all audit fixes to GitHub `main` (`commit 5bd4372`), verified frozen lockfile builds, and passed all 25 unit/integration tests across monorepo packages.
+- **HMAC-Signed OAuth State & Dynamic Origin**: Upgraded Google OAuth flow in [auth.ts](file:///g:/projects/AirLock/apps/web/lib/auth.ts) and [callback](file:///g:/projects/AirLock/apps/web/app/api/auth/callback/google/route.ts) with cryptographically signed timestamped nonces and dynamic base URL detection, completely eliminating `invalid_oauth_state` on multi-tab or cross-site redirects.
+- **Enterprise Typography & Emoji Removal**: Removed emoji icons (`⚡`, `💡`, `🧭`, `🛡️`, etc.) across all web pages and components in favor of clean, professional enterprise styling.
+- **Persistent Session Across Reloads**: Implemented direct response cookie attachment and deterministic fallback secrets ensuring Google OAuth sessions remain signed in on page refresh.
+- **Interactive 7-Step Product Tour**: Created [ProductTourModal.tsx](file:///g:/projects/AirLock/apps/web/components/ProductTourModal.tsx) guiding first-time users through Overview, Approvals, Audit Trail, Agents, Tools, Policies, and Benchmark.
+- **Fresh Account Zero-State**: Guaranteed clean zero-state for new demo and Google Auth accounts (0 calls, 0 tokens, 0 pending).
 
 ## 4. Next Immediate Steps
 - [ ] Review live local test run (`pnpm -r test` & `pnpm bench`) with user
