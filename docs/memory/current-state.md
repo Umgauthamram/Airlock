@@ -8,15 +8,15 @@
 - **Languages**: TypeScript / Node.js
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: Multi-Modal Auth (Google + Email) & 5-Min Auto-Approved 12-Hour Demo License
-- **Status**: Completed dual Sign In / Sign Up flows, interactive Google Account chooser, 5-minute automated compliance countdown with live ticker, fast-track bypass, and 12-hour session issuance.
+- **Current Focus**: Landing Page Elevation & Post-Auth Control Plane Isolation
+- **Status**: Completed Mimir sculpture centering within dedicated hero viewport, polished rounded UI design, automated dashboard redirect for authenticated users, and added comprehensive enterprise security sections.
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
-- **Login & Signup Architecture (`/login`, `/signup`)**: Implemented dedicated Sign In / Sign Up tabs with Google authentication, interactive Google Account Chooser dialog, and email/password forms.
-- **Demo Request Engine (`/demo-request`, `lib/demo-requests.ts`)**: Structured the user onboarding flow to collect organization and evaluation scope, auto-approving after 5 minutes and issuing a 12-hour Operator pass.
-- **Live 5-Minute Countdown Screen**: Built an animated countdown timer (`04:59` -> `00:00`) with circular SVG progress ring, background status polling, and an instant Fast-Track button for hackathon evaluators.
-- **12-Hour Session Expiration**: Configured session cookies and Redis tracking for 12-hour validity (`12 * 60 * 60 * 1000`), highlighted with a "12H Demo Pass" navigation badge in `/app`.
-- **Mimir Canvas2D Effect (`MimirAsciiCanvas.tsx`)**: Recreated the exact 21st.dev "mimir" recipe with 13px cell mosaic grid, chiaroscuro classical bust generator, ripple wave animation, chromatic aberration, and seamless edge blending.
+- **Prominent Mimir Sculpture Centering**: Encapsulated the hero viewport into its own height-constrained container, scaling and centering the chiseled bust of Mimir directly beside the headline with smooth rounded corners (`rounded-2xl`, `rounded-xl`).
+- **Post-Auth Landing Page Bypass**: Added server-side session checks in `page.tsx` that automatically redirect authenticated and 12-hour demo users straight to the dashboard (`/app`).
+- **Control Plane Isolation**: Removed internal control plane cards from the public landing page, keeping management endpoints protected behind active sessions.
+- **Rich Technical Landing Sections**: Added 5 new high-impact product sections: (1) 3-Step Pre-Execution Pipeline, (2) Enterprise Threat Matrix covering 6 attack vectors, (3) Multi-Turn vs. Script Mode benchmark table, (4) 60-Second Client Setup (Cursor & Claude), and (5) Interactive Technical FAQ.
+- **Pure Midnight Theme**: Retired the light theme switcher, standardizing on the polished dark obsidian aesthetic (`#080c14`) matching the 21st.dev reference.
 
 ## 4. Next Immediate Steps
 - [ ] Review live local test run (`pnpm -r test` & `pnpm bench`) with user

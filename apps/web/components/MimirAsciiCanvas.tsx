@@ -61,10 +61,10 @@ export default function MimirAsciiCanvas({
       targetCtx.fillStyle = '#06080d';
       targetCtx.fillRect(0, 0, width, height);
 
-      // Position Mimir slightly to the right half of the canvas
-      const centerX = width * 0.64;
-      const centerY = height * 0.52;
-      const scale = Math.min(width, height) * 0.78;
+      // Position Mimir prominently in the hero viewport
+      const centerX = width * 0.55;
+      const centerY = height * 0.45;
+      const scale = Math.min(width * 0.92, height * 0.88);
 
       // 1. Soft atmospheric background aura behind the sculpture
       const auraGrad = targetCtx.createRadialGradient(
@@ -288,8 +288,8 @@ export default function MimirAsciiCanvas({
       const animIntensity = 60;
 
       // Center for ripple wave (originating from Mimir bust)
-      const rippleOriginX = width * 0.64;
-      const rippleOriginY = height * 0.48;
+      const rippleOriginX = width * 0.55;
+      const rippleOriginY = height * 0.44;
 
       ctx.textBaseline = 'middle';
       ctx.textAlign = 'center';
