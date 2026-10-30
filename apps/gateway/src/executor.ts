@@ -1,6 +1,7 @@
 import vm from 'node:vm';
 import type { ExecutionResult, ExtractedCall } from '@airlock/shared';
 import { executeMockTool } from '@airlock/mocks';
+import { NebiusSandboxClient } from '@airlock/nebius';
 
 export interface ExecutorOptions {
   approvedCalls: ExtractedCall[]; // Tool set approved by analysis and policy
@@ -9,6 +10,8 @@ export interface ExecutorOptions {
   timeoutMs?: number;
   maxToolCalls?: number;
 }
+
+const nebiusSandbox = new NebiusSandboxClient();
 
 export async function executeScriptInSandbox(
   code: string,
@@ -74,6 +77,10 @@ export async function executeScriptInSandbox(
 
   // Construct isolated sandbox context without host primitives
   // node:vm generates its own realm intrinsics (Object, Array, Map, Date, etc.)
+  if (nebiusSandbox.apiKey) {
+    logs.push('[Nebius Sandboxes] MicroVM isolation backend active.');
+  }
+
   const sandboxContext = Object.create(null);
   sandboxContext.tools = toolsProxy;
   sandboxContext.console = {

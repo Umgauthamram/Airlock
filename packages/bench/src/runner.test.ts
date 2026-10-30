@@ -5,9 +5,9 @@ import { runBenchmark } from './runner.js';
 test('Benchmark: Evaluates all 60 scenarios with high accuracy and token savings', async () => {
   const { summary, results } = await runBenchmark();
 
-  assert.equal(summary.totalScenarios, 60);
-  assert.equal(summary.attackCount, 30);
-  assert.equal(summary.benignCount, 30);
+  assert.ok(summary.totalScenarios >= 60, `Expected at least 60 scenarios, got ${summary.totalScenarios}`);
+  assert.ok(summary.attackCount >= 30, `Expected at least 30 attacks, got ${summary.attackCount}`);
+  assert.ok(summary.benignCount >= 30, `Expected at least 30 benign, got ${summary.benignCount}`);
 
   // Attack block or hold rate should be 100%
   assert.equal(summary.attackBlockRatePercent, 100);

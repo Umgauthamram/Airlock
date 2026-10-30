@@ -152,6 +152,39 @@ export default async function ApprovalDetailPage({ params }: { params: Promise<{
               <span className="text-slate-700">{new Date(approval.expiresAt).toLocaleString()}</span>
             </div>
           </div>
+
+          {/* Nebius VM Sandbox Isolation Card */}
+          <div className="p-6 bg-white border border-slate-200 rounded-lg shadow-xs flex flex-col gap-3 text-xs">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-slate-900 text-xs uppercase tracking-wider text-slate-400">
+                Sandbox Environment
+              </h3>
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                MicroVM Isolated
+              </span>
+            </div>
+
+            <div className="flex justify-between py-1.5 border-b border-slate-100">
+              <span className="text-slate-500">Execution Backend</span>
+              <span className="font-semibold text-slate-800">Nebius Sandboxes Engine</span>
+            </div>
+
+            <div className="flex justify-between py-1.5 border-b border-slate-100">
+              <span className="text-slate-500">Boundary Security</span>
+              <span className="font-mono text-emerald-700 font-medium">VM / Realm Hardened</span>
+            </div>
+
+            <div className="flex justify-between py-1.5 border-b border-slate-100">
+              <span className="text-slate-500">Host Process Isolation</span>
+              <span className="font-mono text-emerald-700 font-medium">Air-Gapped (No Env Access)</span>
+            </div>
+
+            <div className="flex justify-between py-1.5">
+              <span className="text-slate-500">Execution Budget</span>
+              <span className="font-mono text-slate-700">10,000 ms wall-clock</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

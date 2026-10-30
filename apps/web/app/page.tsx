@@ -80,8 +80,8 @@ export default function LandingPage() {
 
             {/* Email / Access Input Box (Exact style from screenshot) */}
             <div className="flex flex-col gap-3 pt-4 max-w-md">
-              <span className="text-xs font-mono uppercase tracking-wider text-[#3b5945]">
-                Available now for Cursor, Claude &amp; MCP.
+              <span className="text-xs font-mono tracking-wider text-[#3b5945]">
+                Available soon. Be first to get access.
               </span>
 
               {submitted ? (

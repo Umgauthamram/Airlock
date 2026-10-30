@@ -7,7 +7,7 @@ export default function LoginPage() {
     <div className="flex-1 flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-md bg-white border border-[#e7e5e4] rounded-lg p-8 shadow-xs flex flex-col gap-6">
         <div className="flex flex-col gap-2 text-center">
-          <Link href="/" className="font-serif font-bold text-2xl tracking-tight text-[#1c1917]">
+          <Link href="/" className="font-sans font-bold text-2xl tracking-tight text-[#1c1917]">
             Airlock
           </Link>
           <p className="text-sm text-[#78716c]">Sign in to the policy and approval control plane</p>
