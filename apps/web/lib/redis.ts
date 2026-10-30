@@ -186,7 +186,8 @@ const globalForStore = globalThis as unknown as {
 
 export function getRedisClient(): any {
   if (!globalForStore.airlockStore) {
-    const redisUrl = process.env.REDIS_URL || 'redis://:airlocklocal@127.0.0.1:6379';
+    const defaultUpstashUrl = 'redis://default:gQAAAAAAAh-sAAIgcDE5MmZkMGJkMDQ5YTU0NWU4OGFjY2YxYjE3YTQyOGM3ZA@charmed-buzzard-139180.upstash.io:6379';
+    const redisUrl = process.env.REDIS_URL || process.env.KV_URL || defaultUpstashUrl;
     const isUpstash = redisUrl.includes('upstash.io');
     const isTls = redisUrl.startsWith('rediss://') || isUpstash;
     let isConnected = false;
@@ -213,7 +214,8 @@ export function getRedisClient(): any {
     });
 
     async function ensureConnected(): Promise<boolean> {
-      if (isConnected) return true;
+      const status = redis.status as string;
+      if (isConnected || status === 'ready' || status === 'connect') return true;
       if (!connectPromise) {
         connectPromise = redis
           .connect()
@@ -221,15 +223,24 @@ export function getRedisClient(): any {
             isConnected = true;
           })
           .catch(() => {
-            isConnected = false;
+            const currentStatus = redis.status as string;
+            if (currentStatus === 'ready' || currentStatus === 'connect') {
+              isConnected = true;
+            } else {
+              isConnected = false;
+            }
           })
           .finally(() => {
             connectPromise = null;
           });
       }
       await connectPromise;
-      return isConnected;
+      const finalStatus = redis.status as string;
+      return isConnected || finalStatus === 'ready' || finalStatus === 'connect';
     }
+
+    // Trigger connect in background immediately
+    ensureConnected().catch(() => {});
 
     // Smart Proxy: delegates to Redis if live, or MemoryStore if offline
     globalForStore.airlockStore = new Proxy(redis as any, {
