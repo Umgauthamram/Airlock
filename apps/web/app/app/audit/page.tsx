@@ -1,6 +1,7 @@
 import { requireSession } from '@/lib/auth';
 import { getAuditEvents } from '@/lib/data';
 import { cleanUnderscores, formatEventType } from '@/lib/format';
+import { ClientTimestamp } from '@/components/ClientTimestamp';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -45,7 +46,9 @@ export default async function AuditPage() {
               {events.map((evt) => (
                 <tr key={evt.id} className="hover:bg-slate-50/80 transition-colors">
                   <td className="py-4 px-5">
-                    <div className="text-slate-800 font-medium font-sans">{new Date(evt.timestamp).toLocaleString()}</div>
+                    <div className="text-slate-800 font-medium font-sans">
+                      <ClientTimestamp timestamp={evt.timestamp} />
+                    </div>
                     <div className="text-slate-400 text-[11px] mt-0.5">{cleanUnderscores(evt.id)}</div>
                   </td>
                   <td className="py-4 px-5">

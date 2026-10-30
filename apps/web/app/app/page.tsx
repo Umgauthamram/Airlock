@@ -3,6 +3,7 @@ import { requireSession } from '@/lib/auth';
 import { getDashboardStats, getApprovals, getAuditEvents } from '@/lib/data';
 import { cleanUnderscores, formatFlowTag } from '@/lib/format';
 import { FeatureGuide } from '@/components/FeatureGuide';
+import { ClientTimestamp } from '@/components/ClientTimestamp';
 
 export const dynamic = 'force-dynamic';
 
@@ -167,7 +168,7 @@ export default async function DashboardPage() {
                 <div key={evt.id} className="text-xs flex flex-col gap-1 pb-2.5 border-b border-slate-100 last:border-0 last:pb-0">
                   <div className="flex items-center justify-between font-mono text-[11px] text-slate-500">
                     <span className="font-semibold text-slate-700">{cleanUnderscores(evt.eventType)}</span>
-                    <span>{new Date(evt.timestamp).toLocaleTimeString()}</span>
+                    <span><ClientTimestamp timestamp={evt.timestamp} showTimeOnly /></span>
                   </div>
                   {evt.agentId && <span className="text-slate-600">Agent: <strong className="font-mono text-slate-800">{cleanUnderscores(evt.agentId)}</strong></span>}
                   {evt.approvalId && <span className="text-slate-600">Approval: <span className="font-mono text-amber-700">{cleanUnderscores(evt.approvalId)}</span></span>}

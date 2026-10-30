@@ -28,7 +28,8 @@ export function formatAgentName(agentId?: string | null): string {
 export function formatEventType(eventType?: string | null): string {
   if (!eventType) return 'Event';
   return eventType
-    .split(/[_-]/)
+    .replace(/[._-]/g, ' ')
+    .split(/\s+/)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ');
 }
