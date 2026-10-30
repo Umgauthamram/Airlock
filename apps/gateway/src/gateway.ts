@@ -139,7 +139,7 @@ export class AirlockGateway {
     agent: AgentRecord,
     intent?: string
   ): Promise<
-    | { status: 'completed'; result: unknown; logs: string[]; toolCallCount: number; wallClockMs: number }
+    | ExecutionResult
     | { status: 'held'; approvalId: string; reasons: string[]; flaggedFlows: string[] }
     | { status: 'denied'; reasons: string[] }
     | { status: 'error'; error: string }
@@ -220,7 +220,7 @@ export class AirlockGateway {
           ],
           { maxTokens: 120 }
         );
-        if (nanoResp.content) {
+        if (nanoResp.content && !nanoResp.isFallback) {
           explanation = nanoResp.content;
         }
       } catch {
@@ -271,7 +271,7 @@ export class AirlockGateway {
     code: string,
     agentId: string,
     analysis: AnalysisResult
-  ): Promise<{ status: 'completed'; result: unknown; logs: string[]; toolCallCount: number; wallClockMs: number }> {
+  ): Promise<ExecutionResult> {
     await this.logAuditEvent({
       eventType: 'execution_started',
       agentId,
@@ -300,12 +300,14 @@ export class AirlockGateway {
         status: execResult.status,
         toolCallCount: execResult.toolCallCount,
         wallClockMs: execResult.wallClockMs,
+        error: execResult.error,
       },
     });
 
     return {
-      status: 'completed',
+      status: execResult.status,
       result: execResult.result,
+      error: execResult.error,
       logs: execResult.logs,
       toolCallCount: execResult.toolCallCount,
       wallClockMs: execResult.wallClockMs,
@@ -341,11 +343,33 @@ export class AirlockGateway {
       return { success: false, status: 'not_found', error: 'Approval record not found.' };
     }
 
+    // Check expiration (F-08)
+    if (approval.expiresAt && new Date(approval.expiresAt).getTime() < Date.now()) {
+      approval.status = 'expired';
+      await this.storage.set(RedisKeys.approval(targetOrgId, approvalId), JSON.stringify(approval));
+      return {
+        success: false,
+        status: 'expired',
+        error: 'Approval has expired and can no longer be approved or executed.',
+      };
+    }
+
     if (approval.status !== 'pending') {
       return {
         success: false,
         status: approval.status,
         error: `Approval has already been decided (${approval.status}). Duplicate decisions are prevented.`,
+      };
+    }
+
+    // Atomic claim lock (F-07) to guard against concurrent approval execution race conditions
+    const claimLockKey = `lock:approval:${targetOrgId}:${approvalId}`;
+    const claimAcquired = await this.storage.setnx(claimLockKey, decidedBy, 60);
+    if (!claimAcquired) {
+      return {
+        success: false,
+        status: 'executing',
+        error: 'Approval is currently being decided or executed by another operator request.',
       };
     }
 
@@ -534,7 +558,7 @@ export class AirlockGateway {
 
   async getRecentAuditEvents(count = 50): Promise<AuditEvent[]> {
     const streamKey = RedisKeys.streamAudit(this.orgId);
-    const raw = await this.storage.xrange(streamKey, '-', '+', count);
+    const raw = await this.storage.xrevrange(streamKey, '+', '-', count);
     return raw.map((item) => {
       let details = {};
       try {

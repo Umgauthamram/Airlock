@@ -5,11 +5,13 @@ export interface StorageAdapter {
   isAvailable(): boolean;
   get(key: string): Promise<string | null>;
   set(key: string, value: string, ttlSeconds?: number): Promise<void>;
+  setnx(key: string, value: string, ttlSeconds?: number): Promise<boolean>;
   del(key: string): Promise<void>;
   hget(key: string, field: string): Promise<string | null>;
   hincrby(key: string, field: string, increment: number): Promise<number>;
   xadd(stream: string, fields: Record<string, string>): Promise<string>;
   xrange(stream: string, start?: string, end?: string, count?: number): Promise<{ id: string; fields: Record<string, string> }[]>;
+  xrevrange(stream: string, end?: string, start?: string, count?: number): Promise<{ id: string; fields: Record<string, string> }[]>;
   close(): Promise<void>;
 }
 
@@ -29,6 +31,12 @@ export class MemoryStorageAdapter implements StorageAdapter {
 
   async set(key: string, value: string): Promise<void> {
     this.kv.set(key, value);
+  }
+
+  async setnx(key: string, value: string): Promise<boolean> {
+    if (this.kv.has(key)) return false;
+    this.kv.set(key, value);
+    return true;
   }
 
   async del(key: string): Promise<void> {
@@ -65,6 +73,11 @@ export class MemoryStorageAdapter implements StorageAdapter {
   async xrange(stream: string, start = '-', end = '+', count = 100): Promise<{ id: string; fields: Record<string, string> }[]> {
     const list = this.streams.get(stream) || [];
     return list.slice(0, count);
+  }
+
+  async xrevrange(stream: string, end = '+', start = '-', count = 100): Promise<{ id: string; fields: Record<string, string> }[]> {
+    const list = this.streams.get(stream) || [];
+    return [...list].reverse().slice(0, count);
   }
 
   async close(): Promise<void> {
@@ -121,6 +134,11 @@ export class RedisStorageAdapter implements StorageAdapter {
     }
   }
 
+  async setnx(key: string, value: string, ttlSeconds = 60): Promise<boolean> {
+    const res = await this.client.set(key, value, 'EX', ttlSeconds, 'NX');
+    return res === 'OK';
+  }
+
   async del(key: string): Promise<void> {
     await this.client.del(key);
   }
@@ -143,6 +161,17 @@ export class RedisStorageAdapter implements StorageAdapter {
 
   async xrange(stream: string, start = '-', end = '+', count = 100): Promise<{ id: string; fields: Record<string, string> }[]> {
     const raw = await this.client.xrange(stream, start, end, 'COUNT', count);
+    return raw.map(([id, entries]: [string, string[]]) => {
+      const fields: Record<string, string> = {};
+      for (let i = 0; i < entries.length; i += 2) {
+        fields[entries[i]] = entries[i + 1];
+      }
+      return { id, fields };
+    });
+  }
+
+  async xrevrange(stream: string, end = '+', start = '-', count = 100): Promise<{ id: string; fields: Record<string, string> }[]> {
+    const raw = await this.client.xrevrange(stream, end, start, 'COUNT', count);
     return raw.map(([id, entries]: [string, string[]]) => {
       const fields: Record<string, string> = {};
       for (let i = 0; i < entries.length; i += 2) {

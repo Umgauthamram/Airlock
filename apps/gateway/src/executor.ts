@@ -1,7 +1,6 @@
-import vm from 'node:vm';
+import { Worker } from 'node:worker_threads';
 import type { ExecutionResult, ExtractedCall } from '@airlock/shared';
 import { executeMockTool } from '@airlock/mocks';
-import { NebiusSandboxClient } from '@airlock/nebius';
 
 export interface ExecutorOptions {
   approvedCalls: ExtractedCall[]; // Tool set approved by analysis and policy
@@ -11,97 +10,18 @@ export interface ExecutorOptions {
   maxToolCalls?: number;
 }
 
-const nebiusSandbox = new NebiusSandboxClient();
+const WORKER_BOOTSTRAP_CODE = `
+const { parentPort, workerData } = require('node:worker_threads');
+const vm = require('node:vm');
 
-export async function executeScriptInSandbox(
-  code: string,
-  options: ExecutorOptions
-): Promise<ExecutionResult> {
-  const timeoutMs = options.timeoutMs || 10_000;
-  const maxCalls = options.maxToolCalls || 100;
-  const logs: string[] = [];
-  let toolCallCount = 0;
-  const startTime = Date.now();
-
-  // Create set of approved server.tool signatures
-  const approvedSet = new Set(options.approvedCalls.map((c) => `${c.server}.${c.tool}`));
-
-  // Construct host proxy object: tools.<server>.<tool>(args)
-  const toolsProxy = new Proxy(
-    {},
-    {
-      get(_target, serverName: string) {
-        return new Proxy(
-          {},
-          {
-            get(_subTarget, toolName: string) {
-              return async (args: any) => {
-                // 1. Check tool call budget
-                if (toolCallCount >= maxCalls) {
-                  throw new Error(`Tool call limit exceeded (max ${maxCalls} calls per script).`);
-                }
-                toolCallCount++;
-
-                // 2. Kill switch check on every runtime call
-                if (await options.isAgentSuspended()) {
-                  throw new Error('Agent execution aborted: Agent key is suspended.');
-                }
-
-                // 3. Runtime verification against approved call set
-                const toolKey = `${serverName}.${toolName}`;
-                if (!approvedSet.has(toolKey)) {
-                  throw new Error(
-                    `Unauthorized tool invocation '${toolKey}'. Runtime call was not present in the pre-approved call set.`
-                  );
-                }
-
-                // 4. Notify audit logger
-                if (options.onToolCalled) {
-                  await options.onToolCalled(serverName, toolName, args);
-                }
-
-                // 5. Execute tool and enforce size cap (64 KB)
-                const result = await executeMockTool(serverName, toolName, args);
-                const str = JSON.stringify(result);
-                if (str && str.length > 64 * 1024) {
-                  throw new Error(`Tool result from '${toolKey}' exceeded 64 KB size limit.`);
-                }
-                return result;
-              };
-            },
-          }
-        );
-      },
-    }
-  );
-
-  // Construct isolated sandbox context without host primitives
-  // node:vm generates its own realm intrinsics (Object, Array, Map, Date, etc.)
-  if (nebiusSandbox.apiKey) {
-    logs.push('[Nebius Sandboxes] MicroVM isolation backend active.');
-  }
-
-  const sandboxContext = Object.create(null);
-  sandboxContext.tools = toolsProxy;
-  sandboxContext.console = {
-    log: (...msgs: any[]) => {
-      const text = msgs.map((m) => (typeof m === 'object' ? JSON.stringify(m) : String(m))).join(' ');
-      if (logs.length < 50 && logs.join('\n').length < 8192) {
-        logs.push(text);
-      }
-    },
-    warn: (...msgs: any[]) => logs.push(`[WARN] ${msgs.join(' ')}`),
-    error: (...msgs: any[]) => logs.push(`[ERROR] ${msgs.join(' ')}`),
-  };
-
-  const context = vm.createContext(sandboxContext, {
-    codeGeneration: { strings: false, wasm: false }, // Disables eval() and Function() string compilation
-  });
-
-  // Execute realm hardening inside context to scrub any host/process bridge
+(async () => {
   try {
-    vm.runInContext(
-      `
+    const sandbox = Object.create(null);
+    const context = vm.createContext(sandbox, {
+      codeGeneration: { strings: false, wasm: false },
+    });
+
+    vm.runInContext(\`
       try { delete this.process; } catch(e) {}
       try { delete this.global; } catch(e) {}
       try { delete this.Reflect; } catch(e) {}
@@ -145,58 +65,219 @@ export async function executeScriptInSandbox(
       try { Object.freeze(Object.prototype); } catch(e) {}
       try { Object.freeze(Function.prototype); } catch(e) {}
       try { Object.freeze(Array.prototype); } catch(e) {}
-    `,
-      context
-    );
-  } catch {
-    // Best-effort realm hardening
+    \`, context);
+
+    const pendingCalls = new Map();
+    let callIdSeq = 0;
+
+    parentPort.on('message', (msg) => {
+      if (msg.type === 'TOOL_RESULT') {
+        const cb = pendingCalls.get(msg.callId);
+        if (cb) {
+          pendingCalls.delete(msg.callId);
+          if (msg.error) {
+            cb.reject(new Error(msg.error));
+          } else {
+            try {
+              // Rebuild tool results strictly inside the sandbox realm
+              const parsed = vm.runInContext('JSON.parse', context)(JSON.stringify(msg.result));
+              cb.resolve(parsed);
+            } catch (err) {
+              cb.reject(err);
+            }
+          }
+        }
+      }
+    });
+
+    sandbox.console = {
+      log: (...msgs) => {
+        parentPort.postMessage({
+          type: 'LOG',
+          text: msgs.map((m) => (typeof m === 'object' ? JSON.stringify(m) : String(m))).join(' ')
+        });
+      },
+      warn: (...msgs) => parentPort.postMessage({ type: 'LOG', text: '[WARN] ' + msgs.join(' ') }),
+      error: (...msgs) => parentPort.postMessage({ type: 'LOG', text: '[ERROR] ' + msgs.join(' ') }),
+    };
+
+    sandbox.tools = new Proxy({}, {
+      get(_t, server) {
+        if (server === 'constructor' || server === '__proto__' || server === 'prototype') return undefined;
+        return new Proxy({}, {
+          get(_st, tool) {
+            if (tool === 'constructor' || tool === '__proto__' || tool === 'prototype') return undefined;
+            const fn = (args) => {
+              return new Promise((resolve, reject) => {
+                const callId = ++callIdSeq;
+                pendingCalls.set(callId, { resolve, reject });
+                parentPort.postMessage({
+                  type: 'CALL_TOOL',
+                  callId,
+                  server,
+                  tool,
+                  args: args ? JSON.parse(JSON.stringify(args)) : args,
+                });
+              });
+            };
+            Object.setPrototypeOf(fn, null);
+            return fn;
+          }
+        });
+      }
+    });
+
+    const wrappedCode = \`(async () => {\\n\${workerData.code}\\n})()\`;
+    const script = new vm.Script(wrappedCode, { filename: 'airlock-sandbox.js' });
+    const runPromise = script.runInContext(context, {
+      timeout: workerData.timeoutMs || 10000,
+      microtaskMode: 'afterEvaluate',
+    });
+
+    const result = await runPromise;
+    parentPort.postMessage({ type: 'DONE', status: 'completed', result: result ?? null });
+  } catch (err) {
+    parentPort.postMessage({
+      type: 'DONE',
+      status: 'failed',
+      error: err && err.message ? err.message : String(err)
+    });
   }
+})();
+`;
 
-  try {
-    // Wrap code in an async IIFE to support top-level await
-    const wrappedCode = `(async () => {\n${code}\n})()`;
-    const script = new vm.Script(wrappedCode, {
-      filename: 'airlock-sandbox.js',
+export async function executeScriptInSandbox(
+  code: string,
+  options: ExecutorOptions
+): Promise<ExecutionResult> {
+  const timeoutMs = options.timeoutMs || 10_000;
+  const maxCalls = options.maxToolCalls || 100;
+  const logs: string[] = [];
+  let toolCallCount = 0;
+  const startTime = Date.now();
+
+  const approvedSet = new Set(options.approvedCalls.map((c) => `${c.server}.${c.tool}`));
+
+  return new Promise((resolve) => {
+    let isSettled = false;
+    let workerTimer: NodeJS.Timeout | undefined;
+
+    const worker = new Worker(WORKER_BOOTSTRAP_CODE, {
+      eval: true,
+      workerData: { code, timeoutMs },
     });
 
-    // 1. Synchronous CPU execution timeout handled by script.runInContext
-    const executionPromise = script.runInContext(context, {
-      timeout: timeoutMs,
-      displayErrors: true,
-    });
+    const cleanupAndResolve = async (res: ExecutionResult) => {
+      if (isSettled) return;
+      isSettled = true;
+      if (workerTimer) clearTimeout(workerTimer);
+      try {
+        await worker.terminate();
+      } catch {
+        // Best effort worker cleanup
+      }
+      resolve(res);
+    };
 
-    // 2. Asynchronous wall-clock timeout race for pending promises and async hangs
-    let timerHandle: NodeJS.Timeout | undefined;
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      timerHandle = setTimeout(() => {
-        reject(new Error(`Execution timed out after ${timeoutMs}ms (wall-clock limit).`));
-      }, timeoutMs);
-      if (typeof timerHandle.unref === 'function') timerHandle.unref();
-    });
-
-    try {
-      const rawResult = await Promise.race([executionPromise, timeoutPromise]);
+    workerTimer = setTimeout(() => {
       const wallClockMs = Date.now() - startTime;
-
-      return {
-        status: 'completed',
-        result: rawResult ?? null,
+      cleanupAndResolve({
+        status: 'timed_out',
+        error: `Execution timed out after ${timeoutMs}ms (wall-clock limit).`,
         logs,
         toolCallCount,
         wallClockMs,
-      };
-    } finally {
-      if (timerHandle) clearTimeout(timerHandle);
-    }
-  } catch (err: any) {
-    const wallClockMs = Date.now() - startTime;
-    return {
-      status: err.message?.includes('timed out') ? 'timed_out' : 'failed',
-      error: err.message || String(err),
-      logs,
-      toolCallCount,
-      wallClockMs,
-    };
-  }
-}
+      });
+    }, timeoutMs);
 
+    if (typeof workerTimer.unref === 'function') {
+      workerTimer.unref();
+    }
+
+    worker.on('message', async (msg: any) => {
+      if (msg.type === 'LOG') {
+        if (logs.length < 50 && logs.join('\n').length < 8192) {
+          logs.push(msg.text);
+        }
+      } else if (msg.type === 'CALL_TOOL') {
+        if (toolCallCount >= maxCalls) {
+          worker.postMessage({
+            type: 'TOOL_RESULT',
+            callId: msg.callId,
+            error: `Tool call limit exceeded (max ${maxCalls} calls per script).`,
+          });
+          return;
+        }
+        toolCallCount++;
+
+        if (await options.isAgentSuspended()) {
+          worker.postMessage({
+            type: 'TOOL_RESULT',
+            callId: msg.callId,
+            error: 'Agent execution aborted: Agent key is suspended.',
+          });
+          return;
+        }
+
+        const toolKey = `${msg.server}.${msg.tool}`;
+        if (approvedSet.size > 0 && !approvedSet.has(toolKey)) {
+          worker.postMessage({
+            type: 'TOOL_RESULT',
+            callId: msg.callId,
+            error: `Unauthorized tool invocation '${toolKey}'. Runtime call was not present in the pre-approved call set.`,
+          });
+          return;
+        }
+
+        if (options.onToolCalled) {
+          await options.onToolCalled(msg.server, msg.tool, msg.args);
+        }
+
+        try {
+          const hostResult = await executeMockTool(msg.server, msg.tool, msg.args);
+          const str = JSON.stringify(hostResult);
+          if (str && str.length > 64 * 1024) {
+            worker.postMessage({
+              type: 'TOOL_RESULT',
+              callId: msg.callId,
+              error: `Tool result from '${toolKey}' exceeded 64 KB size limit.`,
+            });
+            return;
+          }
+          worker.postMessage({
+            type: 'TOOL_RESULT',
+            callId: msg.callId,
+            result: hostResult,
+          });
+        } catch (err: any) {
+          worker.postMessage({
+            type: 'TOOL_RESULT',
+            callId: msg.callId,
+            error: err.message || String(err),
+          });
+        }
+      } else if (msg.type === 'DONE') {
+        const wallClockMs = Date.now() - startTime;
+        cleanupAndResolve({
+          status: msg.status,
+          result: msg.result ?? null,
+          error: msg.error,
+          logs,
+          toolCallCount,
+          wallClockMs,
+        });
+      }
+    });
+
+    worker.on('error', (err) => {
+      const wallClockMs = Date.now() - startTime;
+      cleanupAndResolve({
+        status: 'failed',
+        error: err.message || String(err),
+        logs,
+        toolCallCount,
+        wallClockMs,
+      });
+    });
+  });
+}

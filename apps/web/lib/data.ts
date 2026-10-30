@@ -61,6 +61,10 @@ export async function seedDemoSimulation(orgId: string, userEmail?: string) {
 
 // Clear simulated test data back to clean state
 export async function clearDemoData(orgId: string) {
+  // Safety guard: NEVER clear real enterprise tenants or 'main' (F-06)
+  if (!orgId.startsWith('demo-') || orgId === 'main') {
+    throw new Error('Refusing to clear non-demo organization data.');
+  }
   const redis = getRedisClient();
   try {
     const keys = await redis.keys(`org:{${orgId}}:approval:*`);
@@ -203,7 +207,10 @@ export async function getAuditEvents(orgId: string, limit = 50): Promise<AuditEv
   const redis = getRedisClient();
   try {
     const streamKey = RedisKeys.streamAudit(orgId);
-    const raw = await redis.xrange(streamKey, '-', '+', 'COUNT', limit);
+    // Use xrevrange to fetch the newest audit events first (F-23)
+    const raw = typeof redis.xrevrange === 'function'
+      ? await redis.xrevrange(streamKey, '+', '-', 'COUNT', limit)
+      : (await redis.xrange(streamKey, '-', '+', 'COUNT', limit)).reverse();
     return raw
       .map(([id, entries]: [string, string[]]) => {
         const fields: Record<string, string> = {};

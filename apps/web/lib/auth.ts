@@ -11,21 +11,26 @@ export interface UserSession {
   orgId: string;
   role: UserRole;
   isDemo?: boolean;
+  demoCreatedAt?: number; // Creation timestamp in milliseconds
   exp: number; // Expiration timestamp in milliseconds
 }
 
 const SESSION_COOKIE_NAME = 'airlock_session';
 
-// Cryptographically secure secret resolution
+// Cryptographically secure secret resolution (F-02)
 function getSessionSecret(): string {
-  if (process.env.AUTH_SECRET && process.env.AUTH_SECRET.length >= 32) {
-    return process.env.AUTH_SECRET;
+  const secret = process.env.AUTH_SECRET;
+  if (process.env.NODE_ENV === 'production') {
+    if (!secret || secret.length < 32) {
+      throw new Error('FATAL: AUTH_SECRET must be configured with at least 32 characters in production.');
+    }
+    return secret;
   }
-  if (process.env.AUTH_SECRET) {
-    return process.env.AUTH_SECRET;
+  if (secret && secret.length >= 32) {
+    return secret;
   }
-  // Safe deterministic fallback to ensure user sessions persist across page reloads
-  return 'airlock_production_persistent_session_secret_min_32_characters_key_98765';
+  // Safe deterministic fallback for local offline development only
+  return 'dev_airlock_offline_development_session_secret_32_characters_minimum';
 }
 
 const SESSION_SECRET = getSessionSecret();
@@ -150,14 +155,16 @@ export async function createDemoSession(params: {
   name?: string;
   orgId?: string;
 }): Promise<void> {
+  const now = Date.now();
   await createSessionCookie({
-    userId: `usr_demo_${Date.now().toString(36)}`,
+    userId: `usr_demo_${now.toString(36)}`,
     email: params.email,
     name: params.name || params.email.split('@')[0],
     orgId: params.orgId || 'demo',
     role: Role.OPERATOR,
     isDemo: true,
-    exp: Date.now() + 12 * 60 * 60 * 1000, // 12 hours
+    demoCreatedAt: now,
+    exp: now + 12 * 60 * 60 * 1000, // 12 hours
   });
 }
 

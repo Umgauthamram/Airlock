@@ -8,15 +8,15 @@
 - **Languages**: TypeScript / Node.js
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: Clean Initial Account State & Comprehensive Feature Walkthrough Guide
-- **Status**: Completed clean zero-state for new demo and Google Auth accounts (0 calls, 0 tokens, 0 pending), created interactive [FeatureGuide.tsx](file:///g:/projects/AirLock/apps/web/components/FeatureGuide.tsx) with platform preview, real vs demo account setup guides, and one-click test simulation controls at `/app/guide` and on `/app`.
+- **Current Focus**: Comprehensive Security Audit Remediation & Hardening (F-01 through F-25)
+- **Status**: Completed full remediation of all 25 audit findings against rules to check.md. Sandbox escape eliminated via isolated Worker threads and AST computed property bans; event loop starvation neutralized with parent kill timers; secrets and master keys secured to fail closed in production; RBAC hardened with VIEWER default; Docker, Caddyfile, and GitHub CI added.
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
-- **Resolved Logout on Navigation**: Identified and resolved the exact bug causing spontaneous logout when navigating tabs or pages: Next.js `<Link href="/api/auth/logout">` in the header was automatically prefetching `/api/auth/logout` in the background, which silently cleared the session cookie. Replaced with `<form action="/api/auth/logout" method="POST">`, guarded `GET /api/auth/logout` with `?confirm=1`, and encoded session tokens in Base64URL.
-- **HMAC-Signed OAuth State & Dynamic Origin**: Upgraded Google OAuth flow in [auth.ts](file:///g:/projects/AirLock/apps/web/lib/auth.ts) and [callback](file:///g:/projects/AirLock/apps/web/app/api/auth/callback/google/route.ts) with cryptographically signed timestamped nonces and dynamic base URL detection, completely eliminating `invalid_oauth_state` on multi-tab or cross-site redirects.
-- **Enterprise Typography & Emoji Removal**: Removed emoji icons across all web pages and components in favor of clean, professional enterprise styling.
-- **Persistent Session Across Reloads**: Implemented direct response cookie attachment and deterministic fallback secrets ensuring Google OAuth sessions remain signed in on page refresh.
-- **Interactive 7-Step Product Tour**: Created [ProductTourModal.tsx](file:///g:/projects/AirLock/apps/web/components/ProductTourModal.tsx) guiding first-time users through Overview, Approvals, Audit Trail, Agents, Tools, Policies, and Benchmark.
+- **Sandbox Escape & Starvation Neutralized (F-01, F-04)**: Upgraded [executor.ts](file:///g:/projects/AirLock/apps/gateway/src/executor.ts) to execute untrusted scripts in dedicated `node:worker_threads` Workers with prototype scrubbing/freezing (`Object.prototype.constructor`, `Function.prototype.constructor`) and parent termination kill timers. AST analyzer in [analyzer.ts](file:///g:/projects/AirLock/packages/analyzer/src/analyzer.ts) strictly bans chained computed member access.
+- **Fail-Closed Secrets & RBAC Hardening (F-02, F-03, F-05)**: Throw in production on missing or weak `AUTH_SECRET` and `AIRLOCK_MASTER_KEY`. Google OAuth callback defaults new users to `Role.VIEWER`, enforces `email_verified`, and preserves existing user roles in Redis.
+- **Atomic Approvals & Policy Fail-Closed (F-07, F-08, F-10)**: Added atomic `SETNX` claim lock and expired approval rejection in [gateway.ts](file:///g:/projects/AirLock/apps/gateway/src/gateway.ts). Added rule `R6` to [engine.ts](file:///g:/projects/AirLock/packages/policy/src/engine.ts) denying scripts calling uncatalogued tools.
+- **Docker, Caddy & CI Infrastructure (F-14, F-15)**: Added root [tsconfig.json](file:///g:/projects/AirLock/tsconfig.json), configured reverse proxy in [infra/Caddyfile](file:///g:/projects/AirLock/infra/Caddyfile), hardened [Dockerfile](file:///g:/projects/AirLock/apps/gateway/Dockerfile) with unprivileged `USER node`, and created [.github/workflows/ci.yml](file:///g:/projects/AirLock/.github/workflows/ci.yml).
+- **Benchmark & Honest Claims Alignment (F-11, F-12)**: Replaced uninvoked microVM claims with "Hardened Sandboxed Worker Isolation", and unified benchmark reporting across README and UI to 62 scenarios, 31/31 attacks blocked (100%), and 99.5% token reduction.
 
 ## 4. Next Immediate Steps
 - [ ] Review live local test run (`pnpm -r test` & `pnpm bench`) with user

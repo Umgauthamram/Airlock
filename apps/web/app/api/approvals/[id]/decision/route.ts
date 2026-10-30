@@ -28,8 +28,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     // Try calling the gateway service
     const gatewayOutcome = await decideApprovalViaGateway(id, decision, session.userId, note, session.orgId);
     return NextResponse.json(gatewayOutcome);
-  } catch {
-    // If gateway HTTP server is unreachable in standalone web mode, perform direct atomic state update in Redis
+  } catch (err: any) {
+    // If approving, script execution requires the gateway runtime (F-22). Never mark approved without execution.
+    if (decision === 'approved') {
+      return NextResponse.json(
+        { error: `Gateway execution service is currently unreachable: ${err.message || 'Unable to execute approved script without gateway sandbox.'}` },
+        { status: 503 }
+      );
+    }
+
+    // For denials, safe direct recording into Redis
     const redis = getRedisClient();
     const appr = await getApprovalById(session.orgId, id);
 

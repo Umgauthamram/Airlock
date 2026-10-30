@@ -134,8 +134,8 @@ export async function verifyCode(email: string, inputCode: string): Promise<bool
     }
   }
 
-  // Developer convenience code for local manual smoke testing only in non-production
-  if (process.env.NODE_ENV !== 'production' && cleanInput === '123456') {
+  // Developer convenience code for local manual smoke testing only when explicitly enabled
+  if (process.env.ALLOW_DEV_VERIFICATION_CODE === 'true' && process.env.NODE_ENV !== 'production' && cleanInput === '123456') {
     return true;
   }
 

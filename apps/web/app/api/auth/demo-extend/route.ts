@@ -22,8 +22,7 @@ export async function POST() {
     const now = Date.now();
     const currentExp = session.exp || now + 12 * 60 * 60 * 1000;
     
-    // Estimate initial creation time (12 hours before original expiry)
-    const initialCreatedAt = (session as any).demoCreatedAt || (currentExp - 12 * 60 * 60 * 1000);
+    const initialCreatedAt = session.demoCreatedAt || (currentExp - 12 * 60 * 60 * 1000);
     const maxAllowedExpiry = initialCreatedAt + MAX_DEMO_LIFETIME_MS;
 
     const newExp = Math.max(currentExp, now) + EXTENSION_INCREMENT_MS;
@@ -37,6 +36,7 @@ export async function POST() {
 
     await createSessionCookie({
       ...session,
+      demoCreatedAt: initialCreatedAt,
       exp: newExp,
     });
 

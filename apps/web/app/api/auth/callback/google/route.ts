@@ -18,13 +18,13 @@ export async function GET(req: Request) {
     return NextResponse.redirect(`${authUrl}/login?error=missing_code`);
   }
 
-  // Verify anti-CSRF state token:
+  // Verify anti-CSRF state token (F-16):
   // 1. Verify cryptographic HMAC signature (resilient against multi-tab, double clicks, partitioned cookies)
   // 2. Or fallback to matching the saved cookie
   const isCryptographicallyValid = verifySignedOAuthState(state);
   const matchesCookie = Boolean(savedState && state && state === savedState);
 
-  if (state && !isCryptographicallyValid && !matchesCookie) {
+  if (!state || (!isCryptographicallyValid && !matchesCookie)) {
     return NextResponse.redirect(`${authUrl}/login?error=invalid_oauth_state`);
   }
 
@@ -104,13 +104,13 @@ export async function GET(req: Request) {
       return NextResponse.redirect(`${authUrl}/login?error=account_deactivated`);
     }
 
-    // Determine user role: preserve existing role, or check bootstrap admin list, or default to operator
+    // Determine user role: preserve existing role, or check bootstrap admin list, or default to viewer (F-05)
     const bootstrapAdmins = (process.env.BOOTSTRAP_ADMIN_EMAILS || '')
       .split(',')
       .map((e) => e.trim().toLowerCase())
       .filter(Boolean);
 
-    const role = existingUser?.role || (bootstrapAdmins.includes(email) ? Role.ADMIN : Role.OPERATOR);
+    const role = existingUser?.role || (bootstrapAdmins.includes(email) ? Role.ADMIN : Role.VIEWER);
     const status = existingUser?.status || 'active';
 
     // Upsert user record in Redis without stomping role/status

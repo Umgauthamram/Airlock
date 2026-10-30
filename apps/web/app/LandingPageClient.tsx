@@ -139,9 +139,9 @@ export default function LandingPageClient() {
                 <div className="w-10 h-10 rounded-xl bg-emerald-200 border border-emerald-300 flex items-center justify-center font-mono font-bold text-emerald-900 text-sm">
                   03
                 </div>
-                <h3 className="text-lg font-bold text-slate-900">Sandboxed MicroVM Execution</h3>
+                <h3 className="text-lg font-bold text-slate-900">Hardened Sandboxed Worker Isolation</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Safe scripts execute single-shot inside isolated Nebius Sandboxes microVMs. Flagged operations (such as untrusted email reads writing to external webhooks) pause for 1-click human approval.
+                  Safe scripts execute single-shot inside isolated sandboxed workers with strict memory and CPU caps. Flagged operations (such as untrusted email reads writing to external webhooks) pause for 1-click human approval.
                 </p>
                 <div className="mt-auto pt-4 border-t border-slate-200 text-[11px] font-mono text-emerald-600 font-semibold">
                   ✓ Air-gapped process boundary
@@ -232,7 +232,7 @@ export default function LandingPageClient() {
                     <tr className="hover:bg-slate-50/70">
                       <td className="py-4 px-6 font-semibold text-slate-900 font-sans">Execution Isolation</td>
                       <td className="py-4 px-6 text-slate-600">Host process environment</td>
-                      <td className="py-4 px-6 text-emerald-600 font-bold">Isolated Nebius MicroVM Sandbox</td>
+                      <td className="py-4 px-6 text-emerald-600 font-bold">Hardened Isolated Worker Sandbox</td>
                     </tr>
                     <tr className="hover:bg-slate-50/70">
                       <td className="py-4 px-6 font-semibold text-slate-900 font-sans">Analysis Latency Overhead</td>

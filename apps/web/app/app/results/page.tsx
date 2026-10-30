@@ -18,24 +18,24 @@ export default async function ResultsPage() {
         <div className="p-6 bg-white border border-slate-200 rounded-lg shadow-xs flex flex-col gap-1.5">
           <span className="text-xs uppercase font-semibold text-slate-500 tracking-wider">Attack Block / Hold Rate</span>
           <span className="text-4xl font-mono font-bold text-emerald-600">100%</span>
-          <span className="text-xs text-slate-400 mt-0.5">30/30 attacks prevented</span>
+          <span className="text-xs text-slate-400 mt-0.5">31/31 attacks prevented</span>
         </div>
 
         <div className="p-6 bg-white border border-slate-200 rounded-lg shadow-xs flex flex-col gap-1.5">
           <span className="text-xs uppercase font-semibold text-slate-500 tracking-wider">Benign False-Hold Rate</span>
           <span className="text-4xl font-mono font-bold text-slate-900">0.0%</span>
-          <span className="text-xs text-slate-400 mt-0.5">0/30 false holds</span>
+          <span className="text-xs text-slate-400 mt-0.5">0/31 false holds</span>
         </div>
 
         <div className="p-6 bg-white border border-slate-200 rounded-lg shadow-xs flex flex-col gap-1.5">
           <span className="text-xs uppercase font-semibold text-slate-500 tracking-wider">Token Reduction</span>
-          <span className="text-4xl font-mono font-bold text-emerald-600">99.6%</span>
-          <span className="text-xs text-slate-400 mt-0.5">608k vs 2.7k tokens</span>
+          <span className="text-4xl font-mono font-bold text-emerald-600">99.5%</span>
+          <span className="text-xs text-slate-400 mt-0.5">628k vs 3.4k tokens (estimated)</span>
         </div>
 
         <div className="p-6 bg-white border border-slate-200 rounded-lg shadow-xs flex flex-col gap-1.5">
           <span className="text-xs uppercase font-semibold text-slate-500 tracking-wider">Analysis Latency (p95)</span>
-          <span className="text-4xl font-mono font-bold text-slate-900">0.83 ms</span>
+          <span className="text-4xl font-mono font-bold text-slate-900">0.69 ms</span>
           <span className="text-xs text-slate-400 mt-0.5">Target was &lt; 50 ms</span>
         </div>
       </div>
@@ -46,7 +46,7 @@ export default async function ResultsPage() {
         <div className="md:col-span-7 xl:col-span-8 p-7 bg-white border border-slate-200 rounded-lg shadow-xs flex flex-col gap-4 text-xs text-slate-600 leading-relaxed">
           <h2 className="text-base font-bold text-slate-900">Methodology & Corpus Breakdown</h2>
           <p>
-            The benchmark corpus rigorously evaluates 60 distinct attack and benign test scenarios against an expanded MCP catalog of 50 tools across 8 realistic services:
+            The benchmark corpus rigorously evaluates 62 distinct attack and benign test scenarios against an expanded MCP catalog of 50 tools across 8 realistic services:
           </p>
           <ul className="list-disc pl-5 flex flex-col gap-2.5">
             <li>

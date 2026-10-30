@@ -71,6 +71,7 @@ export const PolicyRuleConditionSchema = z.object({
   none: z.array(ToolTagSchema).optional(),
   tool_outside_agent_scope: z.boolean().optional(),
   write_call_in_loop: z.boolean().optional(),
+  uncatalogued_tool: z.boolean().optional(),
 });
 export type PolicyRuleCondition = z.infer<typeof PolicyRuleConditionSchema>;
 

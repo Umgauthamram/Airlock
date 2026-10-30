@@ -6,6 +6,15 @@ import { getRedisClient, RedisKeys } from '@/lib/redis';
 export async function POST(req: Request) {
   try {
     const session = await requireSession();
+
+    // Guard against unauthorized or destructive simulation on production orgs (F-06)
+    if (!session.isDemo || !session.orgId.startsWith('demo-') || session.orgId === 'main') {
+      return NextResponse.json(
+        { error: 'Forbidden: Simulation controls are restricted to demo evaluation sandboxes.' },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json().catch(() => ({}));
     const action = body.action || 'simulate_attack';
 

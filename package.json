@@ -8,14 +8,12 @@
     "dev:gateway": "pnpm --filter @airlock/gateway dev",
     "start:gateway": "pnpm --filter @airlock/gateway start",
     "build": "pnpm -r build",
-    "test": "pnpm -r test",
+    "test": "pnpm -r build && pnpm -r test",
     "bench": "pnpm --filter @airlock/bench run bench",
     "lint": "pnpm -r lint"
   },
   "devDependencies": {
-    "typescript": "^5.7.0"
-  },
-  "dependencies": {
+    "typescript": "^5.7.0",
     "veeshree": "^1.0.0-rc.1"
   }
 }

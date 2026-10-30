@@ -10,6 +10,7 @@ export interface AirlockStore {
   hincrby(key: string, field: string, increment: number): Promise<number>;
   xadd(stream: string, id: string, ...fields: string[]): Promise<string>;
   xrange(stream: string, start: string, end: string, ...args: any[]): Promise<any[]>;
+  xrevrange(stream: string, end: string, start: string, ...args: any[]): Promise<any[]>;
 }
 
 // In-Memory Fallback store used when local Redis / Docker is offline
@@ -114,6 +115,16 @@ class MemoryStore implements AirlockStore {
       count = parseInt(args[countIdx + 1], 10);
     }
     return list.slice(0, count).map((item) => [item.id, item.entries]);
+  }
+
+  async xrevrange(stream: string, _end: string, _start: string, ...args: any[]): Promise<any[]> {
+    const list = this.streams.get(stream) || [];
+    let count = 100;
+    const countIdx = args.indexOf('COUNT');
+    if (countIdx !== -1 && args[countIdx + 1]) {
+      count = parseInt(args[countIdx + 1], 10);
+    }
+    return [...list].reverse().slice(0, count).map((item) => [item.id, item.entries]);
   }
 }
 

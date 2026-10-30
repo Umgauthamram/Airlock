@@ -2,11 +2,13 @@ import { NextResponse } from 'next/server';
 import { createVerificationCode, RateLimitError } from '@/lib/verification';
 import { sendVerificationEmail } from '@/lib/mailer';
 
+const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+
 export async function POST(req: Request) {
   try {
     const { email } = await req.json();
-    if (!email || !email.includes('@')) {
-      return NextResponse.json({ error: 'Valid email address is required' }, { status: 400 });
+    if (!email || typeof email !== 'string' || !EMAIL_REGEX.test(email.trim()) || email.includes(',') || email.includes(';') || email.length > 254) {
+      return NextResponse.json({ error: 'A single valid email address is required.' }, { status: 400 });
     }
 
     const normalizedEmail = email.trim().toLowerCase();

@@ -1,12 +1,16 @@
 import Fastify from 'fastify';
 import dotenv from 'dotenv';
+import { timingSafeEqual } from 'node:crypto';
 import { AirlockGateway } from './gateway.js';
 import { RedisStorageAdapter, MemoryStorageAdapter } from './redis.js';
 
 dotenv.config();
 
 export async function createServer() {
-  const app = Fastify({ logger: true });
+  const app = Fastify({
+    logger: true,
+    bodyLimit: 1024 * 1024, // 1 MB payload limit (F-20)
+  });
 
   const redisUrl = process.env.REDIS_URL || 'redis://:airlocklocal@127.0.0.1:6379';
   const orgId = process.env.DEMO_MODE === '1' ? 'demo' : 'main';
@@ -66,6 +70,24 @@ export async function createServer() {
       }
       return reply.status(statusCode).send({ error: message });
     };
+
+    // Standard MCP Protocol Handshake (F-24)
+    if (method === 'initialize') {
+      return sendSuccess({
+        protocolVersion: '2024-11-05',
+        capabilities: {
+          tools: {},
+        },
+        serverInfo: {
+          name: 'airlock-gateway',
+          version: '0.1.0',
+        },
+      });
+    }
+
+    if (method === 'notifications/initialized') {
+      return reply.status(204).send();
+    }
 
     // Standard MCP: tools/list
     if (method === 'tools/list') {
@@ -243,17 +265,25 @@ export async function createServer() {
   // ---------------------------------------------------------------------------
   // Authenticated Control Plane Endpoints (Restricted to Internal Web App)
   // ---------------------------------------------------------------------------
-  const masterKey =
-    process.env.AIRLOCK_MASTER_KEY || 'airlock_default_master_key_for_local_development_32_chars';
+  const DEFAULT_DEV_KEY = 'airlock_default_master_key_for_local_development_32_chars';
+  const masterKey = process.env.AIRLOCK_MASTER_KEY || DEFAULT_DEV_KEY;
 
-  if (process.env.NODE_ENV === 'production' && !process.env.AIRLOCK_MASTER_KEY) {
-    app.log.warn('[SECURITY WARNING] AIRLOCK_MASTER_KEY is not set in production. Using default fallback key.');
+  if (process.env.NODE_ENV === 'production') {
+    if (!process.env.AIRLOCK_MASTER_KEY || process.env.AIRLOCK_MASTER_KEY === DEFAULT_DEV_KEY || process.env.AIRLOCK_MASTER_KEY.length < 32) {
+      throw new Error('FATAL: AIRLOCK_MASTER_KEY must be set with at least 32 characters in production.');
+    }
   }
 
   function verifyControlPlaneAuth(req: any, reply: any): boolean {
     const auth = req.headers.authorization;
     const token = auth ? auth.replace(/^Bearer\s+/i, '').trim() : '';
-    if (!token || token !== masterKey) {
+    if (!token) {
+      reply.status(401).send({ error: 'Unauthorized: Invalid control plane credentials.' });
+      return false;
+    }
+    const tokenBuf = Buffer.from(token, 'utf8');
+    const masterBuf = Buffer.from(masterKey, 'utf8');
+    if (tokenBuf.length !== masterBuf.length || !timingSafeEqual(tokenBuf, masterBuf)) {
       reply.status(401).send({ error: 'Unauthorized: Invalid control plane credentials.' });
       return false;
     }

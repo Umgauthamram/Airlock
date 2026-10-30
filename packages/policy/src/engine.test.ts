@@ -116,3 +116,27 @@ test('Policy: Invalid AST analysis fails closed with deny', () => {
   assert.ok(res.reasons[0].includes('eval'));
 });
 
+test('Policy: Uncatalogued tool invocation is denied by default (R6 fail-closed)', () => {
+  const analysis: AnalysisResult = {
+    valid: true,
+    sha256: 'abc5',
+    calls: [
+      { server: 'nosuch', tool: 'thing', line: 1, inLoop: false },
+    ],
+    uniqueToolKeys: ['nosuch.thing'],
+    tags: [],
+    errors: [],
+  };
+
+  const res = evaluatePolicy({
+    analysis,
+    toolTagMap: {
+      'inbox.get_unread': ['reads_untrusted'],
+    },
+  });
+
+  assert.equal(res.decision, 'deny');
+  assert.ok(res.matchedRules.includes('R6'));
+  assert.ok(res.flaggedFlows.includes('uncatalogued_tool'));
+});
+

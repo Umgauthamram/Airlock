@@ -26,6 +26,7 @@ ENV PORT=4000
 # Copy node_modules and built dist artifacts
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/gateway/node_modules ./apps/gateway/node_modules
 COPY --from=builder /app/packages/ packages/
 COPY --from=builder /app/apps/gateway/dist ./apps/gateway/dist
 COPY --from=builder /app/apps/gateway/package.json ./apps/gateway/package.json

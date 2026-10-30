@@ -10,16 +10,16 @@ Airlock sits between autonomous AI agents and upstream MCP (Model Context Protoc
 
 ## Measured Benchmark Results (`pnpm bench`)
 
-Tested against an expanded catalog of **50 realistic MCP tools** across 8 services (`crm`, `cloud`, `db`, `analytics`, `slack`, `github`, `billing`, `calendar`):
+Tested against a comprehensive corpus of **62 benchmark scenarios** (31 attack scenarios + 31 benign scenarios) across an expanded catalog of **50 realistic MCP tools** spanning 8 services (`crm`, `cloud`, `db`, `analytics`, `slack`, `github`, `billing`, `calendar`):
 
 | Metric | Result | Target / Baseline |
 | :--- | :--- | :--- |
-| **Attack Block / Hold Rate** | **100%** (30 / 30) | 100% |
-| **Benign False-Hold Rate** | **0.0%** (0 / 30) | &lt; 5% |
-| **Average Token Reduction** | **99.6%** | &gt; 60% |
-| **Total Tokens Consumed** | **2,700** vs **607,957** | 99.6% savings |
-| **AST Analysis Latency (p50)** | **0.14 ms** | &lt; 20 ms |
-| **AST Analysis Latency (p95)** | **0.83 ms** | &lt; 50 ms |
+| **Attack Block / Hold Rate** | **100%** (31 / 31) | 100% |
+| **Benign False-Hold Rate** | **0.0%** (0 / 31) | &lt; 5% |
+| **Average Token Reduction** | **99.5%** | &gt; 60% |
+| **Total Tokens Consumed** | **3,441** vs **628,400** | 99.5% savings (estimated) |
+| **AST Analysis Latency (p50)** | **0.15 ms** | &lt; 20 ms |
+| **AST Analysis Latency (p95)** | **0.69 ms** | &lt; 50 ms |
 
 To reproduce these metrics on your local machine:
 ```bash

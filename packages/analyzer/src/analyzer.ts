@@ -274,6 +274,15 @@ export function analyzeScript(code: string, options: AnalyzerOptions = {}): Anal
             code: 'BANNED_DYNAMIC_COMPUTED',
           });
         }
+
+        // Block chained computed property accesses (e.g. res[k][k])
+        if (node.object && node.object.type === 'MemberExpression' && node.object.computed) {
+          errors.push({
+            line: node.loc.start.line,
+            message: "Chained computed property access is prohibited.",
+            code: 'BANNED_CHAINED_COMPUTED',
+          });
+        }
       }
 
       // 3. Block dynamic template literals with expressions inside computed properties (e.g. obj[`${'const' + 'ructor'}`])
@@ -372,9 +381,19 @@ export function analyzeScript(code: string, options: AnalyzerOptions = {}): Anal
       }
     },
 
-    // 7. Tool Call Extraction
+    // 7. Tool Call Extraction & Call Safety Checks
     CallExpression(node: any, ancestors: any[]) {
       const callee = node.callee;
+
+      // Disallow invoking computed member methods (e.g. res[k][k]() or obj[k]())
+      if (callee.type === 'MemberExpression' && callee.computed) {
+        errors.push({
+          line: node.loc.start.line,
+          message: "Invoking computed member methods is prohibited.",
+          code: 'BANNED_COMPUTED_CALL',
+        });
+      }
+
       if (
         callee.type === 'MemberExpression' &&
         !callee.computed &&

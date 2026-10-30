@@ -79,18 +79,22 @@ test('Gateway Core Exit Test: End-to-End Pipeline', async () => {
   `;
   const advOutcome = await gateway.runScript(adversarialCode, agent!);
   assert.equal(advOutcome.status, 'denied');
-  assert.ok(advOutcome.reasons.some((r) => r.includes("tools") || r.includes("eval")));
+  if ('reasons' in advOutcome) {
+    assert.ok(advOutcome.reasons.some((r: string) => r.includes("tools") || r.includes("eval")));
+  }
 
   // 9. Kill Switch blocks agent execution
   await gateway.suspendAgent(agent!.id);
   const killSwitchOutcome = await gateway.runScript(benignCode, agent!);
   assert.equal(killSwitchOutcome.status, 'denied');
-  assert.ok(killSwitchOutcome.reasons[0].includes('suspended'));
+  if ('reasons' in killSwitchOutcome) {
+    assert.ok(killSwitchOutcome.reasons[0].includes('suspended'));
+  }
 
   // Resume agent
   await gateway.resumeAgent(agent!.id);
 
-  // 10. Audit stream verification
+  // 10. Audit stream verification (newest first - F-23)
   const auditEvents = await gateway.getRecentAuditEvents(50);
   assert.ok(auditEvents.length >= 6);
 
@@ -101,5 +105,81 @@ test('Gateway Core Exit Test: End-to-End Pipeline', async () => {
   assert.ok(eventTypes.includes('script_approved'));
   assert.ok(eventTypes.includes('agent_suspended'));
   assert.ok(eventTypes.includes('agent_resumed'));
+});
+
+test('Gateway Hardening: Traps host realm escape probe (F-01)', async () => {
+  const storage = new MemoryStorageAdapter();
+  const gateway = new AirlockGateway({ orgId: 'demo', storage });
+  const agentKey = await gateway.registerAgentKey({
+    id: 'agent_f01',
+    orgId: 'demo',
+    name: 'F01 Agent',
+    keyPrefix: '',
+    keyHash: '',
+    scopes: ['*'],
+    budgetDailyTokens: 500_000,
+    rateLimitPerMin: 60,
+    status: 'active',
+  });
+  const agent = await gateway.authenticateKey(`Bearer ${agentKey}`);
+  assert.ok(agent);
+
+  const escapeScript = `
+    const res = await tools.crm.get_contacts({});
+    const k = 'constr' + 'uctor';
+    return res[k][k]('return typeof process')();
+  `;
+  const outcome = await gateway.runScript(escapeScript, agent!);
+  // Should either be denied at analyzer level or fail inside sandbox
+  assert.ok(outcome.status === 'denied' || outcome.status === 'failed');
+  if (outcome.status === 'failed') {
+    assert.ok(outcome.error?.includes('constructor is prohibited') || outcome.error?.includes('Access to constructor is prohibited'));
+  }
+});
+
+test('Gateway Hardening: Terminates event loop starvation loop (F-04)', async () => {
+  const { executeScriptInSandbox } = await import('./executor.js');
+  const starvationScript = `
+    async function f() {
+      await null;
+      return f();
+    }
+    return await f();
+  `;
+  const result = await executeScriptInSandbox(starvationScript, {
+    approvedCalls: [],
+    isAgentSuspended: async () => false,
+    timeoutMs: 1000,
+  });
+  assert.equal(result.status, 'timed_out');
+  assert.ok(result.error?.includes('timed out'));
+});
+
+test('Gateway Hardening: Rejects expired approval decision (F-08)', async () => {
+  const storage = new MemoryStorageAdapter();
+  const gateway = new AirlockGateway({ orgId: 'demo', storage });
+  const expiredApprovalId = 'appr_expired_test';
+  await storage.set(
+    `org:{demo}:approval:${expiredApprovalId}`,
+    JSON.stringify({
+      id: expiredApprovalId,
+      orgId: 'demo',
+      agentId: 'test_agent',
+      scriptHash: 'hash',
+      code: 'return 1;',
+      intent: 'Expired test',
+      flaggedFlows: [],
+      explanation: 'Expired test',
+      status: 'pending',
+      policyVersion: 1,
+      createdAt: new Date(Date.now() - 3600000).toISOString(),
+      expiresAt: new Date(Date.now() - 1000).toISOString(), // 1 second in past
+    })
+  );
+
+  const decision = await gateway.decideApproval(expiredApprovalId, 'approved', 'operator_bob');
+  assert.equal(decision.success, false);
+  assert.equal(decision.status, 'expired');
+  assert.ok(decision.error?.includes('expired'));
 });
 

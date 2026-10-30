@@ -32,7 +32,15 @@
   - [x] Implemented benchmark results view (`/app/results`) and legal pages (`/terms`, `/privacy`)
   - [x] Updated `README.md` and `FEEDBACK.md` with complete technical observations
   - [x] Recorded ADR `0004-empirical-benchmark-and-token-reduction-proof.md`
+- [x] Phase 4: Security Audit Remediation & Hardening (F-01 to F-25)
+  - [x] F-01 & F-04: Isolated Worker thread execution, prototype scrubbing, parent kill timer termination, AST chained computed property bans
+  - [x] F-02 & F-03: Production fail-closed secrets for `AUTH_SECRET` and `AIRLOCK_MASTER_KEY`, constant-time comparisons
+  - [x] F-05 & F-06: Default role VIEWER for Google accounts, verified email enforcement, demo route isolation
+  - [x] F-07 & F-08: Atomic Redis `SETNX` approval claim lock, expired approval rejection
+  - [x] F-10: Policy fail-closed rule R6 for uncatalogued tools
+  - [x] F-11 & F-12: Empirical benchmark alignment (62 scenarios, 31/31 blocked, 99.5% token reduction) and truthful worker sandbox isolation claims
+  - [x] F-14 & F-15: Root `tsconfig.json`, `infra/Caddyfile`, unprivileged Dockerfile, and GitHub Actions CI workflow
+  - [x] F-16 to F-24: Cryptographic OAuth state, single-email regex, 16h demo cap, MCP handshake, and xrevrange audit ordering
 
 ## Backlog
-- [ ] Phase 4: Production hardening (taint tracking, canary credentials, secret rotation)
 - [ ] Phase 5: Multi-tenant workspace switching & Slack/Teams approval integrations

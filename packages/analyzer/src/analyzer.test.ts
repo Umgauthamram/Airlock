@@ -126,6 +126,16 @@ test('Analyzer: Rejects prototype pollution and constructor escape attempts', ()
   const codeEscape3 = `const c = [].constructor;`;
   const resEscape3 = analyzeScript(codeEscape3);
   assert.equal(resEscape3.valid, false);
+
+  // Host object constructor chaining and computed invocation escape (F-01 probe)
+  const codeEscape4 = `
+    const res = await tools.crm.get_contacts({});
+    const k = 'constr' + 'uctor';
+    return res[k][k]('return typeof process')();
+  `;
+  const resEscape4 = analyzeScript(codeEscape4);
+  assert.equal(resEscape4.valid, false);
+  assert.ok(resEscape4.errors.some(e => e.code === 'BANNED_CHAINED_COMPUTED' || e.code === 'BANNED_COMPUTED_CALL'));
 });
 
 test('Analyzer: Rejects classes, this, var, and tagged templates', () => {

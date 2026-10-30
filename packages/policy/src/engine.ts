@@ -45,6 +45,13 @@ export const DEFAULT_POLICY: PolicyDocument = {
       action: 'hold',
       message: 'Script performs write or destructive calls inside a loop context.',
     },
+    {
+      id: 'R6',
+      description: 'Uncatalogued tool invocation',
+      when: { uncatalogued_tool: true },
+      action: 'deny',
+      message: 'Script invokes an uncatalogued tool with no registered security classification tags.',
+    },
   ],
   default: 'allow',
   updatedAt: new Date().toISOString(),
@@ -100,6 +107,12 @@ export function evaluatePolicy(options: EvaluatePolicyOptions): PolicyEvaluation
     return tags.some((t) => t === 'writes_external' || t === 'writes_internal' || t === 'destructive');
   });
 
+  // Check uncatalogued / untagged tools (fail closed)
+  const hasUncataloguedTool = analysis.calls.some((call) => {
+    const key = `${call.server}.${call.tool}`;
+    return !(key in toolTagMap);
+  });
+
   const matchedRules: PolicyRule[] = [];
   const flaggedFlows: string[] = [];
 
@@ -137,6 +150,11 @@ export function evaluatePolicy(options: EvaluatePolicyOptions): PolicyEvaluation
     if (matches && rule.when.write_call_in_loop === true) {
       if (!hasWriteInLoop) matches = false;
       else flaggedFlows.push('write_in_loop');
+    }
+
+    if (matches && rule.when.uncatalogued_tool === true) {
+      if (!hasUncataloguedTool) matches = false;
+      else flaggedFlows.push('uncatalogued_tool');
     }
 
     if (matches) {
