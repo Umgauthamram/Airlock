@@ -38,13 +38,13 @@ export default function LandingPageClient() {
   const threats = [
     {
       title: 'Prompt Injection Exfiltration',
-      tag: 'reads_untrusted → writes_external',
+      tag: 'reads untrusted → writes external',
       color: 'border-rose-500/30 bg-rose-950/20 text-rose-300',
       description: 'Stops untrusted data inside emails, web pages, or customer tickets from instructing agents to exfiltrate database records to external webhooks.',
     },
     {
       title: 'Destructive System Mutations',
-      tag: 'destructive_action_held',
+      tag: 'destructive action held',
       color: 'border-amber-500/30 bg-amber-950/20 text-amber-300',
       description: 'Holds schema drops, table truncations, cloud VM deletions, and production restarts for single-click human operator authorization.',
     },
@@ -88,8 +88,8 @@ export default function LandingPageClient() {
       a: 'The script pauses before any tools are invoked. The exact inspected TypeScript code, risk explanation, and flagged data flows appear in the real-time Operator Approvals Queue. Human operators can review and click "Approve & Execute Once" or "Deny".',
     },
     {
-      q: 'What is the 12-Hour Demo Pass?',
-      a: 'New evaluators and developers can request instant demo access. Requests undergo a 5-minute automated compliance screening, after which a 12-hour Operator pass is unlocked with full access to approval queues, audit trails, and benchmark telemetry.',
+      q: 'How does the allocated demo mode work?',
+      a: 'Each evaluator signing in with their Google account receives an instantly provisioned demo environment with full access to the live approval review queue, audit stream telemetry, and microVM sandbox isolation.',
     },
     {
       q: 'Does Airlock require changing existing MCP tools?',

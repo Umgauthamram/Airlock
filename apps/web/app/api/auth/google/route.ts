@@ -47,16 +47,16 @@ export async function POST(req: Request) {
     }
 
     const normalizedEmail = email.trim().toLowerCase();
-    const cleanPrefix = normalizedEmail.split('@')[0].replace(/[^a-zA-Z0-9]/g, '_');
-    const orgId = `demo_${cleanPrefix}`;
+    const cleanPrefix = normalizedEmail.split('@')[0].replace(/[^a-zA-Z0-9]/g, '-');
+    const orgId = `demo-${cleanPrefix}`;
 
     // Seed allocated demo org data for this specific email
     await ensureDemoOrgSeeded(orgId);
 
-    // Create 12-hour operator session
+    // Create 12-hour operator session with exact email and role
     await createDemoSession({
       email: normalizedEmail,
-      name: name || cleanPrefix,
+      name: name || cleanPrefix.replace(/-/g, ' '),
       orgId,
     });
 

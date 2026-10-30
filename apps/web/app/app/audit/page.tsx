@@ -1,5 +1,6 @@
 import { requireSession } from '@/lib/auth';
 import { getAuditEvents } from '@/lib/data';
+import { cleanUnderscores, formatEventType } from '@/lib/format';
 
 export default async function AuditPage() {
   const session = await requireSession();
@@ -41,21 +42,21 @@ export default async function AuditPage() {
               {events.map((evt) => (
                 <tr key={evt.id} className="hover:bg-slate-50/80 transition-colors">
                   <td className="py-4 px-5">
-                    <div className="text-slate-800 font-medium">{new Date(evt.timestamp).toLocaleString()}</div>
-                    <div className="text-slate-400 text-[11px] mt-0.5">{evt.id}</div>
+                    <div className="text-slate-800 font-medium font-sans">{new Date(evt.timestamp).toLocaleString()}</div>
+                    <div className="text-slate-400 text-[11px] mt-0.5">{cleanUnderscores(evt.id)}</div>
                   </td>
                   <td className="py-4 px-5">
                     <span className="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200 font-semibold text-[11px] inline-block font-sans">
-                      {evt.eventType}
+                      {formatEventType(evt.eventType)}
                     </span>
                   </td>
-                  <td className="py-4 px-5 text-slate-700 font-semibold">{evt.userId || evt.agentId || 'gateway'}</td>
+                  <td className="py-4 px-5 text-slate-700 font-semibold">{cleanUnderscores(evt.userId || evt.agentId || 'gateway')}</td>
                   <td className="py-4 px-5">
-                    {evt.approvalId && <div className="text-amber-700 font-semibold">{evt.approvalId}</div>}
+                    {evt.approvalId && <div className="text-amber-700 font-semibold">{cleanUnderscores(evt.approvalId)}</div>}
                     {evt.scriptHash && <div className="text-slate-400 text-[11px]">{evt.scriptHash.slice(0, 16)}...</div>}
                   </td>
                   <td className="py-4 px-5 text-slate-600 max-w-xl truncate font-sans text-xs">
-                    {JSON.stringify(evt.details)}
+                    {cleanUnderscores(JSON.stringify(evt.details))}
                   </td>
                 </tr>
               ))}

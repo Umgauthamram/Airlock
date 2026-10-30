@@ -1,5 +1,6 @@
 import { requireSession } from '@/lib/auth';
 import { BASE_TOOL_DEFINITIONS } from '@airlock/mocks';
+import { cleanUnderscores, formatFlowTag } from '@/lib/format';
 
 export default async function ToolsPage() {
   await requireSession();
@@ -37,23 +38,23 @@ export default async function ToolsPage() {
               {tools.map((t) => (
                 <tr key={`${t.server}.${t.name}`} className="hover:bg-slate-50/80 transition-colors">
                   <td className="py-4 px-5 font-mono font-bold text-slate-900">
-                    {t.server}.{t.name}
+                    {cleanUnderscores(t.server)}.{cleanUnderscores(t.name)}
                   </td>
                   <td className="py-4 px-5 text-slate-600 max-w-md">{t.description}</td>
                   <td className="py-4 px-5">
                     <div className="flex flex-wrap gap-1.5">
                       {t.tags.map((tag, i) => {
                         const tagStyle =
-                          tag === 'reads_untrusted'
+                          tag.includes('untrusted')
                             ? 'bg-amber-50 text-amber-900 border-amber-200'
-                            : tag === 'writes_external'
+                            : tag.includes('external')
                             ? 'bg-rose-50 text-rose-900 border-rose-200'
                             : tag === 'destructive'
                             ? 'bg-red-50 text-red-900 border-red-300 font-bold'
                             : 'bg-slate-100 text-slate-700 border-slate-200';
                         return (
                           <span key={i} className={`px-2.5 py-0.5 rounded-md font-mono text-xs border ${tagStyle}`}>
-                            {tag}
+                            {formatFlowTag(tag)}
                           </span>
                         );
                       })}
@@ -61,7 +62,7 @@ export default async function ToolsPage() {
                   </td>
                   <td className="py-4 px-5">
                     <span className="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono uppercase text-[11px] font-semibold">
-                      {t.tagStatus}
+                      {cleanUnderscores(t.tagStatus)}
                     </span>
                   </td>
                 </tr>
@@ -79,11 +80,11 @@ export default async function ToolsPage() {
             </p>
             <div className="flex flex-col gap-2.5 pt-1">
               <div className="p-3 bg-amber-50 border border-amber-200 rounded-md">
-                <span className="font-mono font-bold text-amber-900 text-xs">reads_untrusted</span>
+                <span className="font-mono font-bold text-amber-900 text-xs">reads-untrusted</span>
                 <p className="text-[11px] text-amber-950 mt-0.5">Ingests untrusted user input, email bodies, or external web contents.</p>
               </div>
               <div className="p-3 bg-rose-50 border border-rose-200 rounded-md">
-                <span className="font-mono font-bold text-rose-900 text-xs">writes_external</span>
+                <span className="font-mono font-bold text-rose-900 text-xs">writes-external</span>
                 <p className="text-[11px] text-rose-950 mt-0.5">Transmits payloads across network boundaries or external sinks.</p>
               </div>
               <div className="p-3 bg-red-50 border border-red-200 rounded-md">
@@ -91,7 +92,7 @@ export default async function ToolsPage() {
                 <p className="text-[11px] text-red-950 mt-0.5">Deletes resources or triggers irreversible mutations.</p>
               </div>
               <div className="p-3 bg-slate-50 border border-slate-200 rounded-md">
-                <span className="font-mono font-bold text-slate-800 text-xs">reads_private</span>
+                <span className="font-mono font-bold text-slate-800 text-xs">reads-private</span>
                 <p className="text-[11px] text-slate-700 mt-0.5">Accesses confidential customer records or system secrets.</p>
               </div>
             </div>

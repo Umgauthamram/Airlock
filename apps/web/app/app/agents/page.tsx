@@ -1,5 +1,6 @@
 import { requireSession } from '@/lib/auth';
 import { getAgents } from '@/lib/data';
+import { cleanUnderscores } from '@/lib/format';
 import { hasMinimumRole, Role } from '@airlock/shared';
 
 export default async function AgentsPage() {
@@ -26,8 +27,8 @@ export default async function AgentsPage() {
 
           {agents.length === 0 ? (
             <div className="p-12 bg-slate-50 border border-slate-200 rounded-lg text-center text-xs text-slate-500">
-              No custom agent keys registered yet for organization {session.orgId}.
-              Agents authenticate with secret <code className="font-mono bg-white border border-slate-200 px-1.5 py-0.5 rounded text-slate-700">alk_live_...</code> keys.
+              No custom agent keys registered yet for organization {cleanUnderscores(session.orgId)}.
+              Agents authenticate with secret <code className="font-mono bg-white border border-slate-200 px-1.5 py-0.5 rounded text-slate-700">alk-live-...</code> keys.
             </div>
           ) : (
             <div className="overflow-x-auto w-full">
@@ -44,8 +45,8 @@ export default async function AgentsPage() {
                 <tbody className="divide-y divide-slate-100">
                   {agents.map((ag) => (
                     <tr key={ag.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-3.5 px-4 font-bold text-slate-900">{ag.name}</td>
-                      <td className="py-3.5 px-4 font-mono text-slate-500">{ag.keyPrefix}...</td>
+                      <td className="py-3.5 px-4 font-bold text-slate-900">{cleanUnderscores(ag.name)}</td>
+                      <td className="py-3.5 px-4 font-mono text-slate-500">{cleanUnderscores(ag.keyPrefix)}...</td>
                       <td className="py-3.5 px-4 font-mono font-medium text-slate-700">{ag.budgetDailyTokens.toLocaleString()} tokens</td>
                       <td className="py-3.5 px-4">
                         <span

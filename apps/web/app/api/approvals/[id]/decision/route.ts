@@ -47,6 +47,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     appr.decisionNote = note;
 
     await redis.set(RedisKeys.approval(session.orgId, id), JSON.stringify(appr));
+    const altId = id.includes('_') ? id.replace(/_/g, '-') : id.replace(/-/g, '_');
+    await redis.set(RedisKeys.approval(session.orgId, altId), JSON.stringify(appr));
 
     // Log to audit stream
     const streamKey = RedisKeys.streamAudit(session.orgId);
@@ -54,11 +56,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       streamKey,
       '*',
       'id',
-      `evt_${Date.now()}`,
+      `evt-${Date.now()}`,
       'timestamp',
       new Date().toISOString(),
       'eventType',
-      decision === 'approved' ? 'script_approved' : 'script_denied',
+      decision === 'approved' ? 'script-approved' : 'script-denied',
       'userId',
       session.userId,
       'approvalId',

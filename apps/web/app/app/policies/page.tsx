@@ -1,5 +1,6 @@
 import { requireSession } from '@/lib/auth';
 import { DEFAULT_POLICY } from '@airlock/policy';
+import { cleanUnderscores } from '@/lib/format';
 
 export default async function PoliciesPage() {
   await requireSession();
@@ -41,7 +42,7 @@ export default async function PoliciesPage() {
                     <td className="py-4 px-5 font-mono font-bold text-slate-900 text-sm">{rule.id}</td>
                     <td className="py-4 px-5 font-mono text-slate-600">
                       <pre className="text-xs bg-slate-50 p-2 rounded-md border border-slate-200">
-                        {JSON.stringify(rule.when, null, 1)}
+                        {cleanUnderscores(JSON.stringify(rule.when, null, 1))}
                       </pre>
                     </td>
                     <td className="py-4 px-5">

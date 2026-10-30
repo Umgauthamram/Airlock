@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireSession } from '@/lib/auth';
 import { getApprovalById } from '@/lib/data';
+import { cleanUnderscores, formatFlowTag } from '@/lib/format';
 import { hasMinimumRole, Role } from '@airlock/shared';
 import DecisionButtons from './DecisionButtons';
 
@@ -33,7 +34,7 @@ export default async function ApprovalDetailPage({ params }: { params: Promise<{
               Approvals
             </Link>
             <span>/</span>
-            <span className="font-mono text-slate-700">{approval.id}</span>
+            <span className="font-mono text-slate-700">{cleanUnderscores(approval.id)}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mt-1">
             {approval.intent || 'Agent Execution Request'}
@@ -70,7 +71,7 @@ export default async function ApprovalDetailPage({ params }: { params: Promise<{
                   key={i}
                   className="px-3 py-1 rounded bg-white text-rose-800 border border-rose-200 font-mono text-xs font-semibold shadow-xs"
                 >
-                  {flow}
+                  {formatFlowTag(flow)}
                 </span>
               ))}
             </div>
@@ -118,7 +119,7 @@ export default async function ApprovalDetailPage({ params }: { params: Promise<{
               <div className="flex flex-col gap-2 p-4 bg-slate-50 rounded-lg border border-slate-200 text-xs">
                 <span className="text-slate-700">
                   This script was <strong className="uppercase text-slate-900">{approval.status}</strong> by{' '}
-                  <span className="font-mono font-medium">{approval.decidedBy || 'operator'}</span> on{' '}
+                  <span className="font-mono font-medium">{cleanUnderscores(approval.decidedBy || 'operator')}</span> on{' '}
                   {approval.decidedAt ? new Date(approval.decidedAt).toLocaleString() : 'N/A'}.
                 </span>
                 {approval.decisionNote && (
@@ -134,7 +135,7 @@ export default async function ApprovalDetailPage({ params }: { params: Promise<{
             
             <div className="flex justify-between py-1.5 border-b border-slate-100">
               <span className="text-slate-500">Agent ID</span>
-              <span className="font-mono font-semibold text-slate-800">{approval.agentId}</span>
+              <span className="font-mono font-semibold text-slate-800">{cleanUnderscores(approval.agentId)}</span>
             </div>
 
             <div className="flex justify-between py-1.5 border-b border-slate-100">

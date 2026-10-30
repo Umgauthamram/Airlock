@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/auth';
 import { getApprovals } from '@/lib/data';
+import { cleanUnderscores, formatFlowTag } from '@/lib/format';
 
 export default async function ApprovalsListPage() {
   const session = await requireSession();
@@ -24,7 +25,7 @@ export default async function ApprovalsListPage() {
 
       {approvals.length === 0 ? (
         <div className="p-16 bg-white border border-slate-200 rounded-lg text-center text-sm text-slate-500 shadow-xs">
-          No approvals found in organization {session.orgId}.
+          No approvals found in organization {cleanUnderscores(session.orgId)}.
         </div>
       ) : (
         <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-xs w-full">
@@ -57,7 +58,7 @@ export default async function ApprovalsListPage() {
                     </td>
                     <td className="py-4 px-5">
                       <div className="font-bold text-slate-900 text-sm">{appr.intent || 'Agent task'}</div>
-                      <div className="font-mono text-slate-400 text-xs mt-0.5">{appr.id}</div>
+                      <div className="font-mono text-slate-400 text-xs mt-0.5">{cleanUnderscores(appr.id)}</div>
                     </td>
                     <td className="py-4 px-5">
                       <div className="flex flex-wrap gap-1.5">
@@ -66,12 +67,12 @@ export default async function ApprovalsListPage() {
                             key={i}
                             className="px-2.5 py-0.5 rounded bg-rose-50 text-rose-800 border border-rose-200 font-mono text-xs font-semibold"
                           >
-                            {flow}
+                            {formatFlowTag(flow)}
                           </span>
                         ))}
                       </div>
                     </td>
-                    <td className="py-4 px-5 font-mono text-slate-700 font-medium">{appr.agentId}</td>
+                    <td className="py-4 px-5 font-mono text-slate-700 font-medium">{cleanUnderscores(appr.agentId)}</td>
                     <td className="py-4 px-5 text-slate-500">{new Date(appr.createdAt).toLocaleString()}</td>
                     <td className="py-4 px-5 text-right">
                       <Link

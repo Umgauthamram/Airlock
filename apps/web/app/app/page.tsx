@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/auth';
 import { getDashboardStats, getApprovals, getAuditEvents } from '@/lib/data';
+import { cleanUnderscores, formatFlowTag } from '@/lib/format';
 
 export default async function DashboardPage() {
   const session = await requireSession();
@@ -79,7 +80,7 @@ export default async function DashboardPage() {
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <span className="text-xs font-mono text-slate-400">{appr.id}</span>
+                      <span className="text-xs font-mono text-slate-400">{cleanUnderscores(appr.id)}</span>
                       <h3 className="text-sm font-bold text-slate-900 mt-0.5">
                         {appr.intent || 'Automated agent task'}
                       </h3>
@@ -95,7 +96,7 @@ export default async function DashboardPage() {
                     <div className="flex gap-2">
                       {appr.flaggedFlows.map((f, i) => (
                         <span key={i} className="px-2.5 py-0.5 rounded bg-rose-50 text-rose-800 border border-rose-200 font-mono text-xs font-semibold">
-                          {f}
+                          {formatFlowTag(f)}
                         </span>
                       ))}
                     </div>
@@ -128,11 +129,11 @@ export default async function DashboardPage() {
               recentEvents.map((evt) => (
                 <div key={evt.id} className="text-xs flex flex-col gap-1 pb-2.5 border-b border-slate-100 last:border-0 last:pb-0">
                   <div className="flex items-center justify-between font-mono text-[11px] text-slate-500">
-                    <span className="font-semibold text-slate-700">{evt.eventType}</span>
+                    <span className="font-semibold text-slate-700">{cleanUnderscores(evt.eventType)}</span>
                     <span>{new Date(evt.timestamp).toLocaleTimeString()}</span>
                   </div>
-                  {evt.agentId && <span className="text-slate-600">Agent: <strong className="font-mono text-slate-800">{evt.agentId}</strong></span>}
-                  {evt.approvalId && <span className="text-slate-600">Approval: <span className="font-mono text-amber-700">{evt.approvalId}</span></span>}
+                  {evt.agentId && <span className="text-slate-600">Agent: <strong className="font-mono text-slate-800">{cleanUnderscores(evt.agentId)}</strong></span>}
+                  {evt.approvalId && <span className="text-slate-600">Approval: <span className="font-mono text-amber-700">{cleanUnderscores(evt.approvalId)}</span></span>}
                 </div>
               ))
             )}
