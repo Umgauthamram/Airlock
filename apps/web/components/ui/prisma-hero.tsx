@@ -107,17 +107,14 @@ export const PrismaHero = ({
         {/* Gradient overlay */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/75" />
 
-        {/* Clean Top Floating Navbar (Only Pipeline, Quick Start, Sign In) */}
+        {/* Clean Top Floating Navbar with White Background */}
         <nav className="absolute left-1/2 top-0 z-20 -translate-x-1/2">
-          <div className="flex items-center gap-4 rounded-b-2xl bg-black/90 backdrop-blur-md px-6 py-2.5 sm:gap-8 md:gap-10 md:rounded-b-3xl md:px-10 border-b border-x border-white/10 shadow-xl">
+          <div className="flex items-center gap-4 rounded-b-2xl bg-white backdrop-blur-md px-6 py-2.5 sm:gap-8 md:gap-10 md:rounded-b-3xl md:px-10 border-b border-x border-slate-200 shadow-lg">
             {navItems.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
-                className="text-xs sm:text-sm font-medium transition-colors tracking-wide"
-                style={{ color: 'rgba(225, 224, 204, 0.85)' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#E1E0CC')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(225, 224, 204, 0.85)')}
+                className="text-xs sm:text-sm font-semibold text-slate-700 hover:text-slate-950 transition-colors tracking-wide"
               >
                 {item.label}
               </a>
