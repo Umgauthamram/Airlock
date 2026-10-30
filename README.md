@@ -8,16 +8,16 @@ Airlock sits between autonomous AI agents and upstream MCP (Model Context Protoc
 
 ---
 
-## Measured Benchmark Results (`pnpm bench`)
+## Benchmark Results (`pnpm bench`)
 
-Tested against a comprehensive corpus of **62 benchmark scenarios** (31 attack scenarios + 31 benign scenarios) across an expanded catalog of **50 realistic MCP tools** spanning 8 services (`crm`, `cloud`, `db`, `analytics`, `slack`, `github`, `billing`, `calendar`):
+Tested against an empirical corpus of **62 benchmark scenarios** (31 attack scenarios + 31 benign scenarios) across an expanded catalog of **50 realistic MCP tools** spanning 8 services (`crm`, `cloud`, `db`, `analytics`, `slack`, `github`, `billing`, `calendar`):
 
 | Metric | Result | Target / Baseline |
 | :--- | :--- | :--- |
 | **Attack Block / Hold Rate** | **100%** (31 / 31) | 100% |
 | **Benign False-Hold Rate** | **0.0%** (0 / 31) | &lt; 5% |
 | **Average Token Reduction** | **99.5%** | &gt; 60% |
-| **Total Tokens Consumed** | **3,441** vs **628,400** | 99.5% savings (estimated) |
+| **Total Tokens Consumed** | **3,441** vs **628,400** | 99.5% savings (estimated tokens) |
 | **AST Analysis Latency (p50)** | **0.15 ms** | &lt; 20 ms |
 | **AST Analysis Latency (p95)** | **0.69 ms** | &lt; 50 ms |
 
@@ -49,13 +49,13 @@ See [`FEEDBACK.md`](FEEDBACK.md) for our running feedback on Nebius Token Factor
    - Classifies tools with semantic tags: `reads_untrusted`, `reads_private`, `writes_external`, `writes_internal`, `destructive`.
    - Strict precedence: `DENY` > `HOLD` > `ALLOW`.
    - Halts prompt-injection exfiltration attacks (`reads_untrusted -> writes_external`) before execution.
-3. **Sandboxed Execution & Runtime Tool Proxy (`apps/gateway`)**:
-   - Executes code in an isolated ECMAScript context with resource and timeout bounds.
+3. **Sandboxed Worker Execution & Runtime Tool Proxy (`apps/gateway`)**:
+   - Executes code in an isolated Node.js Worker thread sandbox with prototype scrubbing, memory bounds, and parent process termination timers.
    - The tool proxy validates each tool call at runtime against the pre-approved call set from static analysis before reaching upstream servers.
 4. **Human-in-the-Loop Approvals & RBAC (`apps/web`)**:
    - Review queue with visual risk flows, script inspection, and one-click approve/deny.
    - Enforces server-side roles: `Viewer` < `Operator` < `Admin`.
-   - Isolated Demo Mode (`org:demo`) for instant 1-click evaluation.
+   - Isolated Demo Mode for instant 1-click evaluation.
 
 ---
 
@@ -74,7 +74,7 @@ airlock/
     nebius/       # Nebius Token Factory client & token usage accounting
     agent-ref/    # Reference agent: classic mode vs Airlock script mode
     bench/        # Reproducible benchmark suite (pnpm bench)
-  infra/          # Docker Compose (Redis Stack), deployment configs
+  infra/          # Docker Compose (Redis Stack), Caddy reverse proxy, deployment configs
   docs/memory/    # Veeshree context persistence & ADRs
 ```
 
@@ -84,23 +84,23 @@ airlock/
 
 ### Prerequisites
 - Node.js >= 22
-- pnpm >= 10
+- pnpm 9.15.4 (via `corepack enable`)
 - Docker & Docker Compose (for local Redis Stack)
 
 ### Local Setup
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-org/airlock.git
-cd airlock
+git clone https://github.com/Umgauthamram/Airlock.git
+cd Airlock
 
-# 2. Install dependencies
-pnpm install
+# 2. Install dependencies (frozen lockfile)
+pnpm install --frozen-lockfile
 
-# 3. Start local Redis Stack (JSON + RediSearch)
+# 3. Start local Redis Stack
 docker compose -f infra/docker-compose.yml up -d
 
-# 4. Run full test suite across all packages
-pnpm -r test
+# 4. Run full test suite across all packages (builds then tests)
+pnpm test
 
 # 5. Run reproducible benchmark suite
 pnpm bench

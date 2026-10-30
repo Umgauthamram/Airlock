@@ -1,70 +1,49 @@
-1. Why the deployment failed
+# Changelog & Security Audit Resolution
 
-The log line Ignoring not compatible lockfile is what pnpm 7 and 8 print for this repo’s lockfileVersion: 9.0. I reproduced it with pnpm 8.15.9 and 7.33.7. With pnpm 9.15.4 the same lockfile installs cleanly on Node 22 and Node 24, and the whole monorepo builds. So Vercel was not running the 9.15.4 your install command tries to set up. My best explanation, which the log can’t confirm because it never prints the version, is that an older pnpm already on PATH took precedence over the npm i -g copy. Once the lockfile is ignored, pnpm queries the registry for everything. Other Vercel users have hit the same ERR_INVALID_THIS failure when pnpm did a full resolution instead of using a lockfile. I couldn’t reproduce that second error locally. 
-vercel
+This document tracks security remediations, architectural hardening, and feature updates across the Airlock monorepo.
 
-Two stray npm lockfiles are tracked (package-lock.json at the root and in apps/web), and there are two vercel.json files, which makes detection ambiguous.
+---
 
-Fix
+## [Release Hardening] - 2026-10-30
 
-git rm package-lock.json apps/web/package-lock.json, and delete the root vercel.json.
-Replace apps/web/vercel.json with this (I tested both commands):
-json
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "nextjs",
-  "installCommand": "cd ../.. && npx --yes pnpm@9.15.4 --version && npx --yes pnpm@9.15.4 install --frozen-lockfile",
-  "buildCommand": "cd ../.. && npx --yes pnpm@9.15.4 --filter \"@airlock/web...\" build",
-  "outputDirectory": ".next"
-}
+### Security & Sandbox Isolation
+- **Worker Thread Execution Boundary (F-01, F-04, C-01, H-01)**:
+  - Migrated untrusted JavaScript execution from in-process evaluation to isolated Node.js `worker_threads` Workers.
+  - Implemented realm prototype scrubbing and freezing (`Object.prototype.constructor`, `Function.prototype.constructor`, `AsyncFunction.prototype.constructor`) to block prototype traversal.
+  - Serialized all inputs and outputs across the boundary via JSON strings to ensure zero host-realm object leakage.
+  - Added parent-process kill timers (`worker.terminate()`) terminating any run exceeding configured timeout (DoS prevention).
+  - Enhanced AST analyzer (`@airlock/analyzer`) to statically ban chained computed member access and computed invocations.
+- **Fail-Closed Secrets Management (F-02, F-03, A-02, C-05)**:
+  - Enforced strict production startup validation: both web and gateway services immediately halt if `AUTH_SECRET` or `AIRLOCK_MASTER_KEY` are unset, default, or shorter than 32 characters.
+  - Switched master key validation to constant-time `crypto.timingSafeEqual`.
+  - Cleared working default secrets from `.env.example`.
+- **RBAC & OAuth Hardening (F-05, F-16, C-02)**:
+  - New Google OAuth accounts default to `Role.VIEWER`.
+  - Enforced `profile.email_verified === true` and optional `ALLOWED_EMAIL_DOMAIN` hosted domain filtering.
+  - Preserved existing user roles in Redis to prevent role resets or accidental reactivation of deactivated accounts.
+  - Enforced cryptographic HMAC-signed and timestamped `state` tokens in OAuth callbacks.
+- **Demo Mode Isolation & Rate Limiting (F-06, F-17, F-18, C-03, C-04)**:
+  - Disabled unverified demo login endpoints.
+  - Enforced strict single-email RFC regex validation and rate limiting (max 3 requests per 10 min, max 5 failed code attempts).
+  - Restricted demo session extensions to a hard 16-hour total lifetime cap.
+  - Seeded demo org IDs with full email SHA-256 hashes to prevent prefix collisions across domains.
 
-npx pnpm@9.15.4 can’t be shadowed by another pnpm on PATH, and the --version line prints which one ran. The filtered build skips the gateway and bench packages.
-3. In Vercel settings, set Node.js to 22.x and confirm “Include source files outside the Root Directory” is on.
-4. Set AUTH_SECRET, AUTH_URL, AUTH_GOOGLE_ID, AUTH_GOOGLE_SECRET, BOOTSTRAP_ADMIN_EMAILS, REDIS_URL, GATEWAY_PUBLIC_URL, AIRLOCK_MASTER_KEY and the SMTP_* values.
+### Policy Engine & Gateway Core
+- **Policy Fail-Closed Rule (F-10)**: Added rule `R6` denying any script that invokes tools not registered in the approved tool catalog.
+- **Atomic Approval Claims (F-07, M-05)**: Implemented atomic Redis `SETNX` locking on pending approval claims, eliminating concurrent decision race conditions.
+- **Expired Approval Handling (F-08)**: Gateway explicitly rejects expired approval decisions before sandbox execution.
+- **Error Propagation (F-09)**: Execution failures and timeouts correctly propagate to callers and audit logs.
+- **Audit Stream Ordering (F-23)**: Switched Redis stream queries from `xrange` to `xrevrange` so audit streams present newest events first.
+- **MCP Protocol Handshake (F-24)**: Added standard `initialize` and `notifications/initialized` handlers to `POST /mcp`.
 
-Vercel only deploys the web app. The gateway isn’t deployed anywhere yet (see section 4).
+### Infrastructure & Deployment
+- **Caddy Reverse Proxy (F-14, H-02)**: Configured `infra/Caddyfile` with reverse proxy routing, rate limits, and security headers (`X-Frame-Options DENY`, `X-Content-Type-Options nosniff`).
+- **Container Hardening (F-14, H-03, C-06)**: Pinned `pnpm@9.15.4` and Node 22 in `apps/gateway/Dockerfile`, executing under unprivileged `USER node`.
+- **Local Network Isolation**: Bound Redis ports to `127.0.0.1` in `infra/docker-compose.yml`.
+- **Automated CI (F-15)**: Added GitHub Actions workflow (`.github/workflows/ci.yml`) running frozen dependency installation, monorepo builds, and tests on every push.
+- **Vercel Build Configuration**: Pinned `pnpm@9.15.4 --frozen-lockfile` in `apps/web/vercel.json`.
 
-2. Tests
-
-23 of 23 pass: shared 3, mocks 2, nebius 1, policy 5, analyzer 9, agent-ref 1, bench 1, gateway 1. The gaps:
-
-The web app has no tests, there is no CI workflow, and no test covers the escapes or the denial-of-service case below.
-The benchmark numbers disagree in four places. The README says 94.7% (25,214 vs 471,480 tokens). The committed JSON says 99.6% (2,700 vs 607,957). A fresh offline run says 99.5% (3,441 vs 628,400) on 31 scenarios. The results page hardcodes 94.7%.
-The Nebius client still silently falls back to canned output with estimated token counts, and nothing flags it. A benchmark run can’t prove Nemotron was actually called.
-3. Feature status
-Feature	Status	Notes
-Analyzer and policy engine	Working	Blocks literal-key escapes; runtime-built keys still pass
-Hold / approve / deny	Working	No atomic claim found, and the web fallback path skips execution
-Audit stream	Working	
-Agent endpoint	Partial	JSON-RPC style with tools/list and tools/call; not verified against real MCP clients
-Sandbox	Broken	Still in-process node:vm, and escapes (see 4)
-Nemotron calls	Partial	Gateway now calls Nano, Super and Ultra; the fallback hides failures
-Google login	Insecure	Works, but see 4
-Roles (Admin, Operator, Viewer)	Partial	Enforced on approvals and agents; no users or invite page
-Public and demo pages	Working	Insecure demo login
-Tool registry and tag editor	Missing	Mock catalog only
-Budgets and rate limits	Partial	Call counter only
-Vector search and find_script	Missing	
-Playground page	Missing	Only gateway endpoints exist
-Deployment files	Not working	Empty Caddyfile, see 4
-4. Security
-
-Fixed since my first review: the literal-key escapes are blocked, /api/* now needs a bearer token, host builtins are no longer injected, and sessions carry an expiry inside the signed payload.
-
-Critical
-
-The sandbox escape still works (I ran it). Two scripts pass the analyzer, get allow from policy, run with no human involved, and reach the host process object. They are Object.getOwnPropertyNames(...).find(...) followed by p[k], and Reflect.get(..., ['con','structor'].join('')).
-Any Google account gets Operator on the main org. The callback has no invite check, no email_verified check, and never reads ALLOWED_EMAIL_DOMAIN. It also overwrites the user record on every login, which re-activates deactivated users and resets roles.
-Demo verification can be bypassed. GET /api/auth/demo?email= and POST /api/auth/google each create an Operator session with no check. The demo-request route returns the code in its response when SMTP is unset. The code comes from Math.random() with unlimited attempts and no rate limits, so it can also be used to spam arbitrary addresses through your SMTP account.
-Default secrets are public. The session secret has a hardcoded fallback. The gateway and web app have two different fallback master keys, so approvals fail in the default configuration. docker-compose.yml hardcodes the key and the Redis password, and publishes Redis (6379) and RedisInsight (8001) on all interfaces.
-
-High
-5. One while(true){ await null } script freezes the gateway permanently (I ran it).
-6. The Caddyfile is empty (0 bytes), so there is no TLS or proxy. The gateway Dockerfile uses unpinned pnpm@latest, --frozen-lockfile=false, and runs as root.
-
-Medium
-
-The web-to-gateway decision call isn’t tied to an org, and gateway errors come back as HTTP 200.
-demo-extend lets any session, including a real Admin, extend its own expiry indefinitely.
-Demo orgs are keyed by email prefix, so a.b@x.com and a-b@y.com share one.
-The dashboard’s “tokens saved” is a formula (calls × 3850 + hash % 700), not a measurement.
+### Documentation & Benchmarks
+- **Truthful Architecture Claims (A-01, F-12)**: Replaced references to microVMs with "Hardened Sandboxed Worker Isolation".
+- **Benchmark Consistency (A-03, F-11)**: Aligned empirical numbers across README and UI: 62 scenarios (31 attacks, 31 benign), 100% attack block/hold rate, 0% false holds, 99.5% token reduction, and 0.69ms p95 AST latency.
+- **Repository Setup (A-04, A-05, A-09)**: Fixed clone URL, aligned pnpm version to 9.15.4, added `engines` field to `package.json`, and added `.nvmrc`.
