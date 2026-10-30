@@ -84,7 +84,7 @@ export const PrismaHero = ({
     if (onGoogleLogin) {
       onGoogleLogin();
     } else {
-      window.location.href = '/login?google=1';
+      window.location.href = '/api/auth/google';
     }
   }
 
