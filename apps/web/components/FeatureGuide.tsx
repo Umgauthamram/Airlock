@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface FeatureGuideProps {
   isDemo?: boolean;
@@ -16,6 +17,7 @@ export function FeatureGuide({
   defaultExpanded = false,
   onSimulationRun,
 }: FeatureGuideProps) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(defaultExpanded);
   const [activeTab, setActiveTab] = useState<'features' | 'real_account' | 'demo_account' | 'simulate'>(
     isDemo ? 'demo_account' : 'real_account'
@@ -39,10 +41,10 @@ export function FeatureGuide({
         if (action === 'simulate_tavily' && data.searchData) {
           setTavilyData(data.searchData);
         }
+        router.refresh();
         if (onSimulationRun) {
           onSimulationRun();
-        } else if (action !== 'simulate_tavily') {
-          // Refresh page after short delay to show updated counts
+        } else if (action === 'clear' || action === 'simulate_attack') {
           setTimeout(() => {
             window.location.reload();
           }, 600);

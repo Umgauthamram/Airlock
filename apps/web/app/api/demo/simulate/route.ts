@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { requireSession } from '@/lib/auth';
 import { seedDemoSimulation, clearDemoData } from '@/lib/data';
 import { getRedisClient, RedisKeys } from '@/lib/redis';
@@ -12,6 +13,9 @@ export async function POST(req: Request) {
 
     if (action === 'simulate_attack') {
       await seedDemoSimulation(session.orgId, session.email);
+      revalidatePath('/app/approvals');
+      revalidatePath('/app');
+      revalidatePath('/app/audit');
       return NextResponse.json({
         success: true,
         message: 'Simulated prompt injection exfiltration attack held in approval queue.',
@@ -36,6 +40,8 @@ export async function POST(req: Request) {
         'details', JSON.stringify({ tools: ['inbox.get_emails'], decision: 'allow', runtimeMs: 0.7 })
       );
 
+      revalidatePath('/app');
+      revalidatePath('/app/audit');
       return NextResponse.json({
         success: true,
         message: 'Simulated routine benign agent task completed cleanly.',
@@ -149,6 +155,9 @@ export async function POST(req: Request) {
         })
       );
 
+      revalidatePath('/app/approvals');
+      revalidatePath('/app');
+      revalidatePath('/app/audit');
       return NextResponse.json({
         success: true,
         message: 'Research Agent executed live Tavily web search. Exfiltration attempt held under Rule R1.',
@@ -157,6 +166,9 @@ export async function POST(req: Request) {
     }
 
     if (action === 'clear') {
+      revalidatePath('/app/approvals');
+      revalidatePath('/app');
+      revalidatePath('/app/audit');
       // For demo sandboxes, full reset of demo data
       if (session.isDemo || session.orgId.startsWith('demo-')) {
         await clearDemoData(session.orgId);

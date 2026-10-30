@@ -21,11 +21,11 @@ export const metadata: Metadata = {
   description: 'Deterministic policy inspection, script gating, and immutable audit logs for MCP tools.',
   icons: {
     icon: [
+      { url: '/icon', type: 'image/png' },
       { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/icon.svg' },
     ],
-    shortcut: '/icon.svg',
-    apple: '/icon.svg',
+    shortcut: '/icon',
+    apple: '/icon',
   },
 };
 
@@ -37,6 +37,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${poppins.variable} ${mono.variable} h-full antialiased`}>
       <head>
+        <link rel="icon" type="image/png" href="/icon" />
         <link rel="icon" type="image/svg+xml" href="/icon.svg" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

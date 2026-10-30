@@ -6,6 +6,9 @@ import { cleanUnderscores, formatFlowTag } from '@/lib/format';
 import { hasMinimumRole, Role } from '@airlock/shared';
 import DecisionButtons from './DecisionButtons';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function ApprovalDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await requireSession();
   const { id } = await params;

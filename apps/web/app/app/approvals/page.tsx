@@ -3,6 +3,9 @@ import { requireSession } from '@/lib/auth';
 import { getApprovals } from '@/lib/data';
 import { cleanUnderscores, formatFlowTag } from '@/lib/format';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function ApprovalsListPage() {
   const session = await requireSession();
   const approvals = await getApprovals(session.orgId);

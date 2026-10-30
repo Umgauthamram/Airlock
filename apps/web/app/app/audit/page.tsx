@@ -2,6 +2,9 @@ import { requireSession } from '@/lib/auth';
 import { getAuditEvents } from '@/lib/data';
 import { cleanUnderscores, formatEventType } from '@/lib/format';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function AuditPage() {
   const session = await requireSession();
   const events = await getAuditEvents(session.orgId, 100);
