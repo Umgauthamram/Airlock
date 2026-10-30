@@ -35,7 +35,7 @@ export default async function AuditPage() {
                 <th className="py-3.5 px-5">Event Type</th>
                 <th className="py-3.5 px-5">Actor</th>
                 <th className="py-3.5 px-5">Target</th>
-                <th className="py-3.5 px-5">Telemetry Details</th>
+                <th className="py-3.5 px-5">Event Details</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-mono text-xs">

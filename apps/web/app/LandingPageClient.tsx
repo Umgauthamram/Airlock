@@ -64,7 +64,7 @@ export default function LandingPageClient() {
     },
     {
       q: 'How does the allocated demo mode work?',
-      a: 'Each evaluator signing in with their Google account receives an instantly provisioned demo environment with full access to the live approval review queue, audit stream telemetry, and microVM sandbox isolation.',
+      a: 'Each evaluator signing in with their Google account receives an instantly provisioned demo environment with full access to the live approval review queue, audit stream logs, and hardened sandbox worker isolation.',
     },
     {
       q: 'Does Airlock require changing existing MCP tools?',

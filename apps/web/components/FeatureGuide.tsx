@@ -199,7 +199,7 @@ export function FeatureGuide({
               </div>
 
               <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg flex flex-col gap-2">
-                <h3 className="text-xs font-bold text-slate-900">Real-Time Audit Telemetry</h3>
+                <h3 className="text-xs font-bold text-slate-900">Audit Stream & Event Logs</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Immutable Redis streams record every script submission, AST analysis outcome, operator review,
                   and mock/live tool result with cryptographic SHA-256 hashes.
@@ -390,7 +390,7 @@ export function FeatureGuide({
                 <div>
                   <h4 className="font-bold text-slate-900">Test Your Demo Environment Now:</h4>
                   <p className="text-slate-500 text-xs">
-                    Trigger live security workflows with one click to see how approvals and telemetry operate.
+                    Trigger live security workflows with one click to see how approvals and audit stream operate.
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
