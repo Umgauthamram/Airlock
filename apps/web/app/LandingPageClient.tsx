@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { PrismaHero } from '@/components/ui/prisma-hero';
-import MimirAsciiCanvas from '@/components/MimirAsciiCanvas';
 
 export default function LandingPageClient() {
   const router = useRouter();
@@ -103,14 +102,27 @@ export default function LandingPageClient() {
       {/* 21st.dev Prisma Hero Component */}
       <PrismaHero
         title="AIRLOCK"
-        description="Airlock intercepts MCP actions before runtime execution. It halts prompt-injection exfiltration, gates risky external calls, and holds destructive changes for single-click human approval."
-        ctaText="Sign in with Google"
-        ctaHref="/login"
+        onGoogleLogin={() => router.push('/login?google=1')}
+        onDemoRequest={async (demoEmail) => {
+          setLoading(true);
+          try {
+            const res = await fetch('/api/auth/google', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: demoEmail }),
+            });
+            const data = await res.json();
+            if (res.ok && data.redirect) {
+              router.push(data.redirect);
+            } else {
+              router.push(`/login?email=${encodeURIComponent(demoEmail)}`);
+            }
+          } catch {
+            router.push(`/login?email=${encodeURIComponent(demoEmail)}`);
+          }
+        }}
         navItems={[
-          { label: "Overview", href: "#overview" },
           { label: "Pipeline", href: "#pipeline" },
-          { label: "Threat Matrix", href: "#threats" },
-          { label: "Benchmark", href: "#benchmark" },
           { label: "Quick Start", href: "/quickstart" },
           { label: "Sign In", href: "/login" },
         ]}
@@ -118,68 +130,6 @@ export default function LandingPageClient() {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col">
-        {/* Instant Access & Google Demo Allocation Section */}
-        <section id="overview" className="w-full py-16 px-6 lg:px-12 border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md">
-          <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-10 items-center">
-            <div className="lg:col-span-6 flex flex-col gap-5">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-semibold uppercase tracking-wider w-fit">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                Deterministic Pre-Execution Security
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
-                Security Mode for Cursor &amp; Autonomous Agents
-              </h2>
-              <p className="text-sm text-slate-400 leading-relaxed font-normal">
-                Every AI agent script is evaluated statically into an AST before execution. Data flows between untrusted inputs and sensitive egress endpoints are held for human operator review in real time.
-              </p>
-
-              {/* Polished Rounded Access Box */}
-              <div className="flex flex-col gap-3 pt-2 max-w-md">
-                <span className="text-xs font-mono tracking-wider text-slate-400">
-                  Instant allocated demo for each Google account:
-                </span>
-
-                <form onSubmit={handleAccessSubmit} className="flex p-1.5 bg-slate-900/90 border border-slate-700 rounded-2xl shadow-xl backdrop-blur-md focus-within:border-emerald-400 transition-colors">
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="YOUR GOOGLE EMAIL"
-                    className="px-4 py-3 bg-transparent text-xs font-mono tracking-wider text-white placeholder:text-slate-500 outline-none flex-1 min-w-0"
-                  />
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-md hover:scale-[1.02] shrink-0 disabled:opacity-50"
-                  >
-                    {loading ? 'SIGNING IN...' : 'CONTINUE →'}
-                  </button>
-                </form>
-
-                <div className="flex items-center gap-4 text-[11px] text-slate-500 font-mono pt-1">
-                  <span>⚡ Instant Google allocation</span>
-                  <span>·</span>
-                  <span>🔒 Isolated MicroVM sandbox</span>
-                  <span>·</span>
-                  <span>⏱ 12h validity</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Live Interactive ASCII Chiaroscuro Canvas */}
-            <div className="lg:col-span-6 h-[400px] lg:h-[460px] rounded-2xl overflow-hidden border border-slate-800/80 shadow-2xl relative">
-              <MimirAsciiCanvas
-                cellSize={13}
-                renderMode="mosaic"
-                theme="dark"
-                backgroundColor="#0f172b"
-                className="w-full h-full"
-              />
-            </div>
-          </div>
-        </section>
-
         {/* SECTION 1: HOW AIRLOCK WORKS (3-STEP PIPELINE) */}
         <section id="pipeline" className="w-full py-24 px-6 lg:px-12 border-b border-slate-800/80 bg-[#0f172b]">
           <div className="max-w-7xl mx-auto flex flex-col gap-14">
