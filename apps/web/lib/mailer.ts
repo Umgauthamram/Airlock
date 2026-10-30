@@ -101,3 +101,4 @@ export async function sendVerificationEmail({ to, code }: SendVerificationOption
     return { success: false, error: err.message };
   }
 }
+
