@@ -140,3 +140,53 @@ test('Policy: Uncatalogued tool invocation is denied by default (R6 fail-closed)
   assert.ok(res.flaggedFlows.includes('uncatalogued_tool'));
 });
 
+test('Policy: Tavily web_search alone is allowed; web_search + external write is held (R1)', () => {
+  // Scenario 1: web_search alone
+  const benignAnalysis: AnalysisResult = {
+    valid: true,
+    sha256: 'tavily_benign',
+    calls: [
+      { server: 'tavily', tool: 'web_search', line: 1, inLoop: false },
+    ],
+    uniqueToolKeys: ['tavily.web_search'],
+    tags: ['reads_untrusted'],
+    errors: [],
+  };
+
+  const benignRes = evaluatePolicy({
+    analysis: benignAnalysis,
+    toolTagMap: {
+      'tavily.web_search': ['reads_untrusted'],
+    },
+  });
+
+  assert.equal(benignRes.decision, 'allow');
+  assert.equal(benignRes.matchedRules.length, 0);
+
+  // Scenario 2: web_search paired with external write (exfiltration)
+  const attackAnalysis: AnalysisResult = {
+    valid: true,
+    sha256: 'tavily_attack',
+    calls: [
+      { server: 'tavily', tool: 'web_search', line: 1, inLoop: false },
+      { server: 'webhook', tool: 'send', line: 2, inLoop: false },
+    ],
+    uniqueToolKeys: ['tavily.web_search', 'webhook.send'],
+    tags: ['reads_untrusted', 'writes_external'],
+    errors: [],
+  };
+
+  const attackRes = evaluatePolicy({
+    analysis: attackAnalysis,
+    toolTagMap: {
+      'tavily.web_search': ['reads_untrusted'],
+      'webhook.send': ['writes_external'],
+    },
+  });
+
+  assert.equal(attackRes.decision, 'hold');
+  assert.ok(attackRes.matchedRules.includes('R1'));
+  assert.ok(attackRes.flaggedFlows.includes('reads_untrusted -> writes_external'));
+});
+
+

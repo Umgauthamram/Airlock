@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { BASE_TOOL_DEFINITIONS, generateFullToolCatalog, executeMockTool, MOCK_EMAILS } from './tools.js';
 
 test('Mocks: Catalog definitions & ~50 generator', () => {
-  assert.equal(BASE_TOOL_DEFINITIONS.length, 10);
+  assert.equal(BASE_TOOL_DEFINITIONS.length, 11);
   const fullCatalog = generateFullToolCatalog();
   assert.ok(fullCatalog.length >= 50, `Expected at least 50 tools, got ${fullCatalog.length}`);
 

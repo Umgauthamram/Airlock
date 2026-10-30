@@ -1,6 +1,7 @@
 import { Worker } from 'node:worker_threads';
 import type { ExecutionResult, ExtractedCall } from '@airlock/shared';
 import { executeMockTool } from '@airlock/mocks';
+import { web_search } from './tools/tavily.js';
 
 export interface ExecutorOptions {
   approvedCalls: ExtractedCall[]; // Tool set approved by analysis and policy
@@ -234,7 +235,12 @@ export async function executeScriptInSandbox(
         }
 
         try {
-          const hostResult = await executeMockTool(msg.server, msg.tool, msg.args);
+          let hostResult: any;
+          if (msg.server === 'tavily' && msg.tool === 'web_search') {
+            hostResult = await web_search(msg.args?.query || '', msg.args?.maxResults || 5);
+          } else {
+            hostResult = await executeMockTool(msg.server, msg.tool, msg.args);
+          }
           const str = JSON.stringify(hostResult);
           if (str && str.length > 64 * 1024) {
             worker.postMessage({

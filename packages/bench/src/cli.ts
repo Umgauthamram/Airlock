@@ -8,7 +8,7 @@ async function main() {
   console.log(' Measuring Attack Gating, Token Savings & Analysis Latencies');
   console.log('================================================================\n');
 
-  console.log('Executing 60 benchmark scenarios (30 attacks + 30 benign)...');
+  console.log('Executing 64 benchmark scenarios (32 attacks + 32 benign)...');
   const { results, summary } = await runBenchmark();
 
   console.log('\n--- BENCHMARK RESULTS SUMMARY ---');

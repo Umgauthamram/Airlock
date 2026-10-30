@@ -158,6 +158,7 @@ export const AuditEventTypeSchema = z.enum([
   'script_denied',
   'execution_started',
   'tool_called',
+  'tavily_search',
   'execution_completed',
   'agent_suspended',
   'agent_resumed',

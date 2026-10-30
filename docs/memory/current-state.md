@@ -8,15 +8,15 @@
 - **Languages**: TypeScript / Node.js
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: Real Account Simulation Enablement & Tab Isolation
-- **Status**: Enabled simulation workflows (`simulate_attack`, `simulate_benign`) for real logged-in Google accounts so operators can test held approvals and telemetry without 403 Forbidden errors; preserved audit log immutability by clearing only simulated test approvals on production orgs. Isolated the "How To Do: Demo Account" tab so it only renders for demo evaluation accounts.
+- **Current Focus**: Real Runtime Tavily Search API Integration & 64-Scenario Benchmark Expansion
+- **Status**: Implemented Tavily as a real, host-executed tool (`tavily.web_search`) in `apps/gateway/src/tools/tavily.ts` with strict timeout, fail-closed configuration, and full audit stream logging. Registered `tavily.web_search` with tag `reads_untrusted` in `packages/mocks/src/tools.ts`, passing policy unit tests (allowed alone, held when paired with external write sinks under Rule R1). Added Scenario C "Research Agent (Powered by Tavily)" to the UI with live search results preview. Expanded benchmark corpus to 64 scenarios (32 attack + 32 benign) with 100% attack blocking (32/32) and 99.4% token reduction.
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
-- **Removed Product Tour & Telemetry Copy**: Removed the product tour modal, launcher button, and dead code; replaced "Real-Time Telemetry" across the overview dashboard, audit stream table, feature guide, and landing page with clean, simple copy ("Audit Stream", "Event Details").
-- **Real Account Simulation Access**: Allowed real authenticated Google accounts in [/api/demo/simulate](file:///g:/projects/AirLock/apps/web/app/api/demo/simulate/route.ts) to trigger prompt injection exfiltration attacks and benign agent runs, while keeping production audit logs strictly immutable.
-- **Demo Tab Separation in Guide**: Updated [FeatureGuide.tsx](file:///g:/projects/AirLock/apps/web/components/FeatureGuide.tsx) so logged-in Google users only see the "Real Account (Google Auth)" setup guide and test simulations, hiding the irrelevant demo account tab.
-- **Pnpm Lockfile Vercel CI Sync**: Synchronized `pnpm-lock.yaml` with `package.json` devDependencies, enabling clean frozen lockfile builds on Vercel.
-- **Sandbox Escape & Starvation Neutralized (F-01, F-04)**: Upgraded [executor.ts](file:///g:/projects/AirLock/apps/gateway/src/executor.ts) to execute untrusted scripts in dedicated `node:worker_threads` Workers with prototype scrubbing/freezing and parent termination kill timers.
+- **Tavily Real Runtime Tool**: Added `apps/gateway/src/tools/tavily.ts` executing `https://api.tavily.com/search` strictly on the gateway host; secrets never reach the sandbox worker. Added fail-closed startup validation in `server.ts` and audit logging for every Tavily search.
+- **Tavily Policy Unit Testing & Catalog Tagging**: Added `tavily.web_search` to tool catalog with `reads_untrusted` tag; verified policy engine permits web search alone (`allow`) and holds exfiltration when chained with external egress (`hold`, Rule R1).
+- **Web UI Research Agent Scenario & "Powered by Tavily"**: Added interactive Scenario C to `FeatureGuide.tsx` and `/api/demo/simulate` allowing users to trigger real-time Tavily queries with live answer/source preview and demonstrate Airlock holding untrusted web exfiltration.
+- **Benchmark Suite Expanded (64 Scenarios)**: Added `atk_32` and `ben_32` to `packages/bench/src/corpus.ts`; refreshed `benchmark-results.json` and aligned numbers in `README.md` and `apps/web/app/app/results/page.tsx` (100% attack block, 32/32 prevented, 99.4% token savings).
+- **Devpost Submission Answers Updated**: Completed `things to fill.md` with humanized, accurate details regarding Nemotron tiers, Nebius Token Factory acceleration, and the functional Tavily runtime implementation.
 
 ## 4. Next Immediate Steps
 - [ ] Review live local test run (`pnpm -r test` & `pnpm bench`) with user

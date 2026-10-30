@@ -274,6 +274,13 @@ export async function createServer() {
     }
   }
 
+  // Fail-closed validation for Tavily API if feature is enabled
+  if (process.env.TAVILY_ENABLED === 'true' || process.env.ENABLE_TAVILY === 'true') {
+    if (!process.env.TAVILY_API_KEY || process.env.TAVILY_API_KEY.trim() === '') {
+      throw new Error('FATAL: TAVILY_API_KEY must be configured when Tavily search integration is enabled.');
+    }
+  }
+
   function verifyControlPlaneAuth(req: any, reply: any): boolean {
     const auth = req.headers.authorization;
     const token = auth ? auth.replace(/^Bearer\s+/i, '').trim() : '';

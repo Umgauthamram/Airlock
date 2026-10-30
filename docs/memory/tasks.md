@@ -41,6 +41,15 @@
   - [x] F-11 & F-12: Empirical benchmark alignment (62 scenarios, 31/31 blocked, 99.5% token reduction) and truthful worker sandbox isolation claims
   - [x] F-14 & F-15: Root `tsconfig.json`, `infra/Caddyfile`, unprivileged Dockerfile, and GitHub Actions CI workflow
   - [x] F-16 to F-24: Cryptographic OAuth state, single-email regex, 16h demo cap, MCP handshake, and xrevrange audit ordering
+- [x] Phase 5: Tavily Search API Integration & 64-Scenario Benchmark Expansion
+  - [x] Implement real host-side `web_search` in `apps/gateway/src/tools/tavily.ts` calling Tavily API with 8s timeout and error handling
+  - [x] Register `tavily.web_search` in tool catalog with `reads_untrusted` classification
+  - [x] Add policy test verifying `tavily.web_search` alone is allowed; web_search + external write is held (R1)
+  - [x] Add interactive Scenario C "Research Agent (Powered by Tavily)" to Web UI with live results preview and hold enforcement
+  - [x] Add `TAVILY_API_KEY` and `TAVILY_ENABLED` to `.env.example` with fail-closed validation on startup
+  - [x] Add `atk_32` and `ben_32` scenarios to `packages/bench/src/corpus.ts`, achieving 100% (32/32) attack gating and 99.4% token reduction across 64 scenarios
+  - [x] Log every Tavily search event to the audit stream
+  - [x] Update Devpost submission answers in `things to fill.md`
 
 ## Backlog
-- [ ] Phase 5: Multi-tenant workspace switching & Slack/Teams approval integrations
+- [ ] Phase 6: Multi-tenant workspace switching & Slack/Teams approval integrations

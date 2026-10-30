@@ -289,6 +289,19 @@ export class AirlockGateway {
           scriptHash: analysis.sha256,
           details: { server, tool, args },
         });
+
+        if (server === 'tavily' && tool === 'web_search') {
+          await this.logAuditEvent({
+            eventType: 'tavily_search',
+            agentId,
+            scriptHash: analysis.sha256,
+            details: {
+              query: args?.query,
+              maxResults: args?.maxResults || 5,
+              provider: 'Tavily Search API',
+            },
+          });
+        }
       },
     });
 

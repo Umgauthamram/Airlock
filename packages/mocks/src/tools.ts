@@ -148,6 +148,24 @@ export const BASE_TOOL_DEFINITIONS: ToolDefinition[] = [
     tagStatus: 'confirmed',
     contentHash: 'hash_files_delete',
   },
+
+  // tavily
+  {
+    server: 'tavily',
+    name: 'web_search',
+    description: 'Perform real-time web search and retrieve verified web intelligence via Tavily API.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'Search query' },
+        maxResults: { type: 'number', description: 'Maximum results to return (default: 5)' },
+      },
+      required: ['query'],
+    },
+    tags: ['reads_untrusted'],
+    tagStatus: 'confirmed',
+    contentHash: 'hash_tavily_web_search',
+  },
 ];
 
 /**
@@ -257,6 +275,21 @@ export async function executeMockTool(server: string, tool: string, args: any): 
     if (tool === 'delete') {
       delete MOCK_FILES[args.path];
       return { success: true, deleted: args.path };
+    }
+  }
+
+  if (server === 'tavily') {
+    if (tool === 'web_search') {
+      return {
+        answer: `Summary intelligence for: ${args?.query || ''}`,
+        results: [
+          {
+            title: `Search: ${args?.query || 'AI security'}`,
+            url: 'https://api.tavily.com/demo/1',
+            content: `Verified web search content for "${args?.query || ''}". Powered by Tavily.`,
+          },
+        ],
+      };
     }
   }
 
