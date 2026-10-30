@@ -1,27 +1,21 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
-import { motion, useInView } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
+import { motion, useInView } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import { useRef } from "react";
 
 /* ---------------- WordsPullUp ---------------- */
-export interface WordsPullUpProps {
+interface WordsPullUpProps {
   text: string;
   className?: string;
   showAsterisk?: boolean;
   style?: React.CSSProperties;
 }
 
-export const WordsPullUp = ({ text, className = '', showAsterisk = false, style }: WordsPullUpProps) => {
+export const WordsPullUp = ({ text, className = "", showAsterisk = false, style }: WordsPullUpProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true });
-  const words = text.split(' ');
+  const words = text.split(" ");
 
   return (
     <div ref={ref} className={`inline-flex flex-wrap ${className}`} style={style}>
@@ -34,7 +28,7 @@ export const WordsPullUp = ({ text, className = '', showAsterisk = false, style 
             animate={isInView ? { y: 0, opacity: 1 } : {}}
             transition={{ duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
             className="inline-block relative"
-            style={{ marginRight: isLast ? 0 : '0.25em' }}
+            style={{ marginRight: isLast ? 0 : "0.25em" }}
           >
             {word}
             {showAsterisk && isLast && (
@@ -48,24 +42,24 @@ export const WordsPullUp = ({ text, className = '', showAsterisk = false, style 
 };
 
 /* ---------------- WordsPullUpMultiStyle ---------------- */
-export interface Segment {
+interface Segment {
   text: string;
   className?: string;
 }
 
-export interface WordsPullUpMultiStyleProps {
+interface WordsPullUpMultiStyleProps {
   segments: Segment[];
   className?: string;
   style?: React.CSSProperties;
 }
 
-export const WordsPullUpMultiStyle = ({ segments, className = '', style }: WordsPullUpMultiStyleProps) => {
+export const WordsPullUpMultiStyle = ({ segments, className = "", style }: WordsPullUpMultiStyleProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true });
 
   const words: { word: string; className?: string }[] = [];
   segments.forEach((seg) => {
-    seg.text.split(' ').forEach((w) => {
+    seg.text.split(" ").forEach((w) => {
       if (w) words.push({ word: w, className: seg.className });
     });
   });
@@ -78,8 +72,8 @@ export const WordsPullUpMultiStyle = ({ segments, className = '', style }: Words
           initial={{ y: 20, opacity: 0 }}
           animate={isInView ? { y: 0, opacity: 1 } : {}}
           transition={{ duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-          className={`inline-block ${w.className ?? ''}`}
-          style={{ marginRight: '0.25em' }}
+          className={`inline-block ${w.className ?? ""}`}
+          style={{ marginRight: "0.25em" }}
         >
           {w.word}
         </motion.span>
@@ -89,126 +83,53 @@ export const WordsPullUpMultiStyle = ({ segments, className = '', style }: Words
 };
 
 /* ---------------- Hero ---------------- */
-const defaultNavItems = ['Our story', 'Collective', 'Workshops', 'Programs', 'Inquiries'];
+export interface NavItem {
+  label: string;
+  href: string;
+}
+
+const defaultNavItems: NavItem[] = [
+  { label: "Our story", href: "#" },
+  { label: "Collective", href: "#" },
+  { label: "Workshops", href: "#" },
+  { label: "Programs", href: "#" },
+  { label: "Inquiries", href: "#" },
+];
 
 export interface PrismaHeroProps {
   title?: string;
   description?: string;
   ctaText?: string;
   onCtaClick?: () => void;
+  ctaHref?: string;
   videoSrc?: string;
-  subjectImageSrc?: string;
+  navItems?: NavItem[];
+  showAsterisk?: boolean;
 }
 
 const PrismaHero = ({
-  title = 'Prisma',
-  description = 'Prisma is a worldwide network of visual artists, filmmakers and storytellers bound not by place, status or labels but by passion and hunger to unlock potential through our unique perspectives.',
-  ctaText = 'Join the lab',
+  title = "Prisma",
+  description = "Prisma is a worldwide network of visual artists, filmmakers and storytellers bound not by place, status or labels but by passion and hunger to unlock potential through our unique perspectives.",
+  ctaText = "Join the lab",
   onCtaClick,
-  videoSrc = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_170732_8a9ccda6-5cff-4628-b164-059c500a2b41.mp4',
-  subjectImageSrc,
+  ctaHref,
+  videoSrc = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_170732_8a9ccda6-5cff-4628-b164-059c500a2b41.mp4",
+  navItems = defaultNavItems,
+  showAsterisk = true,
 }: PrismaHeroProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const backgroundRef = useRef<HTMLDivElement>(null);
-  const subjectRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    // Horizontal parallax scroll effect using GSAP ScrollTrigger
-    // Starting: picture is on the left, moving right
-    // Background: drifting right
-    // Text: moving left
-    const ctx = gsap.context(() => {
-      if (backgroundRef.current) {
-        gsap.fromTo(
-          backgroundRef.current,
-          { x: -60, scale: 1.05 },
-          {
-            x: 80,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: containerRef.current,
-              start: 'top top',
-              end: 'bottom top',
-              scrub: 1.2,
-            },
-          }
-        );
-      }
-
-      if (subjectRef.current) {
-        // Person sitting / sculpture: starts on left, moves to right as user scrolls
-        gsap.fromTo(
-          subjectRef.current,
-          { x: -120, opacity: 0.9 },
-          {
-            x: 140,
-            opacity: 1,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: containerRef.current,
-              start: 'top top',
-              end: 'bottom top',
-              scrub: 1.4,
-            },
-          }
-        );
-      }
-
-      if (textRef.current) {
-        // Text goes left
-        gsap.fromTo(
-          textRef.current,
-          { x: 0 },
-          {
-            x: -120,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: containerRef.current,
-              start: 'top top',
-              end: 'bottom top',
-              scrub: 1.2,
-            },
-          }
-        );
-      }
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <section ref={containerRef} className="h-screen w-full relative">
-      <div className="relative h-full w-full overflow-hidden rounded-2xl md:rounded-[2rem]">
+    <section className="h-screen w-full p-2 sm:p-4">
+      <div className="relative h-full w-full overflow-hidden rounded-2xl md:rounded-[2rem] shadow-2xl">
         
-        {/* Background video / layer that shifts right */}
-        <div ref={backgroundRef} className="absolute inset-0 h-full w-full">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 h-full w-full object-cover"
-            src={videoSrc}
-          />
-        </div>
-
-        {/* Parallax Subject: Person sitting / sculpture starting left, moving right */}
-        {subjectImageSrc && (
-          <div
-            ref={subjectRef}
-            className="absolute bottom-0 left-0 w-1/2 max-w-lg h-[75%] pointer-events-none z-10 flex items-end justify-start pl-6 pb-4"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={subjectImageSrc}
-              alt="Person sitting sculpture"
-              className="h-full object-contain filter drop-shadow-2xl"
-            />
-          </div>
-        )}
+        {/* Background video */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover"
+          src={videoSrc}
+        />
 
         {/* Noise overlay */}
         <div className="noise-overlay pointer-events-none absolute inset-0 opacity-[0.7] mix-blend-overlay" />
@@ -218,32 +139,32 @@ const PrismaHero = ({
 
         {/* Navbar */}
         <nav className="absolute left-1/2 top-0 z-20 -translate-x-1/2">
-          <div className="flex items-center gap-3 rounded-b-2xl bg-black px-4 py-2 sm:gap-6 md:gap-12 md:rounded-b-3xl md:px-8 lg:gap-14">
-            {defaultNavItems.map((item) => (
+          <div className="flex items-center gap-3 rounded-b-2xl bg-black px-4 py-2 sm:gap-6 md:gap-12 md:rounded-b-3xl md:px-8 lg:gap-14 shadow-lg">
+            {navItems.map((item) => (
               <a
-                key={item}
-                href="#"
+                key={item.label}
+                href={item.href}
                 className="text-[10px] transition-colors sm:text-xs md:text-sm font-medium"
-                style={{ color: 'rgba(225, 224, 204, 0.8)' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#E1E0CC')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(225, 224, 204, 0.8)')}
+                style={{ color: "rgba(225, 224, 204, 0.8)" }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#E1E0CC")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(225, 224, 204, 0.8)")}
               >
-                {item}
+                {item.label}
               </a>
             ))}
           </div>
         </nav>
 
-        {/* Hero content: Text moves left */}
-        <div ref={textRef} className="absolute bottom-0 left-0 right-0 px-4 pb-2 sm:px-6 md:px-10 z-20">
+        {/* Hero content */}
+        <div className="absolute bottom-0 left-0 right-0 px-4 pb-2 sm:px-6 md:px-10 z-10">
           <div className="grid grid-cols-12 items-end gap-4">
             
             <div className="col-span-12 lg:col-span-8">
               <h1
-                className="font-medium leading-[0.85] tracking-[-0.07em] text-[26vw] sm:text-[24vw] md:text-[22vw] lg:text-[20vw] xl:text-[19vw] 2xl:text-[20vw]"
-                style={{ color: '#E1E0CC' }}
+                className="font-medium leading-[0.85] tracking-[-0.07em] text-[26vw] sm:text-[24vw] md:text-[22vw] lg:text-[20vw] xl:text-[19vw] 2xl:text-[20vw] select-none"
+                style={{ color: "#E1E0CC" }}
               >
-                <WordsPullUp text={title} showAsterisk />
+                <WordsPullUp text={title} showAsterisk={showAsterisk} />
               </h1>
             </div>
 
@@ -253,24 +174,39 @@ const PrismaHero = ({
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="text-xs text-white/80 sm:text-sm md:text-base"
-                style={{ lineHeight: 1.2 }}
+                className="text-xs text-slate-200/90 sm:text-sm md:text-base leading-relaxed"
+                style={{ lineHeight: 1.3 }}
               >
                 {description}
               </motion.p>
 
-              <motion.button
-                onClick={onCtaClick}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                className="group inline-flex items-center gap-2 self-start rounded-full bg-[#E1E0CC] hover:bg-white py-1 pl-5 pr-1 text-sm font-medium text-black transition-all hover:gap-3 sm:text-base cursor-pointer shadow-lg"
-              >
-                {ctaText}
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-black transition-transform group-hover:scale-110 sm:h-10 sm:w-10">
-                  <ArrowRight className="h-4 w-4" style={{ color: '#E1E0CC' }} />
-                </span>
-              </motion.button>
+              {ctaHref ? (
+                <motion.a
+                  href={ctaHref}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                  className="group inline-flex items-center gap-2 self-start rounded-full bg-[#E1E0CC] hover:bg-white py-1 pl-5 pr-1 text-sm font-semibold text-black transition-all hover:gap-3 sm:text-base cursor-pointer shadow-lg"
+                >
+                  {ctaText}
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-black transition-transform group-hover:scale-110 sm:h-10 sm:w-10">
+                    <ArrowRight className="h-4 w-4" style={{ color: "#E1E0CC" }} />
+                  </span>
+                </motion.a>
+              ) : (
+                <motion.button
+                  onClick={onCtaClick}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                  className="group inline-flex items-center gap-2 self-start rounded-full bg-[#E1E0CC] hover:bg-white py-1 pl-5 pr-1 text-sm font-semibold text-black transition-all hover:gap-3 sm:text-base cursor-pointer shadow-lg"
+                >
+                  {ctaText}
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-black transition-transform group-hover:scale-110 sm:h-10 sm:w-10">
+                    <ArrowRight className="h-4 w-4" style={{ color: "#E1E0CC" }} />
+                  </span>
+                </motion.button>
+              )}
 
             </div>
           </div>
@@ -282,4 +218,3 @@ const PrismaHero = ({
 
 export { PrismaHero };
 export default PrismaHero;
-

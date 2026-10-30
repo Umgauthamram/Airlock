@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { PrismaHero } from '@/components/ui/prisma-hero';
 import MimirAsciiCanvas from '@/components/MimirAsciiCanvas';
 
 export default function LandingPageClient() {
@@ -99,65 +100,37 @@ export default function LandingPageClient() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0f172b] text-slate-100 font-sans antialiased selection:bg-emerald-500 selection:text-black">
-      {/* Top Header */}
-      <header className="w-full px-6 lg:px-12 py-6 flex items-center justify-between border-b border-slate-800/80 z-30 bg-[#0f172b]/95 backdrop-blur-md sticky top-0">
-        <Link href="/" className="flex items-center gap-2 group">
-          <span className="font-mono font-black text-xl tracking-[0.25em] text-white uppercase">AIRLOCK</span>
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 group-hover:scale-125 transition-transform"></span>
-        </Link>
-
-        <nav className="flex items-center gap-5 sm:gap-8 text-xs font-mono uppercase tracking-wider font-semibold">
-          <Link href="/quickstart" className="text-slate-400 hover:text-white transition-colors">
-            Quick Start
-          </Link>
-          <Link
-            href="/login"
-            className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl transition-all shadow-lg shadow-emerald-500/20 hover:scale-[1.02] flex items-center gap-2"
-          >
-            <span>Sign in with Google →</span>
-          </Link>
-        </nav>
-      </header>
+      {/* 21st.dev Prisma Hero Component */}
+      <PrismaHero
+        title="AIRLOCK"
+        description="Airlock intercepts MCP actions before runtime execution. It halts prompt-injection exfiltration, gates risky external calls, and holds destructive changes for single-click human approval."
+        ctaText="Sign in with Google"
+        ctaHref="/login"
+        navItems={[
+          { label: "Overview", href: "#overview" },
+          { label: "Pipeline", href: "#pipeline" },
+          { label: "Threat Matrix", href: "#threats" },
+          { label: "Benchmark", href: "#benchmark" },
+          { label: "Quick Start", href: "/quickstart" },
+          { label: "Sign In", href: "/login" },
+        ]}
+      />
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col">
-        {/* HERO SECTION: Mimir Sculpture Prominently Positioned in Viewport */}
-        <section className="relative w-full min-h-[85vh] lg:min-h-[90vh] flex items-center overflow-hidden border-b border-slate-800/60">
-          {/* Mimir Mosaic Canvas in the Right 60% of the Hero Viewport */}
-          <div className="absolute inset-y-0 right-0 w-full lg:w-7/12 pointer-events-auto z-0">
-            <MimirAsciiCanvas
-              cellSize={13}
-              renderMode="mosaic"
-              theme="dark"
-              backgroundColor="#0f172b"
-              className="w-full h-full"
-            />
-          </div>
-
-          {/* Left-Side Hero Text & Access Input */}
-          <div className="w-full px-6 lg:px-12 py-16 z-10 max-w-7xl mx-auto pointer-events-none">
-            <div className="max-w-2xl flex flex-col gap-8 pointer-events-auto">
-              {/* Badge */}
+        {/* Instant Access & Google Demo Allocation Section */}
+        <section id="overview" className="w-full py-16 px-6 lg:px-12 border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md">
+          <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-10 items-center">
+            <div className="lg:col-span-6 flex flex-col gap-5">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-semibold uppercase tracking-wider w-fit">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 Deterministic Pre-Execution Security
               </div>
-
-              {/* Headline */}
-              <div className="flex flex-col">
-                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.02] text-white">
-                  Security Mode <br />
-                  <span className="text-emerald-400">for Cursor</span>
-                </h1>
-              </div>
-
-              {/* Subheading */}
-              <p className="text-lg sm:text-xl font-medium tracking-tight text-slate-200 max-w-xl leading-relaxed">
-                Introducing a new way to protect tools right where your autonomous agents code.
-              </p>
-
-              <p className="text-sm text-slate-400 max-w-lg leading-relaxed font-normal">
-                Airlock intercepts MCP actions before runtime execution. It halts prompt-injection exfiltration, gates risky external calls, and holds destructive changes for single-click human approval.
+              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
+                Security Mode for Cursor &amp; Autonomous Agents
+              </h2>
+              <p className="text-sm text-slate-400 leading-relaxed font-normal">
+                Every AI agent script is evaluated statically into an AST before execution. Data flows between untrusted inputs and sensitive egress endpoints are held for human operator review in real time.
               </p>
 
               {/* Polished Rounded Access Box */}
@@ -193,11 +166,22 @@ export default function LandingPageClient() {
                 </div>
               </div>
             </div>
+
+            {/* Live Interactive ASCII Chiaroscuro Canvas */}
+            <div className="lg:col-span-6 h-[400px] lg:h-[460px] rounded-2xl overflow-hidden border border-slate-800/80 shadow-2xl relative">
+              <MimirAsciiCanvas
+                cellSize={13}
+                renderMode="mosaic"
+                theme="dark"
+                backgroundColor="#0f172b"
+                className="w-full h-full"
+              />
+            </div>
           </div>
         </section>
 
         {/* SECTION 1: HOW AIRLOCK WORKS (3-STEP PIPELINE) */}
-        <section className="w-full py-24 px-6 lg:px-12 border-b border-slate-800/80 bg-[#0f172b]">
+        <section id="pipeline" className="w-full py-24 px-6 lg:px-12 border-b border-slate-800/80 bg-[#0f172b]">
           <div className="max-w-7xl mx-auto flex flex-col gap-14">
             <div className="flex flex-col gap-2 max-w-2xl">
               <span className="text-xs font-mono uppercase tracking-widest text-emerald-400 font-bold">

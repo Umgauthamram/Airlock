@@ -16,13 +16,6 @@ function LoginContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Quick Google test accounts
-  const googleAccounts = [
-    { email: 'alex.developer@gmail.com', name: 'Alex Developer', avatar: 'A', color: 'bg-blue-600' },
-    { email: 'security.operator@gmail.com', name: 'Sarah Security', avatar: 'S', color: 'bg-emerald-600' },
-    { email: 'agent.engineer@gmail.com', name: 'Marcus Vance', avatar: 'M', color: 'bg-indigo-600' },
-  ];
-
   async function handleGoogleLogin(email: string, name?: string) {
     setLoading(true);
     setError(null);
@@ -146,31 +139,7 @@ function LoginContent() {
               </button>
             </div>
 
-            <div className="flex flex-col gap-1">
-              <h3 className="text-base font-bold text-slate-900">Choose an account</h3>
-              <p className="text-xs text-slate-500">to access your allocated Airlock demo environment</p>
-            </div>
-
-            {/* List of Google Accounts */}
-            <div className="flex flex-col divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
-              {googleAccounts.map((acc) => (
-                <button
-                  key={acc.email}
-                  type="button"
-                  disabled={loading}
-                  onClick={() => handleGoogleLogin(acc.email, acc.name)}
-                  className="flex items-center gap-3.5 p-3.5 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-                >
-                  <div className={`w-8 h-8 rounded-full ${acc.color} text-white font-bold text-xs flex items-center justify-center shrink-0`}>
-                    {acc.avatar}
-                  </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-semibold text-xs text-slate-900 truncate">{acc.name}</span>
-                    <span className="text-[11px] text-slate-500 truncate">{acc.email}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
+            
 
             {/* Custom Google Account Entry */}
             <div className="flex flex-col gap-2 pt-1 border-t border-slate-100">
