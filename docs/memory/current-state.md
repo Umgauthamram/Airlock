@@ -12,11 +12,11 @@
 - **Status**: Completed clean zero-state for new demo and Google Auth accounts (0 calls, 0 tokens, 0 pending), created interactive [FeatureGuide.tsx](file:///g:/projects/AirLock/apps/web/components/FeatureGuide.tsx) with platform preview, real vs demo account setup guides, and one-click test simulation controls at `/app/guide` and on `/app`.
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
+- **Resolved Logout on Navigation**: Identified and resolved the exact bug causing spontaneous logout when navigating tabs or pages: Next.js `<Link href="/api/auth/logout">` in the header was automatically prefetching `/api/auth/logout` in the background, which silently cleared the session cookie. Replaced with `<form action="/api/auth/logout" method="POST">`, guarded `GET /api/auth/logout` with `?confirm=1`, and encoded session tokens in Base64URL.
 - **HMAC-Signed OAuth State & Dynamic Origin**: Upgraded Google OAuth flow in [auth.ts](file:///g:/projects/AirLock/apps/web/lib/auth.ts) and [callback](file:///g:/projects/AirLock/apps/web/app/api/auth/callback/google/route.ts) with cryptographically signed timestamped nonces and dynamic base URL detection, completely eliminating `invalid_oauth_state` on multi-tab or cross-site redirects.
-- **Enterprise Typography & Emoji Removal**: Removed emoji icons (`⚡`, `💡`, `🧭`, `🛡️`, etc.) across all web pages and components in favor of clean, professional enterprise styling.
+- **Enterprise Typography & Emoji Removal**: Removed emoji icons across all web pages and components in favor of clean, professional enterprise styling.
 - **Persistent Session Across Reloads**: Implemented direct response cookie attachment and deterministic fallback secrets ensuring Google OAuth sessions remain signed in on page refresh.
 - **Interactive 7-Step Product Tour**: Created [ProductTourModal.tsx](file:///g:/projects/AirLock/apps/web/components/ProductTourModal.tsx) guiding first-time users through Overview, Approvals, Audit Trail, Agents, Tools, Policies, and Benchmark.
-- **Fresh Account Zero-State**: Guaranteed clean zero-state for new demo and Google Auth accounts (0 calls, 0 tokens, 0 pending).
 
 ## 4. Next Immediate Steps
 - [ ] Review live local test run (`pnpm -r test` & `pnpm bench`) with user
