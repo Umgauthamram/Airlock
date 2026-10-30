@@ -75,6 +75,27 @@ export async function createSessionCookie(session: Omit<UserSession, 'exp'> & { 
   });
 }
 
+export function attachSessionCookie(
+  response: import('next/server').NextResponse,
+  session: Omit<UserSession, 'exp'> & { exp?: number }
+): void {
+  const sessionWithExp: UserSession = {
+    ...session,
+    exp: session.exp || Date.now() + 12 * 60 * 60 * 1000,
+  };
+
+  const jsonStr = JSON.stringify(sessionWithExp);
+  const signed = signPayload(jsonStr);
+
+  response.cookies.set(SESSION_COOKIE_NAME, signed, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 12 * 60 * 60,
+    path: '/',
+  });
+}
+
 export async function createDemoSession(params: {
   email: string;
   name?: string;

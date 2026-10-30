@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { randomBytes } from 'node:crypto';
 
 export async function GET(req: Request) {
@@ -15,14 +14,6 @@ export async function GET(req: Request) {
   }
 
   const state = randomBytes(16).toString('hex');
-  const cookieStore = await cookies();
-  cookieStore.set('airlock_oauth_state', state, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 10 * 60, // 10 minutes
-    path: '/',
-  });
 
   const params = new URLSearchParams({
     client_id: googleId,
@@ -34,5 +25,18 @@ export async function GET(req: Request) {
     prompt: 'select_account',
   });
 
-  return NextResponse.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
+  const response = NextResponse.redirect(
+    `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`
+  );
+
+  // Set the anti-CSRF state cookie directly on the outgoing HTTP redirect response
+  response.cookies.set('airlock_oauth_state', state, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 10 * 60, // 10 minutes
+    path: '/',
+  });
+
+  return response;
 }

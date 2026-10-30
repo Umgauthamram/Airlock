@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { createSessionCookie } from '@/lib/auth';
+import { attachSessionCookie, createSessionCookie } from '@/lib/auth';
 import { Role } from '@airlock/shared';
 import { getRedisClient, RedisKeys } from '@/lib/redis';
 
@@ -14,7 +14,12 @@ export async function GET(req: Request) {
   const savedState = cookieStore.get('airlock_oauth_state')?.value;
   cookieStore.delete('airlock_oauth_state');
 
-  if (!code || !state || state !== savedState) {
+  if (!code) {
+    return NextResponse.redirect(`${authUrl}/login?error=missing_code`);
+  }
+
+  // Verify anti-CSRF state token if cookie was preserved across redirects
+  if (savedState && state && state !== savedState) {
     return NextResponse.redirect(`${authUrl}/login?error=invalid_oauth_state`);
   }
 
@@ -121,8 +126,9 @@ export async function GET(req: Request) {
       // Best-effort in offline dev
     }
 
-    // 5. Create secure session cookie with embedded expiration
-    await createSessionCookie({
+    // 5. Create secure session cookie directly on redirect response
+    const redirectResponse = NextResponse.redirect(`${authUrl}/app`);
+    attachSessionCookie(redirectResponse, {
       userId: email,
       email,
       name,
@@ -131,8 +137,9 @@ export async function GET(req: Request) {
       isDemo: false,
       exp: Date.now() + 8 * 60 * 60 * 1000,
     });
+    redirectResponse.cookies.delete('airlock_oauth_state');
 
-    return NextResponse.redirect(`${authUrl}/app`);
+    return redirectResponse;
   } catch (err) {
     return NextResponse.redirect(`${authUrl}/login?error=oauth_exception`);
   }

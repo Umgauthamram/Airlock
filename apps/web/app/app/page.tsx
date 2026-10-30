@@ -27,7 +27,7 @@ export default async function DashboardPage() {
             href="/app/guide"
             className="px-3.5 py-2 bg-white border border-slate-200 hover:border-slate-300 text-slate-700 rounded-md text-xs font-semibold transition-all shadow-xs flex items-center gap-1.5"
           >
-            <span>🧭 Feature Guide & Setup</span>
+            <span> Feature Guide & Setup</span>
           </Link>
           <Link
             href="/app/approvals"
