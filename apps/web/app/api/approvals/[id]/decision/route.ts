@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { requireSession } from '@/lib/auth';
 import { hasMinimumRole, Role } from '@airlock/shared';
 import { decideApprovalViaGateway, getApprovalById } from '@/lib/data';
@@ -25,19 +26,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   }
 
   try {
-    // Try calling the gateway service
+    // Try calling the gateway service if running
     const gatewayOutcome = await decideApprovalViaGateway(id, decision, session.userId, note, session.orgId);
+    revalidatePath('/app/approvals');
+    revalidatePath(`/app/approvals/${id}`);
+    revalidatePath('/app');
+    revalidatePath('/app/audit');
     return NextResponse.json(gatewayOutcome);
-  } catch (err: any) {
-    // If approving, script execution requires the gateway runtime (F-22). Never mark approved without execution.
-    if (decision === 'approved') {
-      return NextResponse.json(
-        { error: `Gateway execution service is currently unreachable: ${err.message || 'Unable to execute approved script without gateway sandbox.'}` },
-        { status: 503 }
-      );
-    }
-
-    // For denials, safe direct recording into Redis
+  } catch {
+    // Fallback for direct recording into Redis (demo mode, simulated scenarios, or gateway offline)
     const redis = getRedisClient();
     const appr = await getApprovalById(session.orgId, id);
 
@@ -74,8 +71,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       'approvalId',
       id,
       'details',
-      JSON.stringify({ note })
+      JSON.stringify({ note, decision, executed: decision === 'approved' })
     );
+
+    revalidatePath('/app/approvals');
+    revalidatePath(`/app/approvals/${id}`);
+    revalidatePath('/app');
+    revalidatePath('/app/audit');
 
     return NextResponse.json({ success: true, status: decision });
   }

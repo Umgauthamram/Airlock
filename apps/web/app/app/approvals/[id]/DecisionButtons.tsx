@@ -25,7 +25,8 @@ export default function DecisionButtons({ approvalId }: { approvalId: string }) 
         throw new Error(data.error || 'Failed to apply decision.');
       }
 
-      router.refresh();
+      // Redirect immediately to approvals queue with full fresh fetch
+      window.location.href = '/app/approvals';
     } catch (err: any) {
       setError(err.message || String(err));
       setLoading(false);
