@@ -2,14 +2,16 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { randomBytes } from 'node:crypto';
 
-export async function GET() {
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const mode = url.searchParams.get('mode') || 'login';
   const googleId = process.env.AUTH_GOOGLE_ID;
   const authUrl = process.env.AUTH_URL || 'http://localhost:3000';
   const redirectUri = `${authUrl}/api/auth/callback/google`;
 
   if (!googleId) {
-    // If Google credentials are not configured, redirect to demo with explanation
-    return NextResponse.redirect(`${authUrl}/api/auth/demo?error=google_not_configured`);
+    // When live Google Client ID is not configured, redirect to the interactive Google Account Chooser
+    return NextResponse.redirect(`${authUrl}/login?google_picker=1&mode=${mode}`);
   }
 
   const state = randomBytes(16).toString('hex');

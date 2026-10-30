@@ -58,6 +58,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </div>
 
           <div className="flex items-center gap-4 text-sm">
+            {session.isDemo && (
+              <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                12H Demo Pass
+              </span>
+            )}
             <div className="flex items-center gap-2.5">
               <span className="text-xs text-slate-500 font-medium">{session.email}</span>
               <span

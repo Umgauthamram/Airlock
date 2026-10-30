@@ -56,7 +56,7 @@ function verifyPayload(signedValue: string): string | null {
 export async function createSessionCookie(session: Omit<UserSession, 'exp'> & { exp?: number }): Promise<void> {
   const sessionWithExp: UserSession = {
     ...session,
-    exp: session.exp || Date.now() + 8 * 60 * 60 * 1000, // 8 hours
+    exp: session.exp || Date.now() + 12 * 60 * 60 * 1000, // 12 hours valid
   };
 
   const jsonStr = JSON.stringify(sessionWithExp);
@@ -67,8 +67,24 @@ export async function createSessionCookie(session: Omit<UserSession, 'exp'> & { 
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: 8 * 60 * 60, // 8 hours
+    maxAge: 12 * 60 * 60, // 12 hours
     path: '/',
+  });
+}
+
+export async function createDemoSession(params: {
+  email: string;
+  name?: string;
+  orgId?: string;
+}): Promise<void> {
+  await createSessionCookie({
+    userId: `usr_demo_${Date.now().toString(36)}`,
+    email: params.email,
+    name: params.name || params.email.split('@')[0],
+    orgId: params.orgId || 'demo',
+    role: Role.OPERATOR,
+    isDemo: true,
+    exp: Date.now() + 12 * 60 * 60 * 1000, // 12 hours
   });
 }
 
