@@ -58,9 +58,6 @@ export function FeatureGuide({
       {/* Header Bar */}
       <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <span className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-xs shadow-xs">
-            🧭
-          </span>
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-sm font-bold text-slate-900 tracking-tight">

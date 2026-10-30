@@ -3,6 +3,7 @@ import { requireSession } from '@/lib/auth';
 import { getDashboardStats } from '@/lib/data';
 import { AppNav } from '@/components/AppNav';
 import { DemoCountdown } from '@/components/DemoCountdown';
+import { ProductTourLauncher } from '@/components/ProductTourLauncher';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,7 +29,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <AppNav pendingApprovals={stats.pendingApprovals} />
           </div>
 
-          <div className="flex items-center gap-4 text-sm">
+          <div className="flex items-center gap-3 text-sm">
+            <ProductTourLauncher />
             <span className="text-xs text-slate-600 font-medium">{session.email}</span>
             <Link
               href="/api/auth/logout"

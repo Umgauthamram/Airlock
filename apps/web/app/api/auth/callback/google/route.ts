@@ -126,17 +126,22 @@ export async function GET(req: Request) {
       // Best-effort in offline dev
     }
 
-    // 5. Create secure session cookie directly on redirect response
-    const redirectResponse = NextResponse.redirect(`${authUrl}/app`);
-    attachSessionCookie(redirectResponse, {
+    // 5. Create secure session cookie directly on redirect response and cookie store
+    const userSession = {
       userId: email,
       email,
       name,
       orgId,
       role,
       isDemo: false,
-      exp: Date.now() + 8 * 60 * 60 * 1000,
-    });
+      exp: Date.now() + 12 * 60 * 60 * 1000,
+    };
+
+    await createSessionCookie(userSession);
+
+    const redirectUrl = new URL('/app', req.url);
+    const redirectResponse = NextResponse.redirect(redirectUrl);
+    attachSessionCookie(redirectResponse, userSession);
     redirectResponse.cookies.delete('airlock_oauth_state');
 
     return redirectResponse;
